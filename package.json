@@ -1,0 +1,6 @@
+{
+  "name": "vitest-testdirs",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Test directories in Vitest"
+}
