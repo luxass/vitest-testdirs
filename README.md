@@ -3,7 +3,7 @@
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 
-A [Vitest](https://vitest.dev) utility to run tests in isolated test directories.
+A utility for Vitest to create isolated test directories
 
 ## 📦 Installation
 
