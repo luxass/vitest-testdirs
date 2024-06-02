@@ -1,9 +1,20 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import { readFileSync, readdirSync } from 'node:fs'
 import type { fs } from 'memfs'
-import { type Task, describe, expect, it, vi } from 'vitest'
+import { type Task, afterEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { getCurrentTest } from 'vitest/suite'
-import { getDirNameFromTask, testdir } from '../src/utils'
+import { getDirNameFromTask, testdir, testdirSync } from '../src/utils'
+
+vi.mock('node:fs/promises', async () => {
+  const memfs: { fs: typeof fs } = await vi.importActual('memfs')
+
+  return memfs.fs.promises
+})
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('getDirNameFromTask', () => {
   it('should return the correct directory name for a task using \'getCurrentTest\'', () => {
@@ -82,12 +93,6 @@ describe('getDirNameFromTask', () => {
 })
 
 describe('testdir', () => {
-  vi.mock('node:fs/promises', async () => {
-    const memfs: { fs: typeof fs } = await vi.importActual('memfs')
-
-    return memfs.fs.promises
-  })
-
   it('should create a test directory with the specified files', async () => {
     const files = {
       'file1.txt': 'content1',
@@ -124,25 +129,113 @@ describe('testdir', () => {
     expect(dirname).toBe('.vitest-testdirs/custom-dirname')
   })
 
-  // it('should cleanup the directory after the test has finished if cleanup option is true', async () => {
-  //   const files = {
-  //     'file.txt': 'content',
-  //   }
-  //   const dirname = await testdir(files, { cleanup: true })
+  it('should cleanup the directory after the test has finished if cleanup option is true', async () => {
+    const files = {
+      'file.txt': 'content',
+    }
 
-  //   // Assert that the test directory is created
-  //   expect(await readdir(dirname)).toEqual(['file.txt'])
+    // we need to have the onTestFinished callback before calling testdir
+    // otherwise the order that they are called is testdir first, and then ours.
+    // which means that our onTestFinished callback will be called before the one from testdir
+    onTestFinished(() => {
+      const dirname = getDirNameFromTask(getCurrentTest()!)
+      expect(readdir(dirname)).rejects.toThrow()
+    })
 
-  //   // Assert that the test directory is deleted
-  //   await expect(readdir(dirname)).rejects.toThrow()
-  // })
+    const dirname = await testdir(files, { cleanup: true })
+    expect(await readdir(dirname)).toEqual(['file.txt'])
+  })
 
-  // it('should throw an error if testdir is called outside of a test', async () => {
-  //   const files = {
-  //     'file.txt': 'content',
-  //   }
+  it('should allow the directory to be created outside of the `.vitest-testdirs` directory if allowOutside is true', async () => {
+    const files = {
+      'file.txt': 'content',
+    }
 
-  //   // Call testdir outside of a test
-  //   await expect(testdir(files)).rejects.toThrow('testdir must be called inside a test')
-  // })
+    const dirname = await testdir(files, { allowOutside: true })
+    expect(await readdir(dirname)).toEqual(['file.txt'])
+  })
+
+  it('should throw error if directory will be created outside of `.vitest-testdirs` by default', async () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    await expect(testdir(files, {
+      dirname: '../testdir',
+    })).rejects.toThrowError('The directory name must start with \'.vitest-testdirs\'')
+  })
+})
+
+describe('testdirSync', () => {
+  it('should create a test directory with the specified files', () => {
+    const files = {
+      'file1.txt': 'content1',
+      'file2.txt': 'content2',
+      'subdir': {
+        'file3.txt': 'content3',
+      },
+    }
+
+    const dirname = testdirSync(files)
+
+    expect(readdirSync(dirname)).toEqual(['file1.txt', 'file2.txt', 'subdir'])
+    expect(readdirSync(join(dirname, 'subdir'))).toEqual(['file3.txt'])
+    expect(readFileSync(join(dirname, 'file1.txt'), 'utf8')).toBe('content1')
+    expect(readFileSync(join(dirname, 'file2.txt'), 'utf8')).toBe('content2')
+    expect(readFileSync(join(dirname, 'subdir', 'file3.txt'), 'utf8')).toBe('content3')
+  })
+
+  it('should generate a directory name based on the test name if dirname is not provided', () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    const dirname = testdirSync(files)
+    expect(dirname).toBe('.vitest-testdirs/vitest-utils-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided')
+  })
+
+  it('should generate a directory name based on the provided dirname', () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    const dirname = testdirSync(files, { dirname: 'custom-dirname' })
+    expect(dirname).toBe('.vitest-testdirs/custom-dirname')
+  })
+
+  it('should cleanup the directory after the test has finished if cleanup option is true', () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    // we need to have the onTestFinished callback before calling testdir
+    // otherwise the order that they are called is testdir first, and then ours.
+    // which means that our onTestFinished callback will be called before the one from testdir
+    onTestFinished(() => {
+      const dirname = getDirNameFromTask(getCurrentTest()!)
+      expect(readdir(dirname)).rejects.toThrow()
+    })
+
+    const dirname = testdirSync(files, { cleanup: true })
+    expect(readdirSync(dirname)).toEqual(['file.txt'])
+  })
+
+  it('should allow the directory to be created outside of the `.vitest-testdirs` directory if allowOutside is true', () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    const dirname = testdirSync(files, { allowOutside: true })
+    expect(readdirSync(dirname)).toEqual(['file.txt'])
+  })
+
+  it('should throw error if directory will be created outside of `.vitest-testdirs` by default', () => {
+    const files = {
+      'file.txt': 'content',
+    }
+
+    expect(() => testdirSync(files, {
+      dirname: '../testdir',
+    })).toThrowError('The directory name must start with \'.vitest-testdirs\'')
+  })
 })

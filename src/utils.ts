@@ -1,13 +1,14 @@
 import { rm } from 'node:fs/promises'
 import { normalize } from 'node:path'
+import { rmSync } from 'node:fs'
 import { type Task, onTestFinished } from 'vitest'
 import {
   getCurrentTest,
 } from 'vitest/suite'
-import { createFileTree } from './file-tree'
+import { createFileTree, createFileTreeSync } from './file-tree'
 import type { DirectoryJSON } from './types'
 
-export const BASE_DIR = './.vitest-testdirs'
+export const BASE_DIR = '.vitest-testdirs'
 
 export interface TestdirOptions {
   /**
@@ -22,6 +23,17 @@ export interface TestdirOptions {
    * If not provided, a directory name will be generated based on the test name.
    */
   dirname?: string
+
+  /**
+   * Whether to allow the directory to be created outside of the `.vitest-testdirs` directory.
+   *
+   * WARN:
+   * This can be dangerous as it can delete files, folders, etc. where it shouldn't.
+   * Use with caution.
+   *
+   * @default false
+   */
+  allowOutside?: boolean
 }
 
 /**
@@ -37,11 +49,19 @@ export async function testdir(files: DirectoryJSON, options?: TestdirOptions): P
     throw new Error('testdir must be called inside a test')
   }
   const dirname = options?.dirname ? normalize(`${BASE_DIR}/${options.dirname}`) : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`)
+
+  const allowOutside = options?.allowOutside ?? false
+
+  // if the dirname is escaped from BASE_DIR, throw an error
+  if (!allowOutside && !dirname.startsWith(BASE_DIR)) {
+    throw new Error(`The directory name must start with '${BASE_DIR}'`)
+  }
+
   await createFileTree(dirname, files!)
 
   if (options?.cleanup ?? false) {
-    onTestFinished(() => {
-      rm(dirname, {
+    onTestFinished(async () => {
+      await rm(dirname, {
         recursive: true,
       })
     })
@@ -56,6 +76,50 @@ testdir.cleanup = async (files: DirectoryJSON): Promise<string> => testdir(files
 
 testdir.dir = (dirname: string): (files: DirectoryJSON) => Promise<string> => {
   return (files: DirectoryJSON) => testdir(files, {
+    dirname,
+  })
+}
+
+/**
+ * Creates a test directory with the specified files and options.
+ *
+ * @param {DirectoryJSON} files - The directory structure to create.
+ * @param {TestdirOptions?} options - The options for creating the test directory.
+ * @returns {string} The path of the created test directory.
+ * @throws An error if `testdir` is called outside of a test.
+ */
+export function testdirSync(files: DirectoryJSON, options?: TestdirOptions): string {
+  if (!getCurrentTest()) {
+    throw new Error('testdir must be called inside a test')
+  }
+  const dirname = options?.dirname ? normalize(`${BASE_DIR}/${options.dirname}`) : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`)
+
+  const allowOutside = options?.allowOutside ?? false
+
+  // if the dirname is escaped from BASE_DIR, throw an error
+  if (!allowOutside && !dirname.startsWith(BASE_DIR)) {
+    throw new Error(`The directory name must start with '${BASE_DIR}'`)
+  }
+
+  createFileTreeSync(dirname, files!)
+
+  if (options?.cleanup ?? false) {
+    onTestFinished(() => {
+      rmSync(dirname, {
+        recursive: true,
+      })
+    })
+  }
+
+  return dirname
+}
+
+testdirSync.cleanup = (files: DirectoryJSON): string => testdirSync(files, {
+  cleanup: true,
+})
+
+testdirSync.dir = (dirname: string): (files: DirectoryJSON) => string => {
+  return (files: DirectoryJSON) => testdirSync(files, {
     dirname,
   })
 }
