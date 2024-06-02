@@ -1,7 +1,7 @@
 {
   "name": "vitest-testdirs",
   "version": "0.0.1",
-  "description": "Test directories in Vitest",
+  "description": "A utility for Vitest to create isolated test directories",
   "type": "module",
   "author": {
     "name": "Lucas Nørgård",
