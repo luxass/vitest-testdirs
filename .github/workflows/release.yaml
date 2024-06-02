@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   release:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
           node-version: 20
 
       - run: pnpx changelogithub
