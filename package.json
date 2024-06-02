@@ -19,7 +19,36 @@
     "testdirs"
   ],
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils.d.ts",
+        "default": "./dist/utils.mjs"
+      },
+      "require": {
+        "types": "./dist/utils.d.cts",
+        "default": "./dist/utils.cjs"
+      }
+    },
+    "./file-tree": {
+      "import": {
+        "types": "./dist/file-tree.d.ts",
+        "default": "./dist/file-tree.mjs"
+      },
+      "require": {
+        "types": "./dist/file-tree.d.cts",
+        "default": "./dist/file-tree.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
