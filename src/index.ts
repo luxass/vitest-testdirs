@@ -5,6 +5,7 @@ export type {
 
 export {
   testdir,
+  testdirSync,
   BASE_DIR,
   DIR_REGEX,
   getDirNameFromTask,
