@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fs } from 'memfs'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createFileTree, createFileTreeSync } from '../src/file-tree'
 
 vi.mock('node:fs/promises', async () => {
@@ -15,6 +15,10 @@ vi.mock('node:fs', async () => {
   const memfs: { fs: typeof fs } = await vi.importActual('memfs')
 
   return memfs.fs
+})
+
+afterEach(() => {
+  vi.clearAllMocks()
 })
 
 describe('createFileTree', () => {
