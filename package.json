@@ -1,6 +1,52 @@
 {
   "name": "vitest-testdirs",
-  "type": "module",
   "version": "0.0.1",
-  "description": "Test directories in Vitest"
+  "description": "Test directories in Vitest",
+  "type": "module",
+  "author": {
+    "name": "Lucas Nørgård",
+    "email": "lucasnrgaard@gmail.com",
+    "url": "https://luxass.dev"
+  },
+  "packageManager": "pnpm@9.1.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luxass/vitest-testdirs.git"
+  },
+  "keywords": [
+    "vitest",
+    "testdirs"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@luxass/eslint-config": "^4.4.3",
+    "@types/node": "^20.12.12",
+    "eslint": "^9.3.0",
+    "eslint-plugin-format": "^0.1.1",
+    "memfs": "^4.9.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
 }
