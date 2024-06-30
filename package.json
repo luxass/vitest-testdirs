@@ -72,10 +72,10 @@
     "vitest": "^1.6.0"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.4.3",
+    "@luxass/eslint-config": "^4.7.0",
     "@types/node": "^20.14.9",
-    "eslint": "^9.3.0",
-    "eslint-plugin-format": "^0.1.1",
+    "eslint": "^9.6.0",
+    "eslint-plugin-format": "^0.1.2",
     "memfs": "^4.9.3",
     "tsup": "^8.1.0",
     "typescript": "^5.5.2",
