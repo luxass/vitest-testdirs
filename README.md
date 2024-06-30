@@ -15,40 +15,40 @@ npm install vitest-testdirs --save-dev
 
 ```js
 // index.test.ts
-import { readFile } from 'node:fs/promises'
-import { readFileSync } from 'node:fs'
-import { testdir, testdirSync } from 'vitest-testdirs'
-import { describe, expect, vi } from 'vitest'
+import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { testdir, testdirSync } from "vitest-testdirs";
+import { describe, expect, vi } from "vitest";
 
-describe('testdir', () => {
-  it('isolated-test', async () => {
+describe("testdir", () => {
+  it("isolated-test", async () => {
     const path = await testdir({
-      'file1.txt': 'Hello, World!',
-      'file2.txt': 'Hello, Vitest!',
-    })
+      "file1.txt": "Hello, World!",
+      "file2.txt": "Hello, Vitest!",
+    });
 
-    expect(path).toBeDefined()
-    expect(path).toContain('.vitest-testdirs/vitest-testdir-isolated-test')
+    expect(path).toBeDefined();
+    expect(path).toContain(".vitest-testdirs/vitest-testdir-isolated-test");
 
-    const file = await readFile(`${path}/file1.txt`, 'utf8')
-    expect(file).toBe('Hello, World!')
-  })
-})
+    const file = await readFile(`${path}/file1.txt`, "utf8");
+    expect(file).toBe("Hello, World!");
+  });
+});
 
-describe('testdirSync', () => {
-  it('isolated-test', () => {
+describe("testdirSync", () => {
+  it("isolated-test", () => {
     const path = testdirSync({
-      'file1.txt': 'Hello, World!',
-      'file2.txt': 'Hello, Vitest!',
-    })
+      "file1.txt": "Hello, World!",
+      "file2.txt": "Hello, Vitest!",
+    });
 
-    expect(path).toBeDefined()
-    expect(path).toContain('.vitest-testdirs/vitest-testdirSync-isolated-test')
+    expect(path).toBeDefined();
+    expect(path).toContain(".vitest-testdirs/vitest-testdirSync-isolated-test");
 
-    const file = readFileSync(`${path}/file1.txt`, 'utf8')
-    expect(file).toBe('Hello, World!')
-  })
-})
+    const file = readFileSync(`${path}/file1.txt`, "utf8");
+    expect(file).toBe("Hello, World!");
+  });
+});
 ```
 
 ## 📄 License

@@ -1,7 +1,7 @@
 export type {
   DirectoryJSON,
   DirectoryContent,
-} from './types'
+} from "./types";
 
 export {
   testdir,
@@ -9,12 +9,12 @@ export {
   BASE_DIR,
   DIR_REGEX,
   getDirNameFromTask,
-} from './utils'
+} from "./utils";
 export type {
   TestdirOptions,
-} from './utils'
+} from "./utils";
 
 export {
   createFileTree,
   createFileTreeSync,
-} from './file-tree'
+} from "./file-tree";
