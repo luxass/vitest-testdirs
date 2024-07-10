@@ -72,7 +72,7 @@
     "vitest": "^1.6.0"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.7.0",
+    "@luxass/eslint-config": "^4.8.1",
     "@types/node": "^20.14.9",
     "eslint": "^9.6.0",
     "eslint-plugin-format": "^0.1.2",
