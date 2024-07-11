@@ -69,7 +69,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "vitest": ">=1.5.0 <3.0.0"
+    "vitest": ">=1.5.3 <3.0.0"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^4.9.0",
