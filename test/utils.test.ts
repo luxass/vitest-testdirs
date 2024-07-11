@@ -1,5 +1,5 @@
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, normalize } from "node:path";
 import { readFileSync, readdirSync } from "node:fs";
 import type { fs } from "memfs";
 import { type Task, afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
@@ -123,7 +123,7 @@ describe("testdir", () => {
     };
 
     const dirname = await testdir(files);
-    expect(dirname).toBe(".vitest-testdirs/vitest-utils-testdir-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided");
+    expect(dirname).toBe(normalize(".vitest-testdirs/vitest-utils-testdir-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided"));
   });
 
   it("should generate a directory name based on the provided dirname", async () => {
@@ -132,7 +132,7 @@ describe("testdir", () => {
     };
 
     const dirname = await testdir(files, { dirname: "custom-dirname" });
-    expect(dirname).toBe(".vitest-testdirs/custom-dirname");
+    expect(dirname).toBe(normalize(".vitest-testdirs/custom-dirname"));
   });
 
   it("should cleanup the directory after the test has finished if cleanup option is true", async () => {
@@ -197,7 +197,7 @@ describe("testdirSync", () => {
     };
 
     const dirname = testdirSync(files);
-    expect(dirname).toBe(".vitest-testdirs/vitest-utils-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided");
+    expect(dirname).toBe(normalize(".vitest-testdirs/vitest-utils-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided"));
   });
 
   it("should generate a directory name based on the provided dirname", () => {
@@ -206,7 +206,7 @@ describe("testdirSync", () => {
     };
 
     const dirname = testdirSync(files, { dirname: "custom-dirname" });
-    expect(dirname).toBe(".vitest-testdirs/custom-dirname");
+    expect(dirname).toBe(normalize(".vitest-testdirs/custom-dirname"));
   });
 
   it("should cleanup the directory after the test has finished if cleanup option is true", () => {
