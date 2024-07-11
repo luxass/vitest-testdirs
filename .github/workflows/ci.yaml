@@ -1,14 +1,13 @@
 name: CI
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+
   pull_request:
-    types:
-      - opened
-      - synchronize
+    branches:
+      - main
 
 jobs:
   build:
@@ -16,16 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup node
+      - name: Set node
         uses: actions/setup-node@v4.0.3
         with:
-          node-version: 20
+          node-version: lts/*
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm build
@@ -33,8 +32,41 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Test
-        run: pnpm test
-
       - name: Typecheck
         run: pnpm typecheck
+
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node: [20, 18]
+        vitest: [latest, 1.6.0]
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set node ${{ matrix.node }}
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vitest
+        run: pnpm add -D vitest@${{ matrix.vitest }}
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
