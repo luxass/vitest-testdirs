@@ -36,8 +36,8 @@ jobs:
         run: pnpm typecheck
 
   test:
+    name: "test (os: ${{ matrix.os }}, node: ${{ matrix.node }}, vitest: ${{ matrix.vitest }})"
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         node: [20, 18]
@@ -51,7 +51,6 @@ jobs:
           - macos-latest
           - windows-latest
       fail-fast: false
-
     steps:
       - uses: actions/checkout@v4.1.7
 
