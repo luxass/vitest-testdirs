@@ -2,11 +2,10 @@ import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
 import { rmSync } from "node:fs";
 import { type Task, onTestFinished } from "vitest";
-import {
-  getCurrentTest,
-} from "vitest/suite";
+import { getCurrentTest } from "vitest/suite";
 import { createFileTree, createFileTreeSync } from "./file-tree";
-import type { DirectoryJSON } from "./types";
+import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import { FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "./constants";
 
 export const BASE_DIR = ".vitest-testdirs";
 
@@ -44,11 +43,16 @@ export interface TestdirOptions {
  * @returns {Promise<string>} The path of the created test directory.
  * @throws An error if `testdir` is called outside of a test.
  */
-export async function testdir(files: DirectoryJSON, options?: TestdirOptions): Promise<string> {
+export async function testdir(
+  files: DirectoryJSON,
+  options?: TestdirOptions,
+): Promise<string> {
   if (!getCurrentTest()) {
     throw new Error("testdir must be called inside a test");
   }
-  const dirname = options?.dirname ? normalize(`${BASE_DIR}/${options.dirname}`) : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`);
+  const dirname = options?.dirname
+    ? normalize(`${BASE_DIR}/${options.dirname}`)
+    : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`);
 
   const allowOutside = options?.allowOutside ?? false;
 
@@ -70,14 +74,18 @@ export async function testdir(files: DirectoryJSON, options?: TestdirOptions): P
   return dirname;
 }
 
-testdir.cleanup = async (files: DirectoryJSON): Promise<string> => testdir(files, {
-  cleanup: true,
-});
-
-testdir.dir = (dirname: string): (files: DirectoryJSON) => Promise<string> => {
-  return (files: DirectoryJSON) => testdir(files, {
-    dirname,
+testdir.cleanup = async (files: DirectoryJSON): Promise<string> =>
+  testdir(files, {
+    cleanup: true,
   });
+
+testdir.dir = (
+  dirname: string,
+): ((files: DirectoryJSON) => Promise<string>) => {
+  return (files: DirectoryJSON) =>
+    testdir(files, {
+      dirname,
+    });
 };
 
 /**
@@ -88,11 +96,16 @@ testdir.dir = (dirname: string): (files: DirectoryJSON) => Promise<string> => {
  * @returns {string} The path of the created test directory.
  * @throws An error if `testdir` is called outside of a test.
  */
-export function testdirSync(files: DirectoryJSON, options?: TestdirOptions): string {
+export function testdirSync(
+  files: DirectoryJSON,
+  options?: TestdirOptions,
+): string {
   if (!getCurrentTest()) {
     throw new Error("testdir must be called inside a test");
   }
-  const dirname = options?.dirname ? normalize(`${BASE_DIR}/${options.dirname}`) : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`);
+  const dirname = options?.dirname
+    ? normalize(`${BASE_DIR}/${options.dirname}`)
+    : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`);
 
   const allowOutside = options?.allowOutside ?? false;
 
@@ -114,14 +127,16 @@ export function testdirSync(files: DirectoryJSON, options?: TestdirOptions): str
   return dirname;
 }
 
-testdirSync.cleanup = (files: DirectoryJSON): string => testdirSync(files, {
-  cleanup: true,
-});
-
-testdirSync.dir = (dirname: string): (files: DirectoryJSON) => string => {
-  return (files: DirectoryJSON) => testdirSync(files, {
-    dirname,
+testdirSync.cleanup = (files: DirectoryJSON): string =>
+  testdirSync(files, {
+    cleanup: true,
   });
+
+testdirSync.dir = (dirname: string): ((files: DirectoryJSON) => string) => {
+  return (files: DirectoryJSON) =>
+    testdirSync(files, {
+      dirname,
+    });
 };
 
 export const DIR_REGEX = /[^\w\-]+/g;
@@ -133,7 +148,11 @@ export const DIR_REGEX = /[^\w\-]+/g;
  * @returns {string} The directory name for the task.
  */
 export function getDirNameFromTask(task: Task): string {
-  const fileName = (task.file?.name || "unnamed").split("/").pop()!.replace(/\.test\.ts$/, "").replace(DIR_REGEX, "-");
+  const fileName = (task.file?.name || "unnamed")
+    .split("/")
+    .pop()!
+    .replace(/\.test\.ts$/, "")
+    .replace(DIR_REGEX, "-");
   const name = task.name || "unnamed test";
 
   let dirName: string;
@@ -147,4 +166,26 @@ export function getDirNameFromTask(task: Task): string {
 
   // trim trailing hyphen and multiple hyphens
   return dirName.replace(/-{2,}/g, "-").replace(/-+$/, "");
+}
+
+export function symlink(path: string): TestdirSymlink {
+  return {
+    [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
+    path,
+  };
+}
+
+export function link(path: string): TestdirLink {
+  return {
+    [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
+    path,
+  };
+}
+
+export function isSymlink(value: unknown): value is TestdirSymlink {
+  return typeof value === "object" && value !== null && (value as TestdirSymlink)[FIXTURE_TYPE_SYMLINK_SYMBOL] === FIXTURE_TYPE_SYMLINK_SYMBOL;
+}
+
+export function isLink(value: unknown): value is TestdirLink {
+  return typeof value === "object" && value !== null && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL] === FIXTURE_TYPE_LINK_SYMBOL;
 }

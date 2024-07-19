@@ -2,7 +2,15 @@ import { readFile, readdir } from "node:fs/promises";
 import { join, normalize } from "node:path";
 import { readFileSync, readdirSync } from "node:fs";
 import type { fs } from "memfs";
-import { type Task, afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
+import {
+  type Task,
+  afterEach,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import { getDirNameFromTask, testdir, testdirSync } from "../src/utils";
 
@@ -26,7 +34,9 @@ describe("getDirNameFromTask", () => {
   it("should return the correct directory name for a task using 'getCurrentTest'", () => {
     const dirName = getDirNameFromTask(getCurrentTest()!);
 
-    expect(dirName).toBe("vitest-utils-getDirNameFromTask-should-return-the-correct-directory-name-for-a-task-using-getCurrentTest");
+    expect(dirName).toBe(
+      "vitest-utils-getDirNameFromTask-should-return-the-correct-directory-name-for-a-task-using-getCurrentTest",
+    );
   });
 
   it("should use 'unnamed' as the file name if the task does not have a file name", () => {
@@ -38,7 +48,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-unnamed-utils-should-use-unnamed-as-the-file-name-if-the-task-does-not-have-a-file-name");
+    expect(dirName).toBe(
+      "vitest-unnamed-utils-should-use-unnamed-as-the-file-name-if-the-task-does-not-have-a-file-name",
+    );
   });
 
   it("should include suite name in the directory name", () => {
@@ -50,7 +62,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-unnamed-utils-should-include-suite-name-in-the-directory-name");
+    expect(dirName).toBe(
+      "vitest-unnamed-utils-should-include-suite-name-in-the-directory-name",
+    );
   });
 
   it("should remove '.test.ts' from the file name", () => {
@@ -61,7 +75,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-utils-should-remove-test-ts-from-the-file-name");
+    expect(dirName).toBe(
+      "vitest-utils-should-remove-test-ts-from-the-file-name",
+    );
   });
 
   it("should replace non-alphanumeric characters with '-'", () => {
@@ -72,7 +88,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-utils-should-replace-non-alphanumeric-characters-with");
+    expect(dirName).toBe(
+      "vitest-utils-should-replace-non-alphanumeric-characters-with",
+    );
   });
 
   it("should replace trailing hyphens with nothing", () => {
@@ -83,7 +101,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-utils-should-replace-trailing-hyphens-with-nothing");
+    expect(dirName).toBe(
+      "vitest-utils-should-replace-trailing-hyphens-with-nothing",
+    );
   });
 
   it("should replace multiple hyphens with a single hyphen", () => {
@@ -94,7 +114,9 @@ describe("getDirNameFromTask", () => {
 
     const dirName = getDirNameFromTask(task);
 
-    expect(dirName).toBe("vitest-utils-should-replace-multiple-hyphens-with-a-single-hyphen");
+    expect(dirName).toBe(
+      "vitest-utils-should-replace-multiple-hyphens-with-a-single-hyphen",
+    );
   });
 });
 
@@ -110,11 +132,17 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
 
-    expect(await readdir(dirname)).toEqual(["file1.txt", "file2.txt", "subdir"]);
+    expect(await readdir(dirname)).toEqual([
+      "file1.txt",
+      "file2.txt",
+      "subdir",
+    ]);
     expect(await readdir(join(dirname, "subdir"))).toEqual(["file3.txt"]);
     expect(await readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
     expect(await readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(await readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe("content3");
+    expect(await readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+      "content3",
+    );
   });
 
   it("should generate a directory name based on the test name if dirname is not provided", async () => {
@@ -123,7 +151,11 @@ describe("testdir", () => {
     };
 
     const dirname = await testdir(files);
-    expect(dirname).toBe(normalize(".vitest-testdirs/vitest-utils-testdir-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided"));
+    expect(dirname).toBe(
+      normalize(
+        ".vitest-testdirs/vitest-utils-testdir-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided",
+      ),
+    );
   });
 
   it("should generate a directory name based on the provided dirname", async () => {
@@ -166,9 +198,13 @@ describe("testdir", () => {
       "file.txt": "content",
     };
 
-    await expect(testdir(files, {
-      dirname: "../testdir",
-    })).rejects.toThrowError("The directory name must start with '.vitest-testdirs'");
+    await expect(
+      testdir(files, {
+        dirname: "../testdir",
+      }),
+    ).rejects.toThrowError(
+      "The directory name must start with '.vitest-testdirs'",
+    );
   });
 });
 
@@ -188,7 +224,9 @@ describe("testdirSync", () => {
     expect(readdirSync(join(dirname, "subdir"))).toEqual(["file3.txt"]);
     expect(readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
     expect(readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe("content3");
+    expect(readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+      "content3",
+    );
   });
 
   it("should generate a directory name based on the test name if dirname is not provided", () => {
@@ -197,7 +235,11 @@ describe("testdirSync", () => {
     };
 
     const dirname = testdirSync(files);
-    expect(dirname).toBe(normalize(".vitest-testdirs/vitest-utils-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided"));
+    expect(dirname).toBe(
+      normalize(
+        ".vitest-testdirs/vitest-utils-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided",
+      ),
+    );
   });
 
   it("should generate a directory name based on the provided dirname", () => {
@@ -240,8 +282,10 @@ describe("testdirSync", () => {
       "file.txt": "content",
     };
 
-    expect(() => testdirSync(files, {
-      dirname: "../testdir",
-    })).toThrowError("The directory name must start with '.vitest-testdirs'");
+    expect(() =>
+      testdirSync(files, {
+        dirname: "../testdir",
+      }),
+    ).toThrowError("The directory name must start with '.vitest-testdirs'");
   });
 });

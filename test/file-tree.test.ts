@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { fs } from "memfs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createFileTree, createFileTreeSync } from "../src/file-tree";
+import { link, symlink } from "../src/utils";
 
 vi.mock("node:fs/promises", async () => {
   const memfs: { fs: typeof fs } = await vi.importActual("memfs");
@@ -42,16 +43,25 @@ describe("createFileTree", () => {
     const file1Content = await readFile(resolve(path, "file1.txt"), "utf-8");
     expect(file1Content).toBe("Hello, world!");
 
-    const file2Content = await readFile(resolve(path, "dir1/file2.txt"), "utf-8");
+    const file2Content = await readFile(
+      resolve(path, "dir1/file2.txt"),
+      "utf-8",
+    );
     expect(file2Content).toBe("This is file 2");
 
-    const file3Content = await readFile(resolve(path, "dir1/dir2/file3.txt"), "utf-8");
+    const file3Content = await readFile(
+      resolve(path, "dir1/dir2/file3.txt"),
+      "utf-8",
+    );
     expect(file3Content).toBe("This is file 3");
 
     const nestedFile = await readdir(resolve(path, "this/is"));
     expect(nestedFile).toEqual(["nested.txt"]);
 
-    const nestedFileContent = await readFile(resolve(path, "this/is/nested.txt"), "utf-8");
+    const nestedFileContent = await readFile(
+      resolve(path, "this/is/nested.txt"),
+      "utf-8",
+    );
     expect(nestedFileContent).toBe("This is a file");
 
     // its called six times, because it allows us to do
@@ -99,6 +109,51 @@ describe("createFileTree", () => {
       }
     }
   });
+
+  it("should be able to create symlinks", async () => {
+    const path = "./test";
+    const files = {
+      "file1.txt": "Hello, world!",
+      "dir1": {
+        "file2.txt": "This is file 2",
+        "dir2": {
+          "file3.txt": "This is file 3",
+        },
+      },
+      "link1.txt": symlink("file1.txt"),
+      "link2.txt": link("dir1/file2.txt"),
+    };
+
+    const fsMkdirSpy = vi.spyOn(fs.promises, "mkdir");
+    const fsWriteFileSpy = vi.spyOn(fs.promises, "writeFile");
+    const fsLinkSpy = vi.spyOn(fs.promises, "link");
+
+    await createFileTree(path, files);
+    const file1Content = await readFile(resolve(path, "file1.txt"), "utf-8");
+    expect(file1Content).toBe("Hello, world!");
+
+    const file2Content = await readFile(
+      resolve(path, "dir1/file2.txt"),
+      "utf-8",
+    );
+
+    expect(file2Content).toBe("This is file 2");
+
+    const file3Content = await readFile(
+      resolve(path, "dir1/dir2/file3.txt"),
+      "utf-8",
+    );
+
+    expect(file3Content).toBe("This is file 3");
+
+    const link2Content = await readFile(resolve(path, "link2.txt"), "utf-8");
+
+    expect(link2Content).toBe("This is file 2");
+
+    expect(fsMkdirSpy).toHaveBeenCalledTimes(5);
+    expect(fsWriteFileSpy).toHaveBeenCalledTimes(3);
+    expect(fsLinkSpy).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("createFileTreeSync", () => {
@@ -126,13 +181,19 @@ describe("createFileTreeSync", () => {
     const file2Content = readFileSync(resolve(path, "dir1/file2.txt"), "utf-8");
     expect(file2Content).toBe("This is file 2");
 
-    const file3Content = readFileSync(resolve(path, "dir1/dir2/file3.txt"), "utf-8");
+    const file3Content = readFileSync(
+      resolve(path, "dir1/dir2/file3.txt"),
+      "utf-8",
+    );
     expect(file3Content).toBe("This is file 3");
 
     const nestedFile = readdirSync(resolve(path, "this/is"));
     expect(nestedFile).toEqual(["nested.txt"]);
 
-    const nestedFileContent = readFileSync(resolve(path, "this/is/nested.txt"), "utf-8");
+    const nestedFileContent = readFileSync(
+      resolve(path, "this/is/nested.txt"),
+      "utf-8",
+    );
     expect(nestedFileContent).toBe("This is a file");
 
     // its called six times, because it allows us to do
