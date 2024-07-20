@@ -1,3 +1,23 @@
+/**
+ * This module contains functions for creating file trees.
+ * @module file-tree
+ *
+ * @example
+ * ```ts
+ * import { createFileTree, createFileTreeSync } from "vitest-testdirs/file-tree";
+ *
+ * const files = {
+ *   nested: {
+ *     "file.txt": "Hello, World!",
+ *   },
+ *   "file.txt": "Hello, World!",
+ * };
+ *
+ * await createFileTree("./path/to/dir", files);
+ * createFileTreeSync("./path/to/dir", files);
+ *
+ */
+
 import { dirname, resolve } from "node:path";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
 import {
@@ -7,7 +27,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
-import type { DirectoryJSON } from "./types";
+import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
 import { isLink, isSymlink } from "./utils";
 
 /**
@@ -121,9 +141,14 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
   }
 }
 
-function isPrimitive(
-  data: unknown,
-): data is string | number | boolean | null | undefined | bigint | symbol {
+/**
+ * Checks if the given data is a primitive value.
+ *
+ * @internal
+ * @param {unknown} data - The data to be checked.
+ * @returns {data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON>} `true` if the data is a primitive value, `false` otherwise.
+ */
+function isPrimitive(data: unknown): data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON> {
   return (
     typeof data === "string"
     || typeof data === "number"
@@ -132,10 +157,19 @@ function isPrimitive(
     || data === undefined
     || typeof data === "bigint"
     || typeof data === "symbol"
+    || data instanceof Uint8Array
   );
 }
 
-function isDir(abs: string, target: string) {
+/**
+ * Checks if a given path is a directory.
+ *
+ * @internal
+ * @param {string} abs - The absolute path of the file or directory.
+ * @param {string} target - The target directory to check.
+ * @returns {boolean} `true` if the path is a directory, `false` otherwise.
+ */
+function isDir(abs: string, target: string): boolean {
   try {
     return statSync(resolve(dirname(abs), target)).isDirectory();
     // eslint-disable-next-line unused-imports/no-unused-vars

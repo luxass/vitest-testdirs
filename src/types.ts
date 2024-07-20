@@ -1,3 +1,8 @@
+/**
+ * This module contains types used throughout the project.
+ * @module types
+ */
+
 import type {
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,

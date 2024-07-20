@@ -1,3 +1,22 @@
+/**
+ * @module
+ *
+ * Vitest Testdirs - A utility to create a temporary directory with files and directories for testing.
+ *
+ * @example
+ * ```ts
+ * import { testdir } from "vitest-testdirs";
+ *
+ * const dir = await testdir({
+ *   nested: {
+ *     "file.txt": "Hello, World!",
+ *   },
+ * });
+ *
+ * console.log(dir);
+ * ```
+ */
+
 export type {
   DirectoryJSON,
   DirectoryContent,

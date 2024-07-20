@@ -1,3 +1,24 @@
+/**
+ * This module contains utility functions for creating test directories.
+ * @module utils
+ *
+ *  @example
+ * ```ts
+ * import { testdir, link, symlink } from "vitest-testdirs/utils";
+ *
+ * const dir = await testdir({
+ *   nested: {
+ *     "file.txt": "Hello, World!",
+ *     "link.txt": link("../file.txt"),
+ *     "symlink.txt": symlink("../file.txt"),
+ *   },
+ *   "file.txt": "Hello, World!",
+ * });
+ *
+ * console.log(dir);
+ * ```
+ */
+
 import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
 import { rmSync } from "node:fs";
