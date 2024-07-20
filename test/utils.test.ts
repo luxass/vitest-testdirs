@@ -1,6 +1,6 @@
-import { readFile, readdir } from "node:fs/promises";
+import { lstat, readFile, readdir, readlink, stat } from "node:fs/promises";
 import { join, normalize } from "node:path";
-import { readFileSync, readdirSync } from "node:fs";
+import { lstatSync, readFileSync, readdirSync, readlinkSync, statSync } from "node:fs";
 import type { fs } from "memfs";
 import {
   type Task,
@@ -12,7 +12,8 @@ import {
   vi,
 } from "vitest";
 import { getCurrentTest } from "vitest/suite";
-import { getDirNameFromTask, testdir, testdirSync } from "../src/utils";
+import { getDirNameFromTask, isLink, isSymlink, link, symlink, testdir, testdirSync } from "../src/utils";
+import { FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "../src/constants";
 
 vi.mock("node:fs/promises", async () => {
   const memfs: { fs: typeof fs } = await vi.importActual("memfs");
@@ -206,6 +207,49 @@ describe("testdir", () => {
       "The directory name must start with '.vitest-testdirs'",
     );
   });
+
+  it("should create a test directory with with symlinks", async () => {
+    const files = {
+      "file1.txt": "content1",
+      "file2.txt": "content2",
+      "subdir": {
+        "file3.txt": "content3",
+        "file4.txt": link("../file1.txt"),
+        "file5.txt": symlink("../file2.txt"),
+      },
+      "link4.txt": link("file1.txt"),
+      "link5.txt": symlink("subdir/file3.txt"),
+    };
+
+    const dirname = await testdir(files);
+
+    expect(await readdir(dirname)).toEqual([
+      "file1.txt",
+      "file2.txt",
+      "link4.txt",
+      "link5.txt",
+      "subdir",
+    ]);
+
+    expect(await readdir(join(dirname, "subdir"))).toEqual(["file3.txt", "file4.txt", "file5.txt"]);
+    expect(await readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(await readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(await readFile(join(dirname, "link4.txt"), "utf8")).toBe("content1");
+    expect((await stat(join(dirname, "link4.txt"))).isFile()).toBe(true);
+
+    expect(await readlink(join(dirname, "link5.txt"), "utf8")).toBeDefined();
+    expect((await lstat(join(dirname, "link5.txt"))).isSymbolicLink()).toBe(true);
+
+    expect(await readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+      "content3",
+    );
+
+    expect(await readFile(join(dirname, "subdir", "file4.txt"), "utf8")).toBe("content1");
+    expect((await stat(join(dirname, "subdir", "file4.txt"))).isFile()).toBe(true);
+
+    expect(await readlink(join(dirname, "subdir", "file5.txt"), "utf8")).toBeDefined();
+    expect((await lstat(join(dirname, "subdir", "file5.txt"))).isSymbolicLink()).toBe(true);
+  });
 });
 
 describe("testdirSync", () => {
@@ -287,5 +331,190 @@ describe("testdirSync", () => {
         dirname: "../testdir",
       }),
     ).toThrowError("The directory name must start with '.vitest-testdirs'");
+  });
+
+  it("should create a test directory with with symlinks", () => {
+    const files = {
+      "file1.txt": "content1",
+      "file2.txt": "content2",
+      "subdir": {
+        "file3.txt": "content3",
+        "file4.txt": link("../file1.txt"),
+        "file5.txt": symlink("../file2.txt"),
+      },
+      "link4.txt": link("file1.txt"),
+      "link5.txt": symlink("subdir/file3.txt"),
+    };
+
+    const dirname = testdirSync(files);
+
+    expect(readdirSync(dirname)).toEqual([
+      "file1.txt",
+      "file2.txt",
+      "link4.txt",
+      "link5.txt",
+      "subdir",
+    ]);
+
+    expect(readdirSync(join(dirname, "subdir"))).toEqual(["file3.txt", "file4.txt", "file5.txt"]);
+    expect(readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(readFileSync(join(dirname, "link4.txt"), "utf8")).toBe("content1");
+    expect(statSync(join(dirname, "link4.txt")).isFile()).toBe(true);
+
+    expect(readlinkSync(join(dirname, "link5.txt"), "utf8")).toBeDefined();
+    expect(lstatSync(join(dirname, "link5.txt")).isSymbolicLink()).toBe(true);
+
+    expect(readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+      "content3",
+    );
+
+    expect(readFileSync(join(dirname, "subdir", "file4.txt"), "utf8")).toBe("content1");
+    expect(statSync(join(dirname, "subdir", "file4.txt")).isFile()).toBe(true);
+
+    expect(readlinkSync(join(dirname, "subdir", "file5.txt"), "utf8")).toBeDefined();
+    expect(lstatSync(join(dirname, "subdir", "file5.txt")).isSymbolicLink()).toBe(true);
+  });
+});
+
+describe("isLink", () => {
+  it("should return true if the value is a TestdirLink", () => {
+    const value = {
+      [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
+      path: "path/to/file",
+    };
+
+    const result = isLink(value);
+
+    expect(result).toBe(true);
+  });
+
+  it("should return false if the value is not a TestdirLink", () => {
+    const value = {
+      path: "path/to/file",
+    };
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is null", () => {
+    const value = null;
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is undefined", () => {
+    const value = undefined;
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is a string", () => {
+    const value = "path/to/file";
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is a number", () => {
+    const value = 123;
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is a boolean", () => {
+    const value = true;
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is an array", () => {
+    const value = [1, 2, 3];
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is an object without the link symbol", () => {
+    const value = {
+      path: "path/to/file",
+    };
+
+    const result = isLink(value);
+
+    expect(result).toBe(false);
+  });
+});
+
+describe("isSymlink", () => {
+  it("should return true if the value is a TestdirSymlink", () => {
+    const value = {
+      [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
+      path: "path/to/file",
+    };
+
+    const result = isSymlink(value);
+
+    expect(result).toBe(true);
+  });
+
+  it("should return false if the value is not a TestdirSymlink", () => {
+    const value = {
+      path: "path/to/file",
+    };
+
+    const result = isSymlink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is null", () => {
+    const value = null;
+
+    const result = isSymlink(value);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the value is undefined", () => {
+    const value = undefined;
+
+    const result = isSymlink(value);
+
+    expect(result).toBe(false);
+  });
+});
+
+it("should create a TestdirLink object with the provided path", () => {
+  const path = "path/to/file";
+
+  const result = link(path);
+
+  expect(result).toEqual({
+    [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
+    path,
+  });
+});
+
+it("should create a TestdirSymlink object with the specified path", () => {
+  const path = "path/to/file";
+
+  const result = symlink(path);
+
+  expect(result).toEqual({
+    [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
+    path,
   });
 });

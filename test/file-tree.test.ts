@@ -116,11 +116,12 @@ describe("createFileTree", () => {
       "file1.txt": "Hello, world!",
       "dir1": {
         "file2.txt": "This is file 2",
+        "text.txt": "This is a text file",
         "dir2": {
           "file3.txt": "This is file 3",
         },
       },
-      "link1.txt": symlink("file1.txt"),
+      "link1.txt": symlink("dir1/text.txt"),
       "link2.txt": link("dir1/file2.txt"),
     };
 
@@ -150,14 +151,14 @@ describe("createFileTree", () => {
 
     expect(link2Content).toBe("This is file 2");
 
-    expect(fsMkdirSpy).toHaveBeenCalledTimes(5);
-    expect(fsWriteFileSpy).toHaveBeenCalledTimes(3);
+    expect(fsMkdirSpy).toHaveBeenCalledTimes(6);
+    expect(fsWriteFileSpy).toHaveBeenCalledTimes(4);
     expect(fsLinkSpy).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("createFileTreeSync", () => {
-  it("should create a file tree at the specified path", async () => {
+  it("should create a file tree at the specified path", () => {
     const path = "./test";
     const files = {
       "file1.txt": "Hello, world!",
@@ -202,7 +203,7 @@ describe("createFileTreeSync", () => {
     expect(fsWriteFile).toHaveBeenCalledTimes(4);
   });
 
-  it("should create files using primitive types", async () => {
+  it("should create files using primitive types", () => {
     const path = "./test";
 
     const files = {
@@ -240,5 +241,51 @@ describe("createFileTreeSync", () => {
         expect(fileContent).toBe(String(content));
       }
     }
+  });
+
+  it("should be able to create symlinks", () => {
+    const path = "./test";
+    const files = {
+      "file1.txt": "Hello, world!",
+      "dir1": {
+        "file2.txt": "This is file 2",
+        "text.txt": "This is a text file",
+        "dir2": {
+          "file3.txt": "This is file 3",
+        },
+      },
+      "link1.txt": symlink("dir1/text.txt"),
+      "link2.txt": link("dir1/file2.txt"),
+    };
+
+    const fsMkdirSpy = vi.spyOn(fs, "mkdirSync");
+    const fsWriteFileSpy = vi.spyOn(fs, "writeFileSync");
+    const fsLinkSpy = vi.spyOn(fs, "linkSync");
+
+    createFileTreeSync(path, files);
+    const file1Content = readFileSync(resolve(path, "file1.txt"), "utf-8");
+    expect(file1Content).toBe("Hello, world!");
+
+    const file2Content = readFileSync(
+      resolve(path, "dir1/file2.txt"),
+      "utf-8",
+    );
+
+    expect(file2Content).toBe("This is file 2");
+
+    const file3Content = readFileSync(
+      resolve(path, "dir1/dir2/file3.txt"),
+      "utf-8",
+    );
+
+    expect(file3Content).toBe("This is file 3");
+
+    const link2Content = readFileSync(resolve(path, "link2.txt"), "utf-8");
+
+    expect(link2Content).toBe("This is file 2");
+
+    expect(fsMkdirSpy).toHaveBeenCalledTimes(6);
+    expect(fsWriteFileSpy).toHaveBeenCalledTimes(4);
+    expect(fsLinkSpy).toHaveBeenCalledTimes(1);
   });
 });
