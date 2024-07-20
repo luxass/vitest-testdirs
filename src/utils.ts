@@ -5,7 +5,10 @@ import { type Task, onTestFinished } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import { createFileTree, createFileTreeSync } from "./file-tree";
 import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
-import { FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "./constants";
+import {
+  FIXTURE_TYPE_LINK_SYMBOL,
+  FIXTURE_TYPE_SYMLINK_SYMBOL,
+} from "./constants";
 
 export const BASE_DIR = ".vitest-testdirs";
 
@@ -198,7 +201,12 @@ export function link(path: string): TestdirLink {
  * @returns {value is TestdirSymlink} The same value
  */
 export function isSymlink(value: unknown): value is TestdirSymlink {
-  return typeof value === "object" && value !== null && (value as TestdirSymlink)[FIXTURE_TYPE_SYMLINK_SYMBOL] === FIXTURE_TYPE_SYMLINK_SYMBOL;
+  return (
+    typeof value === "object"
+    && value !== null
+    && (value as TestdirSymlink)[FIXTURE_TYPE_SYMLINK_SYMBOL]
+    === FIXTURE_TYPE_SYMLINK_SYMBOL
+  );
 }
 
 /**
@@ -207,5 +215,10 @@ export function isSymlink(value: unknown): value is TestdirSymlink {
  * @returns {value is TestdirLink} The same value
  */
 export function isLink(value: unknown): value is TestdirLink {
-  return typeof value === "object" && value !== null && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL] === FIXTURE_TYPE_LINK_SYMBOL;
+  return (
+    typeof value === "object"
+    && value !== null
+    && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL]
+    === FIXTURE_TYPE_LINK_SYMBOL
+  );
 }

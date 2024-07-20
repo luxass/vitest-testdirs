@@ -1,4 +1,9 @@
-export type { DirectoryJSON, DirectoryContent, TestdirLink, TestdirSymlink } from "./types";
+export type {
+  DirectoryJSON,
+  DirectoryContent,
+  TestdirLink,
+  TestdirSymlink,
+} from "./types";
 export {
   testdir,
   testdirSync,

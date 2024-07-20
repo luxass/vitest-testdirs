@@ -1,6 +1,12 @@
 import { dirname, resolve } from "node:path";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
-import { linkSync, mkdirSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  linkSync,
+  mkdirSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import type { DirectoryJSON } from "./types";
 import { isLink, isSymlink } from "./utils";
 
@@ -132,7 +138,7 @@ function isPrimitive(
 function isDir(abs: string, target: string) {
   try {
     return statSync(resolve(dirname(abs), target)).isDirectory();
-  // eslint-disable-next-line unused-imports/no-unused-vars
+    // eslint-disable-next-line unused-imports/no-unused-vars
   } catch (err) {
     return false;
   }

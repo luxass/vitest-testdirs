@@ -266,10 +266,7 @@ describe("createFileTreeSync", () => {
     const file1Content = readFileSync(resolve(path, "file1.txt"), "utf-8");
     expect(file1Content).toBe("Hello, world!");
 
-    const file2Content = readFileSync(
-      resolve(path, "dir1/file2.txt"),
-      "utf-8",
-    );
+    const file2Content = readFileSync(resolve(path, "dir1/file2.txt"), "utf-8");
 
     expect(file2Content).toBe("This is file 2");
 
