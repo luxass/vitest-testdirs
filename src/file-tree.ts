@@ -2,7 +2,6 @@ import { dirname, resolve } from "node:path";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
 import { linkSync, mkdirSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import type { DirectoryJSON } from "./types";
-import { FIXTURE_TYPE_LINK_SYMBOL } from "./constants";
 import { isLink, isSymlink } from "./utils";
 
 /**
