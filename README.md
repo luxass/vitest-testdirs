@@ -2,6 +2,7 @@
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![jsr version][jsr-version-src]][jsr-version-href]
 
 A utility for Vitest to create isolated test directories
 
@@ -61,3 +62,5 @@ Published under [MIT License](./LICENSE).
 [npm-version-href]: https://npmjs.com/package/vitest-testdirs
 [npm-downloads-src]: https://img.shields.io/npm/dm/vitest-testdirs?style=flat&colorA=18181B&colorB=4169E1
 [npm-downloads-href]: https://npmjs.com/package/vitest-testdirs
+[jsr-version-src]: https://jsr.io/badges/@luxass/vitest-testdirs?style=flat&labelColor=18181B&logoColor=4169E1
+[jsr-version-href]: https://jsr.io/package/@luxass/vitest-test
