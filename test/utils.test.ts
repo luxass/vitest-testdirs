@@ -15,21 +15,21 @@ import { getCurrentTest } from "vitest/suite";
 import { getDirNameFromTask, isLink, isSymlink, link, symlink, testdir, testdirSync } from "../src/utils";
 import { FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "../src/constants";
 
-// vi.mock("node:fs/promises", async () => {
-//   const memfs: { fs: typeof fs } = await vi.importActual("memfs");
+vi.mock("node:fs/promises", async () => {
+  const memfs: { fs: typeof fs } = await vi.importActual("memfs");
 
-//   return memfs.fs.promises;
-// });
+  return memfs.fs.promises;
+});
 
-// vi.mock("node:fs", async () => {
-//   const memfs: { fs: typeof fs } = await vi.importActual("memfs");
+vi.mock("node:fs", async () => {
+  const memfs: { fs: typeof fs } = await vi.importActual("memfs");
 
-//   return memfs.fs;
-// });
+  return memfs.fs;
+});
 
-// afterEach(() => {
-//   vi.clearAllMocks();
-// });
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 describe("getDirNameFromTask", () => {
   it("should return the correct directory name for a task using 'getCurrentTest'", () => {
