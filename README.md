@@ -63,4 +63,4 @@ Published under [MIT License](./LICENSE).
 [npm-downloads-src]: https://img.shields.io/npm/dm/vitest-testdirs?style=flat&colorA=18181B&colorB=4169E1
 [npm-downloads-href]: https://npmjs.com/package/vitest-testdirs
 [jsr-version-src]: https://jsr.io/badges/@luxass/vitest-testdirs?style=flat&labelColor=18181B&logoColor=4169E1
-[jsr-version-href]: https://jsr.io/package/@luxass/vitest-test
+[jsr-version-href]: https://jsr.io/package/@luxass/vitest-testdirs
