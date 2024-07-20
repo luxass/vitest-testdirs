@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe("createFileTree", () => {
   it("should create a file tree at the specified path", async () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/specified-path";
     const files = {
       "file1.txt": "Hello, world!",
       "this/is/nested.txt": "This is a file",
@@ -71,7 +71,7 @@ describe("createFileTree", () => {
   });
 
   it("should create files using primitive types", async () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/primitive-types";
 
     const files = {
       "file1.txt": "Hello, world!",
@@ -111,7 +111,7 @@ describe("createFileTree", () => {
   });
 
   it("should be able to create symlinks", async () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/with-links";
     const files = {
       "file1.txt": "Hello, world!",
       "dir1": {
@@ -159,7 +159,7 @@ describe("createFileTree", () => {
 
 describe("createFileTreeSync", () => {
   it("should create a file tree at the specified path", () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/specified-path-sync";
     const files = {
       "file1.txt": "Hello, world!",
       "this/is/nested.txt": "This is a file",
@@ -204,7 +204,7 @@ describe("createFileTreeSync", () => {
   });
 
   it("should create files using primitive types", () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/primitive-types-sync";
 
     const files = {
       "file1.txt": "Hello, world!",
@@ -244,7 +244,7 @@ describe("createFileTreeSync", () => {
   });
 
   it("should be able to create symlinks", () => {
-    const path = "./test";
+    const path = "./.vitest-testdirs/with-links-sync";
     const files = {
       "file1.txt": "Hello, world!",
       "dir1": {
