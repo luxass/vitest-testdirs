@@ -13,7 +13,7 @@ export const BASE_DIR = ".vitest-testdirs";
 export interface TestdirOptions {
   /**
    * Whether to cleanup the directory after the test has finished.
-   * @default false
+   * @default true
    */
   cleanup?: boolean;
 
@@ -59,7 +59,7 @@ export async function testdir(files: DirectoryJSON, options?: TestdirOptions): P
 
   await createFileTree(dirname, files!);
 
-  if (options?.cleanup ?? false) {
+  if (options?.cleanup ?? true) {
     onTestFinished(async () => {
       await rm(dirname, {
         recursive: true,
@@ -103,7 +103,7 @@ export function testdirSync(files: DirectoryJSON, options?: TestdirOptions): str
 
   createFileTreeSync(dirname, files!);
 
-  if (options?.cleanup ?? false) {
+  if (options?.cleanup ?? true) {
     onTestFinished(() => {
       rmSync(dirname, {
         recursive: true,
