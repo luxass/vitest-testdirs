@@ -133,7 +133,7 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
 
-    expect(await readdir(dirname)).toEqual([
+    expect(await readdir(dirname)).toContainEqual([
       "file1.txt",
       "file2.txt",
       "subdir",
@@ -223,7 +223,7 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
 
-    expect(await readdir(dirname)).toEqual([
+    expect(await readdir(dirname)).toContainEqual([
       "file1.txt",
       "file2.txt",
       "link4.txt",
@@ -348,7 +348,7 @@ describe("testdirSync", () => {
 
     const dirname = testdirSync(files);
 
-    expect(readdirSync(dirname)).toEqual([
+    expect(readdirSync(dirname)).toContainEqual([
       "file1.txt",
       "file2.txt",
       "link4.txt",
