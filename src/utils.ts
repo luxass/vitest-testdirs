@@ -168,6 +168,11 @@ export function getDirNameFromTask(task: Task): string {
   return dirName.replace(/-{2,}/g, "-").replace(/-+$/, "");
 }
 
+/**
+ * Create a symlink to a file or directory
+ * @param {string} path The path to link to
+ * @returns {TestdirSymlink} A TestdirSymlink object
+ */
 export function symlink(path: string): TestdirSymlink {
   return {
     [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
@@ -175,6 +180,11 @@ export function symlink(path: string): TestdirSymlink {
   };
 }
 
+/**
+ * Create a link to a file or directory
+ * @param {string} path The path to link to
+ * @returns {TestdirLink} A TestdirLink object
+ */
 export function link(path: string): TestdirLink {
   return {
     [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
@@ -182,10 +192,20 @@ export function link(path: string): TestdirLink {
   };
 }
 
+/**
+ * Check if value is a TestdirSymlink
+ * @param {unknown} value The value to check
+ * @returns {value is TestdirSymlink} The same value
+ */
 export function isSymlink(value: unknown): value is TestdirSymlink {
   return typeof value === "object" && value !== null && (value as TestdirSymlink)[FIXTURE_TYPE_SYMLINK_SYMBOL] === FIXTURE_TYPE_SYMLINK_SYMBOL;
 }
 
+/**
+ * Check if value is a TestdirLink
+ * @param value The value to check
+ * @returns {value is TestdirLink} The same value
+ */
 export function isLink(value: unknown): value is TestdirLink {
   return typeof value === "object" && value !== null && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL] === FIXTURE_TYPE_LINK_SYMBOL;
 }

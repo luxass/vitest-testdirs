@@ -12,7 +12,8 @@ export type DirectoryContent =
   | undefined
   | bigint
   | symbol
-  | TestdirSymlink;
+  | TestdirSymlink
+  | TestdirLink;
 
 export interface TestdirSymlink {
   [key: symbol]: typeof FIXTURE_TYPE_SYMLINK_SYMBOL;

@@ -1,6 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
-import { linkSync, mkdirSync, writeFileSync } from "node:fs";
+import { linkSync, mkdirSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import type { DirectoryJSON } from "./types";
 import { FIXTURE_TYPE_LINK_SYMBOL } from "./constants";
 import { isLink, isSymlink } from "./utils";
@@ -23,12 +23,16 @@ export async function createFileTree(
     // check if file is a object with the link symbol
     if (isLink(data)) {
       await link(resolve(dirname(filename), data.path), filename);
-      return;
+      continue;
     }
 
     if (isSymlink(data)) {
-      await symlink(resolve(dirname(filename), data.path), filename);
-      return;
+      await symlink(
+        data.path,
+        filename,
+        isDir(filename, data.path) ? "junction" : "file",
+      );
+      continue;
     }
 
     if (isPrimitive(data) || data instanceof Uint8Array) {
@@ -73,7 +77,16 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
     // check if file is a object with the link symbol
     if (isLink(data)) {
       linkSync(resolve(dirname(filename), data.path), filename);
-      return;
+      continue;
+    }
+
+    if (isSymlink(data)) {
+      symlinkSync(
+        data.path,
+        filename,
+        isDir(filename, data.path) ? "junction" : "file",
+      );
+      continue;
     }
 
     if (isPrimitive(data) || data instanceof Uint8Array) {
@@ -115,4 +128,13 @@ function isPrimitive(
     || typeof data === "bigint"
     || typeof data === "symbol"
   );
+}
+
+function isDir(abs: string, target: string) {
+  try {
+    return statSync(resolve(dirname(abs), target)).isDirectory();
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  } catch (err) {
+    return false;
+  }
 }
