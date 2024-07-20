@@ -1,7 +1,14 @@
 import { dirname, resolve } from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { link, mkdir, symlink, writeFile } from "node:fs/promises";
+import {
+  linkSync,
+  mkdirSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import type { DirectoryJSON } from "./types";
+import { isLink, isSymlink } from "./utils";
 
 /**
  * Creates a file tree at the specified path using the provided files object.
@@ -10,10 +17,28 @@ import type { DirectoryJSON } from "./types";
  * @param {string} path - The path where the file tree should be created.
  * @param {DirectoryJSON} files - An object representing the directory structure and file contents of the tree.
  */
-export async function createFileTree(path: string, files: DirectoryJSON): Promise<void> {
+export async function createFileTree(
+  path: string,
+  files: DirectoryJSON,
+): Promise<void> {
   for (let filename in files) {
     let data = files[filename];
     filename = resolve(path, filename);
+
+    // check if file is a object with the link symbol
+    if (isLink(data)) {
+      await link(resolve(dirname(filename), data.path), filename);
+      continue;
+    }
+
+    if (isSymlink(data)) {
+      await symlink(
+        data.path,
+        filename,
+        isDir(filename, data.path) ? "junction" : "file",
+      );
+      continue;
+    }
 
     if (isPrimitive(data) || data instanceof Uint8Array) {
       const dir = dirname(filename);
@@ -54,6 +79,21 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
     let data = files[filename];
     filename = resolve(path, filename);
 
+    // check if file is a object with the link symbol
+    if (isLink(data)) {
+      linkSync(resolve(dirname(filename), data.path), filename);
+      continue;
+    }
+
+    if (isSymlink(data)) {
+      symlinkSync(
+        data.path,
+        filename,
+        isDir(filename, data.path) ? "junction" : "file",
+      );
+      continue;
+    }
+
     if (isPrimitive(data) || data instanceof Uint8Array) {
       const dir = dirname(filename);
       mkdirSync(dir, {
@@ -81,6 +121,25 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
   }
 }
 
-function isPrimitive(data: unknown): data is string | number | boolean | null | undefined | bigint | symbol {
-  return typeof data === "string" || typeof data === "number" || typeof data === "boolean" || data === null || data === undefined || typeof data === "bigint" || typeof data === "symbol";
+function isPrimitive(
+  data: unknown,
+): data is string | number | boolean | null | undefined | bigint | symbol {
+  return (
+    typeof data === "string"
+    || typeof data === "number"
+    || typeof data === "boolean"
+    || data === null
+    || data === undefined
+    || typeof data === "bigint"
+    || typeof data === "symbol"
+  );
+}
+
+function isDir(abs: string, target: string) {
+  try {
+    return statSync(resolve(dirname(abs), target)).isDirectory();
+    // eslint-disable-next-line unused-imports/no-unused-vars
+  } catch (err) {
+    return false;
+  }
 }
