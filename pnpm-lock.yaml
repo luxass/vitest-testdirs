@@ -22,7 +22,7 @@ importers:
         version: 0.1.2(eslint@9.6.0)
       memfs:
         specifier: ^4.9.3
-        version: 4.9.3
+        version: 4.9.4
       tsup:
         specifier: ^8.1.0
         version: 8.1.0(postcss@8.4.41)(typescript@5.5.3)
@@ -301,14 +301,14 @@ packages:
     peerDependencies:
       tslib: '2'
 
-  '@jsonjoy.com/json-pack@1.0.4':
-    resolution: {integrity: sha512-aOcSN4MeAtFROysrbqG137b7gaDDSmVrl5mpo6sT/w+kcXpWnzhMjmY/Fh/sDx26NBxyIE7MB1seqLeCAzy9Sg==}
+  '@jsonjoy.com/json-pack@1.1.0':
+    resolution: {integrity: sha512-zlQONA+msXPPwHWZMKFVS78ewFczIll5lXiVPwFPCZUsrOKdxc2AvxU1HoNBmMRhqDZUR9HkC3UOm+6pME6Xsg==}
     engines: {node: '>=10.0'}
     peerDependencies:
       tslib: '2'
 
-  '@jsonjoy.com/util@1.2.0':
-    resolution: {integrity: sha512-4B8B+3vFsY4eo33DMKyJPlQ3sBMpPFUZK2dr3O3rXrOGKKbYG44J0XSFkDo1VOQiri5HFEhIeVvItjR2xcazmg==}
+  '@jsonjoy.com/util@1.3.0':
+    resolution: {integrity: sha512-Cebt4Vk7k1xHy87kHY7KSPLT77A7Ev7IfOblyLZhtYEhrdQ6fX4EoLq3xOQ3O/DRMEh2ok5nyC180E+ABS8Wmw==}
     engines: {node: '>=10.0'}
     peerDependencies:
       tslib: '2'
@@ -1373,8 +1373,8 @@ packages:
   mdast-util-to-string@2.0.0:
     resolution: {integrity: sha512-AW4DRS3QbBayY/jJmD8437V1Gombjf8RSOUCMFBuo5iHi58AGEgVCKQ+ezHkZZDpAQS75hcBMpLqjpJTjtUL7w==}
 
-  memfs@4.9.3:
-    resolution: {integrity: sha512-bsYSSnirtYTWi1+OPMFb0M048evMKyUYe0EbtuGQgq6BVQM1g1W8/KIUJCCvjgI/El0j6Q4WsmMiBwLUBSw8LA==}
+  memfs@4.9.4:
+    resolution: {integrity: sha512-Xlj8b2rU11nM6+KU6wC7cuWcHQhVINWCUgdPS4Ar9nPxLaOya3RghqK7ALyDW2QtGebYAYs6uEdEVnwPVT942A==}
     engines: {node: '>= 4.0.0'}
 
   merge-stream@2.0.0:
@@ -2254,15 +2254,15 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
-  '@jsonjoy.com/json-pack@1.0.4(tslib@2.6.3)':
+  '@jsonjoy.com/json-pack@1.1.0(tslib@2.6.3)':
     dependencies:
       '@jsonjoy.com/base64': 1.1.2(tslib@2.6.3)
-      '@jsonjoy.com/util': 1.2.0(tslib@2.6.3)
+      '@jsonjoy.com/util': 1.3.0(tslib@2.6.3)
       hyperdyperid: 1.2.0
       thingies: 1.21.0(tslib@2.6.3)
       tslib: 2.6.3
 
-  '@jsonjoy.com/util@1.2.0(tslib@2.6.3)':
+  '@jsonjoy.com/util@1.3.0(tslib@2.6.3)':
     dependencies:
       tslib: 2.6.3
 
@@ -3439,10 +3439,10 @@ snapshots:
 
   mdast-util-to-string@2.0.0: {}
 
-  memfs@4.9.3:
+  memfs@4.9.4:
     dependencies:
-      '@jsonjoy.com/json-pack': 1.0.4(tslib@2.6.3)
-      '@jsonjoy.com/util': 1.2.0(tslib@2.6.3)
+      '@jsonjoy.com/json-pack': 1.1.0(tslib@2.6.3)
+      '@jsonjoy.com/util': 1.3.0(tslib@2.6.3)
       tree-dump: 1.0.2(tslib@2.6.3)
       tslib: 2.6.3
 
