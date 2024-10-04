@@ -19,17 +19,17 @@
  * ```
  */
 
+import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import { rmSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
-import { rmSync } from "node:fs";
-import { type Task, onTestFinished } from "vitest";
+import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
-import { createFileTree, createFileTreeSync } from "./file-tree";
-import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
 import {
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
+import { createFileTree, createFileTreeSync } from "./file-tree";
 
 export const BASE_DIR = ".vitest-testdirs";
 

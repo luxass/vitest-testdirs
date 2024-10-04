@@ -17,15 +17,14 @@
  * ```
  */
 
+export { createFileTree, createFileTreeSync } from "./file-tree";
 export type {
-  DirectoryJSON,
   DirectoryContent,
+  DirectoryJSON,
   TestdirLink,
   TestdirSymlink,
 } from "./types";
 export {
-  testdir,
-  testdirSync,
   BASE_DIR,
   DIR_REGEX,
   getDirNameFromTask,
@@ -33,7 +32,8 @@ export {
   isSymlink,
   link,
   symlink,
+  testdir,
+  testdirSync,
 } from "./utils";
-export type { TestdirOptions } from "./utils";
 
-export { createFileTree, createFileTreeSync } from "./file-tree";
+export type { TestdirOptions } from "./utils";

@@ -15,11 +15,11 @@ npm install vitest-testdirs --save-dev
 ## 🚀 Usage
 
 ```js
+import { readFileSync } from "node:fs";
 // index.test.ts
 import { readFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
-import { testdir, testdirSync } from "vitest-testdirs";
 import { describe, expect, vi } from "vitest";
+import { testdir, testdirSync } from "vitest-testdirs";
 
 describe("testdir", () => {
   it("isolated-test", async () => {

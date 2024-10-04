@@ -1,23 +1,27 @@
-import { lstat, readFile, readdir, readlink, stat } from "node:fs/promises";
-import { join, normalize } from "node:path";
+import type { fs } from "memfs";
 import {
   lstatSync,
-  readFileSync,
   readdirSync,
+  readFileSync,
   readlinkSync,
   statSync,
 } from "node:fs";
-import type { fs } from "memfs";
+import { lstat, readdir, readFile, readlink, stat } from "node:fs/promises";
+import { join, normalize } from "node:path";
 import {
-  type Task,
   afterEach,
   describe,
   expect,
   it,
   onTestFinished,
+  type Task,
   vi,
 } from "vitest";
 import { getCurrentTest } from "vitest/suite";
+import {
+  FIXTURE_TYPE_LINK_SYMBOL,
+  FIXTURE_TYPE_SYMLINK_SYMBOL,
+} from "../src/constants";
 import {
   getDirNameFromTask,
   isLink,
@@ -27,10 +31,6 @@ import {
   testdir,
   testdirSync,
 } from "../src/utils";
-import {
-  FIXTURE_TYPE_LINK_SYMBOL,
-  FIXTURE_TYPE_SYMLINK_SYMBOL,
-} from "../src/constants";
 
 vi.mock("node:fs/promises", async () => {
   const memfs: { fs: typeof fs } = await vi.importActual("memfs");

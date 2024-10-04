@@ -18,8 +18,7 @@
  *
  */
 
-import { dirname, resolve } from "node:path";
-import { link, mkdir, symlink, writeFile } from "node:fs/promises";
+import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
 import {
   linkSync,
   mkdirSync,
@@ -27,7 +26,8 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
-import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import { link, mkdir, symlink, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { isLink, isSymlink } from "./utils";
 
 /**

@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
+import { readdirSync, readFileSync } from "node:fs";
+import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fs } from "memfs";
 import { afterEach, describe, expect, it, vi } from "vitest";
