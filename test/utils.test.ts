@@ -17,7 +17,7 @@ import {
   expect,
   it,
   onTestFinished,
-  type Task,
+  type RunnerTask,
   vi,
 } from "vitest";
 import { getCurrentTest } from "vitest/suite";
@@ -81,7 +81,7 @@ describe("getDirNameFromTask", () => {
       file: {},
       name: "should include suite name in the directory name",
       suite: { name: "utils" },
-    } as Task;
+    } as RunnerTask;
 
     const dirName = getDirNameFromTask(task);
 
@@ -94,7 +94,7 @@ describe("getDirNameFromTask", () => {
     const task = {
       file: { name: "utils.test.ts" },
       name: "should remove '.test.ts' from the file name",
-    } as Task;
+    } as RunnerTask;
 
     const dirName = getDirNameFromTask(task);
 
@@ -107,7 +107,7 @@ describe("getDirNameFromTask", () => {
     const task = {
       file: { name: "utils.test.ts" },
       name: "should replace ........ æøå non-alphanumeric characters with '-'",
-    } as Task;
+    } as RunnerTask;
 
     const dirName = getDirNameFromTask(task);
 
@@ -120,7 +120,7 @@ describe("getDirNameFromTask", () => {
     const task = {
       file: { name: "utils.test.ts" },
       name: "should replace trailing hyphens with nothing-",
-    } as Task;
+    } as RunnerTask;
 
     const dirName = getDirNameFromTask(task);
 
@@ -133,7 +133,7 @@ describe("getDirNameFromTask", () => {
     const task = {
       file: { name: "utils.test.ts" },
       name: "should replace multiple---hyphens with a single hyphen---",
-    } as Task;
+    } as RunnerTask;
 
     const dirName = getDirNameFromTask(task);
 
