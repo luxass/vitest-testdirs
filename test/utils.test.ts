@@ -596,6 +596,7 @@ describe("fromFileSystem", () => {
       },
     };
 
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs.promises, "stat").mockImplementation(async (path: string) => {
       if (path === "test-dir" || path === "test-dir/subdir") {
         return { isDirectory: () => true } as Stats;
@@ -603,6 +604,7 @@ describe("fromFileSystem", () => {
       return { isDirectory: () => false } as Stats;
     });
 
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs.promises, "readdir").mockImplementation(async (path: string) => {
       if (path === "test-dir") {
         return [
@@ -619,6 +621,7 @@ describe("fromFileSystem", () => {
       return [];
     });
 
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs.promises, "readFile").mockImplementation(async (path: string) => {
       if (path === "test-dir/file1.txt") return "content1";
       if (path === "test-dir/file2.txt") return "content2";
@@ -646,7 +649,7 @@ describe("fromFileSystemSync", () => {
   it("should return an empty object if the path is not a directory", () => {
     vi.spyOn(fs, "statSync").mockResolvedValueOnce({
       isDirectory: () => false,
-    } as unknown as Stats);
+    } as any);
 
     const result = fromFileSystemSync("not-a-directory");
 
@@ -661,7 +664,7 @@ describe("fromFileSystemSync", () => {
         "file3.txt": "content3",
       },
     };
-
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "statSync").mockImplementation((path: string) => {
       if (path === "test-dir" || path === "test-dir/subdir") {
         return { isDirectory: () => true } as Stats;
@@ -669,6 +672,7 @@ describe("fromFileSystemSync", () => {
       return { isDirectory: () => false } as Stats;
     });
 
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "readdirSync").mockImplementation((path: string) => {
       if (path === "test-dir") {
         return [
@@ -685,6 +689,7 @@ describe("fromFileSystemSync", () => {
       return [];
     });
 
+    // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "readFileSync").mockImplementation((path: string) => {
       if (path === "test-dir/file1.txt") return "content1";
       if (path === "test-dir/file2.txt") return "content2";
