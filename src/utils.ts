@@ -23,7 +23,7 @@ import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
 import { readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { readdir, readFile, rm, stat } from "node:fs/promises";
 import { normalize } from "node:path";
-import { onTestFinished, type RunnerTask } from "vitest";
+import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {
   FIXTURE_TYPE_LINK_SYMBOL,
@@ -171,7 +171,7 @@ export const DIR_REGEX = /[^\w\-]+/g;
  * @param {Task} task - The task object.
  * @returns {string} The directory name for the task.
  */
-export function getDirNameFromTask(task: RunnerTask): string {
+export function getDirNameFromTask(task: Task): string {
   const fileName = (task.file?.name || "unnamed")
     .split("/")
     .pop()!
