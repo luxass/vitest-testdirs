@@ -1,6 +1,6 @@
 {
   "name": "vitest-testdirs",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "description": "A utility for Vitest to create isolated test directories",
   "type": "module",
   "author": {
