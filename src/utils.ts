@@ -20,8 +20,8 @@
  */
 
 import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
-import { rmSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { readdir, readFile, rm, stat } from "node:fs/promises";
 import { normalize } from "node:path";
 import { onTestFinished, type RunnerTask } from "vitest";
 import { getCurrentTest } from "vitest/suite";
@@ -242,4 +242,94 @@ export function isLink(value: unknown): value is TestdirLink {
     && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL]
     === FIXTURE_TYPE_LINK_SYMBOL
   );
+}
+
+/**
+ * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
+ *
+ * @param {string} path - The path to the directory to read.
+ * @returns {Promise<DirectoryJSON} A promise that resolves to a `DirectoryJSON` object representing the directory structure.
+ *
+ * @remarks
+ * - If the specified path is not a directory, an empty object is returned.
+ * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
+ * - This function uses `readdir` to read the directory contents and `readFile` to read file contents.
+ */
+export async function fromFileSystem(path: string): Promise<DirectoryJSON> {
+  if (!await isDirectory(path)) {
+    return {};
+  }
+
+  const files: DirectoryJSON = {};
+
+  const dirFiles = await readdir(path, {
+    withFileTypes: true,
+  });
+
+  for (const file of dirFiles) {
+    const filePath = file.name;
+    const fullPath = `${path}/${filePath}`;
+
+    if (file.isDirectory()) {
+      files[filePath] = await fromFileSystem(fullPath);
+    } else {
+      files[filePath] = await readFile(fullPath);
+    }
+  }
+
+  return files;
+}
+
+/**
+ * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
+ *
+ * @param {string} path - The path to the directory to read.
+ * @returns {DirectoryJSON} A `DirectoryJSON` object representing the directory structure.
+ *
+ * @remarks
+ * - If the specified path is not a directory, an empty object is returned.
+ * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
+ * - This function uses `readdirSync` to read the directory contents and `readFileSync` to read file contents.
+ */
+export function fromFileSystemSync(path: string): DirectoryJSON {
+  if (!isDirectorySync(path)) {
+    return {};
+  }
+
+  const files: DirectoryJSON = {};
+
+  const dirFiles = readdirSync(path, {
+    withFileTypes: true,
+  });
+
+  for (const file of dirFiles) {
+    const filePath = file.name;
+    const fullPath = `${path}/${filePath}`;
+
+    if (file.isDirectory()) {
+      files[filePath] = fromFileSystemSync(fullPath);
+    } else {
+      files[filePath] = readFileSync(fullPath, "utf-8");
+    }
+  }
+
+  return files;
+}
+
+async function isDirectory(path: string): Promise<boolean> {
+  try {
+    const result = await stat(path);
+    return result.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function isDirectorySync(path: string): boolean {
+  try {
+    const result = statSync(path);
+    return result.isDirectory();
+  } catch {
+    return false;
+  }
 }

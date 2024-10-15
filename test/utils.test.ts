@@ -1,5 +1,7 @@
-import type { fs } from "memfs";
+import type { FsPromisesApi } from "memfs/lib/node/types";
+import type Stats from "memfs/lib/Stats";
 import {
+  type Dirent,
   lstatSync,
   readdirSync,
   readFileSync,
@@ -8,6 +10,7 @@ import {
 } from "node:fs";
 import { lstat, readdir, readFile, readlink, stat } from "node:fs/promises";
 import { join, normalize } from "node:path";
+import { fs } from "memfs";
 import {
   afterEach,
   describe,
@@ -23,6 +26,8 @@ import {
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "../src/constants";
 import {
+  fromFileSystem,
+  fromFileSystemSync,
   getDirNameFromTask,
   isLink,
   isSymlink,
@@ -561,5 +566,135 @@ it("should create a TestdirSymlink object with the specified path", () => {
   expect(result).toEqual({
     [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
     path,
+  });
+});
+
+describe("fromFileSystem", () => {
+  it("should return an empty object if the path does not exist", async () => {
+    vi.spyOn(fs.promises, "stat").mockRejectedValueOnce(new Error("Path does not exist"));
+
+    const result = await fromFileSystem("non-existent-path");
+
+    expect(result).toEqual({});
+  });
+
+  it("should return an empty object if the path is not a directory", async () => {
+    vi.spyOn(fs.promises, "stat").mockResolvedValueOnce({
+      isDirectory: () => false,
+    } as Stats);
+
+    const result = await fromFileSystem("not-a-directory");
+
+    expect(result).toEqual({});
+  });
+
+  describe("fromFileSystemSync", () => {
+    it("should return an empty object if the path does not exist", () => {
+      vi.spyOn(fs, "statSync").mockImplementationOnce(() => {
+        throw new Error("Path does not exist");
+      });
+
+      const result = fromFileSystemSync("non-existent-path");
+
+      expect(result).toEqual({});
+    });
+
+    it("should return an empty object if the path is not a directory", () => {
+      vi.spyOn(fs, "statSync").mockReturnValueOnce({
+        isDirectory: () => false,
+      } as Stats);
+
+      const result = fromFileSystemSync("not-a-directory");
+
+      expect(result).toEqual({});
+    });
+
+    it("should return the directory structure with file contents", () => {
+      const mockFiles = {
+        "file1.txt": "content1",
+        "file2.txt": "content2",
+        "subdir": {
+          "file3.txt": "content3",
+        },
+      };
+
+      vi.spyOn(fs, "statSync").mockImplementation((path: string) => {
+        if (path === "test-dir" || path === "test-dir/subdir") {
+          return { isDirectory: () => true } as Stats;
+        }
+        return { isDirectory: () => false } as Stats;
+      });
+
+      vi.spyOn(fs, "readdirSync").mockImplementation((path: string) => {
+        if (path === "test-dir") {
+          return [
+            { name: "file1.txt", isDirectory: () => false },
+            { name: "file2.txt", isDirectory: () => false },
+            { name: "subdir", isDirectory: () => true },
+          ] as Dirent[];
+        }
+        if (path === "test-dir/subdir") {
+          return [
+            { name: "file3.txt", isDirectory: () => false },
+          ] as Dirent[];
+        }
+        return [];
+      });
+
+      vi.spyOn(fs, "readFileSync").mockImplementation((path: string) => {
+        if (path === "test-dir/file1.txt") return "content1";
+        if (path === "test-dir/file2.txt") return "content2";
+        if (path === "test-dir/subdir/file3.txt") return "content3";
+        return "";
+      });
+
+      const result = fromFileSystemSync("test-dir");
+
+      expect(result).toEqual(mockFiles);
+    });
+  });
+
+  it("should return the directory structure with file contents", async () => {
+    const mockFiles = {
+      "file1.txt": "content1",
+      "file2.txt": "content2",
+      "subdir": {
+        "file3.txt": "content3",
+      },
+    };
+
+    vi.spyOn(fs.promises, "stat").mockImplementation(async (path: string) => {
+      if (path === "test-dir" || path === "test-dir/subdir") {
+        return { isDirectory: () => true } as Stats;
+      }
+      return { isDirectory: () => false } as Stats;
+    });
+
+    vi.spyOn(fs.promises, "readdir").mockImplementation(async (path: string) => {
+      if (path === "test-dir") {
+        return [
+          { name: "file1.txt", isDirectory: () => false },
+          { name: "file2.txt", isDirectory: () => false },
+          { name: "subdir", isDirectory: () => true },
+        ] as Dirent[];
+      }
+      if (path === "test-dir/subdir") {
+        return [
+          { name: "file3.txt", isDirectory: () => false },
+        ] as Dirent[];
+      }
+      return [];
+    });
+
+    vi.spyOn(fs.promises, "readFile").mockImplementation(async (path: string) => {
+      if (path === "test-dir/file1.txt") return "content1";
+      if (path === "test-dir/file2.txt") return "content2";
+      if (path === "test-dir/subdir/file3.txt") return "content3";
+      return "";
+    });
+
+    const result = await fromFileSystem("test-dir");
+
+    expect(result).toEqual(mockFiles);
   });
 });

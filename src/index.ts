@@ -27,6 +27,8 @@ export type {
 export {
   BASE_DIR,
   DIR_REGEX,
+  fromFileSystem,
+  fromFileSystemSync,
   getDirNameFromTask,
   isLink,
   isSymlink,
