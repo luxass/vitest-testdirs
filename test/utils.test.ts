@@ -553,7 +553,7 @@ it("should create a TestdirLink object with the provided path", () => {
 
   expect(result).toEqual({
     [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
-    path,
+    path: normalize(path),
   });
 });
 
@@ -564,7 +564,7 @@ it("should create a TestdirSymlink object with the specified path", () => {
 
   expect(result).toEqual({
     [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
-    path,
+    path: normalize(path),
   });
 });
 

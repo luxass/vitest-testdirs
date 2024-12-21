@@ -18,7 +18,7 @@ it("should correctly handle symbolic links in the directory", () => {
 
   const result = fromFileSystemSync("./test/fixtures/symlinks");
 
-  expect(result).toEqual(mockFiles);
+  expect(result).toStrictEqual(mockFiles);
 });
 
 it("should correctly handle symbolic links in the directory using async", async () => {
@@ -34,5 +34,5 @@ it("should correctly handle symbolic links in the directory using async", async 
 
   const result = await fromFileSystem("./test/fixtures/symlinks");
 
-  expect(result).toEqual(mockFiles);
+  expect(result).toStrictEqual(mockFiles);
 });
