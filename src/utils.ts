@@ -20,8 +20,8 @@
  */
 
 import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
-import { readdirSync, readFileSync, rmSync, statSync } from "node:fs";
-import { readdir, readFile, rm, stat } from "node:fs/promises";
+import { readdirSync, readFileSync, readlinkSync, rmSync, statSync } from "node:fs";
+import { readdir, readFile, readlink, rm, stat } from "node:fs/promises";
 import { normalize } from "node:path";
 import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
@@ -244,10 +244,26 @@ export function isLink(value: unknown): value is TestdirLink {
   );
 }
 
+export interface FromFileSystemOptions {
+  /**
+   * An array of file names to
+   * ignore when reading the directory.
+   * @default []
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  ignore: ["node_modules", ".git"],
+   * });
+   * ```
+   */
+  ignore?: string[];
+}
+
 /**
  * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
  *
  * @param {string} path - The path to the directory to read.
+ * @param {FromFileSystemOptions?} options - The options
  * @returns {Promise<DirectoryJSON} A promise that resolves to a `DirectoryJSON` object representing the directory structure.
  *
  * @remarks
@@ -255,7 +271,7 @@ export function isLink(value: unknown): value is TestdirLink {
  * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
  * - This function uses `readdir` to read the directory contents and `readFile` to read file contents.
  */
-export async function fromFileSystem(path: string): Promise<DirectoryJSON> {
+export async function fromFileSystem(path: string, options?: FromFileSystemOptions): Promise<DirectoryJSON> {
   if (!await isDirectory(path)) {
     return {};
   }
@@ -266,14 +282,20 @@ export async function fromFileSystem(path: string): Promise<DirectoryJSON> {
     withFileTypes: true,
   });
 
-  for (const file of dirFiles) {
+  const ignore = options?.ignore ?? [];
+
+  const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
+
+  for (const file of filteredFiles) {
     const filePath = file.name;
     const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
       files[filePath] = await fromFileSystem(fullPath);
+    } else if (file.isSymbolicLink()) {
+      files[filePath] = symlink(await readlink(fullPath));
     } else {
-      files[filePath] = await readFile(fullPath);
+      files[filePath] = await readFile(fullPath, "utf8");
     }
   }
 
@@ -308,6 +330,8 @@ export function fromFileSystemSync(path: string): DirectoryJSON {
 
     if (file.isDirectory()) {
       files[filePath] = fromFileSystemSync(fullPath);
+    } else if (file.isSymbolicLink()) {
+      files[filePath] = symlink(readlinkSync(fullPath));
     } else {
       files[filePath] = readFileSync(fullPath, "utf-8");
     }
