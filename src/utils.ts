@@ -200,7 +200,7 @@ export function getDirNameFromTask(task: Task): string {
 export function symlink(path: string): TestdirSymlink {
   return {
     [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
-    path,
+    path: normalize(path),
   };
 }
 
@@ -212,7 +212,7 @@ export function symlink(path: string): TestdirSymlink {
 export function link(path: string): TestdirLink {
   return {
     [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
-    path,
+    path: normalize(path),
   };
 }
 
@@ -306,6 +306,7 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
  * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
  *
  * @param {string} path - The path to the directory to read.
+ * @param {FromFileSystemOptions?} options - The options
  * @returns {DirectoryJSON} A `DirectoryJSON` object representing the directory structure.
  *
  * @remarks
@@ -313,7 +314,7 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
  * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
  * - This function uses `readdirSync` to read the directory contents and `readFileSync` to read file contents.
  */
-export function fromFileSystemSync(path: string): DirectoryJSON {
+export function fromFileSystemSync(path: string, options?: FromFileSystemOptions): DirectoryJSON {
   if (!isDirectorySync(path)) {
     return {};
   }
@@ -324,7 +325,10 @@ export function fromFileSystemSync(path: string): DirectoryJSON {
     withFileTypes: true,
   });
 
-  for (const file of dirFiles) {
+  const ignore = options?.ignore ?? [];
+  const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
+
+  for (const file of filteredFiles) {
     const filePath = file.name;
     const fullPath = `${path}/${filePath}`;
 
