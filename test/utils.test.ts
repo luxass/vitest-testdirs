@@ -599,23 +599,51 @@ describe("fromFileSystem", () => {
     // @ts-expect-error - TODO: fix this
     vi.spyOn(fs.promises, "stat").mockImplementation(async (path: string) => {
       if (path === "test-dir" || path === "test-dir/subdir") {
-        return { isDirectory: () => true } as Stats;
+        return {
+          isDirectory: () => true,
+          isFile: () => false,
+          isSymbolicLink: () => false,
+        } as Stats;
       }
-      return { isDirectory: () => false } as Stats;
+      return {
+        isDirectory: () => false,
+        isFile: () => true,
+        isSymbolicLink: () => false,
+      } as Stats;
     });
 
     // @ts-expect-error - TODO: fix this
     vi.spyOn(fs.promises, "readdir").mockImplementation(async (path: string) => {
       if (path === "test-dir") {
         return [
-          { name: "file1.txt", isDirectory: () => false },
-          { name: "file2.txt", isDirectory: () => false },
-          { name: "subdir", isDirectory: () => true },
+          {
+            name: "file1.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
+          {
+            name: "file2.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
+          {
+            name: "subdir",
+            isDirectory: () => true,
+            isFile: () => false,
+            isSymbolicLink: () => false,
+          },
         ] as Dirent[];
       }
       if (path === "test-dir/subdir") {
         return [
-          { name: "file3.txt", isDirectory: () => false },
+          {
+            name: "file3.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
         ] as Dirent[];
       }
       return [];
@@ -649,6 +677,8 @@ describe("fromFileSystemSync", () => {
   it("should return an empty object if the path is not a directory", () => {
     vi.spyOn(fs, "statSync").mockResolvedValueOnce({
       isDirectory: () => false,
+      isFile: () => false,
+      isSymbolicLink: () => false,
     } as any);
 
     const result = fromFileSystemSync("not-a-directory");
@@ -667,23 +697,51 @@ describe("fromFileSystemSync", () => {
     // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "statSync").mockImplementation((path: string) => {
       if (path === "test-dir" || path === "test-dir/subdir") {
-        return { isDirectory: () => true } as Stats;
+        return {
+          isDirectory: () => true,
+          isFile: () => false,
+          isSymbolicLink: () => false,
+        } as Stats;
       }
-      return { isDirectory: () => false } as Stats;
+      return {
+        isDirectory: () => false,
+        isFile: () => true,
+        isSymbolicLink: () => false,
+      } as Stats;
     });
 
     // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "readdirSync").mockImplementation((path: string) => {
       if (path === "test-dir") {
         return [
-          { name: "file1.txt", isDirectory: () => false },
-          { name: "file2.txt", isDirectory: () => false },
-          { name: "subdir", isDirectory: () => true },
+          {
+            name: "file1.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
+          {
+            name: "file2.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
+          {
+            name: "subdir",
+            isDirectory: () => true,
+            isFile: () => false,
+            isSymbolicLink: () => false,
+          },
         ] as Dirent[];
       }
       if (path === "test-dir/subdir") {
         return [
-          { name: "file3.txt", isDirectory: () => false },
+          {
+            name: "file3.txt",
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          },
         ] as Dirent[];
       }
       return [];
