@@ -27,7 +27,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, normalize, resolve } from "node:path";
+import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { isLink, isSymlink } from "./utils";
 
 /**
@@ -52,6 +53,25 @@ export async function createFileTree(
     }
 
     if (isSymlink(data)) {
+      if (files[FIXTURE_ORIGINAL_PATH] != null) {
+        const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+        const tmpPath = normalize(path.replace(
+          // eslint-disable-next-line node/prefer-global/process
+          `${process.cwd()}/`,
+          "",
+        ));
+        const pathLevels = tmpPath.split("/").filter(Boolean).length;
+        const originalLevels = original.split("/").filter(Boolean).length;
+
+        if (pathLevels < originalLevels) {
+          const diff = originalLevels - pathLevels;
+          data.path = data.path.replace("../".repeat(diff), "");
+        } else if (pathLevels > originalLevels) {
+          const diff = pathLevels - originalLevels;
+          data.path = "../".repeat(diff) + data.path;
+        }
+      }
+
       await symlink(
         data.path,
         filename,
@@ -106,6 +126,25 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
     }
 
     if (isSymlink(data)) {
+      if (files[FIXTURE_ORIGINAL_PATH] != null) {
+        const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+        const tmpPath = normalize(path.replace(
+          // eslint-disable-next-line node/prefer-global/process
+          `${process.cwd()}/`,
+          "",
+        ));
+        const pathLevels = tmpPath.split("/").filter(Boolean).length;
+        const originalLevels = original.split("/").filter(Boolean).length;
+
+        if (pathLevels < originalLevels) {
+          const diff = originalLevels - pathLevels;
+          data.path = data.path.replace("../".repeat(diff), "");
+        } else if (pathLevels > originalLevels) {
+          const diff = pathLevels - originalLevels;
+          data.path = "../".repeat(diff) + data.path;
+        }
+      }
+
       symlinkSync(
         data.path,
         filename,

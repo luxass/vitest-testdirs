@@ -111,7 +111,7 @@ describe("fromFileSystem", () => {
 
     const result = await fromFileSystem("test-dir");
 
-    expect(result).toEqual(mockFiles);
+    expect(result).toMatchObject(mockFiles);
   });
 });
 
@@ -146,6 +146,7 @@ describe("fromFileSystemSync", () => {
         "file3.txt": "content3",
       },
     };
+
     // @ts-expect-error - TODO: fix this
     vi.spyOn(fs, "statSync").mockImplementation((path: string) => {
       if (path === "test-dir" || path === "test-dir/subdir") {
@@ -209,6 +210,6 @@ describe("fromFileSystemSync", () => {
 
     const result = fromFileSystemSync("test-dir");
 
-    expect(result).toEqual(mockFiles);
+    expect(result).toMatchObject(mockFiles);
   });
 });

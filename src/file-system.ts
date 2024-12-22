@@ -1,6 +1,7 @@
 import type { DirectoryJSON } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
+import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { symlink } from "./utils";
 
 export interface FromFileSystemOptions {
@@ -16,6 +17,12 @@ export interface FromFileSystemOptions {
    * ```
    */
   ignore?: string[];
+
+  /**
+   * Whether to follow symbolic links.
+   * @default true
+   */
+  followLinks?: boolean;
 }
 
 /**
@@ -35,13 +42,16 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
     return {};
   }
 
-  const files: DirectoryJSON = {};
+  const files: DirectoryJSON = {
+    [FIXTURE_ORIGINAL_PATH]: path,
+  };
 
   const dirFiles = await readdir(path, {
     withFileTypes: true,
   });
 
   const ignore = options?.ignore ?? [];
+  const followLinks = options?.followLinks ?? true;
 
   const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
 
@@ -50,8 +60,8 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
     const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
-      files[filePath] = await fromFileSystem(fullPath);
-    } else if (file.isSymbolicLink()) {
+      files[filePath] = await fromFileSystem(fullPath, options);
+    } else if (followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(await readlink(fullPath));
     } else {
       files[filePath] = await readFile(fullPath, "utf8");
@@ -78,13 +88,17 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
     return {};
   }
 
-  const files: DirectoryJSON = {};
+  const files: DirectoryJSON = {
+    [FIXTURE_ORIGINAL_PATH]: path,
+  };
 
   const dirFiles = readdirSync(path, {
     withFileTypes: true,
   });
 
   const ignore = options?.ignore ?? [];
+  const followLinks = options?.followLinks ?? true;
+
   const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
 
   for (const file of filteredFiles) {
@@ -92,8 +106,8 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
     const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
-      files[filePath] = fromFileSystemSync(fullPath);
-    } else if (file.isSymbolicLink()) {
+      files[filePath] = fromFileSystemSync(fullPath, options);
+    } else if (followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(readlinkSync(fullPath));
     } else {
       files[filePath] = readFileSync(fullPath, "utf-8");
