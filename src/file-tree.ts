@@ -55,6 +55,9 @@ export async function createFileTree(
     if (isSymlink(data)) {
       if (files[FIXTURE_ORIGINAL_PATH] != null) {
         const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+
+        // we need to replace here due to the fact that we call `createFileTree` recursively,
+        // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
           // eslint-disable-next-line node/prefer-global/process
           `${process.cwd()}/`,
@@ -128,6 +131,9 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
     if (isSymlink(data)) {
       if (files[FIXTURE_ORIGINAL_PATH] != null) {
         const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+
+        // we need to replace here due to the fact that we call `createFileTree` recursively,
+        // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
           // eslint-disable-next-line node/prefer-global/process
           `${process.cwd()}/`,
