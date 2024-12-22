@@ -1,8 +1,7 @@
 import type { Dirent, Stats } from "node:fs";
-import { fs, vol } from "memfs";
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { fs } from "memfs";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fromFileSystem, fromFileSystemSync } from "../src/file-system";
-import { symlink } from "../src/utils";
 
 vi.mock("node:fs", async () => {
   const memfs: { fs: typeof fs } = await vi.importActual("memfs");

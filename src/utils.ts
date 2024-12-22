@@ -26,7 +26,6 @@ import { normalize } from "node:path";
 import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {
-  FIXTURE_ORIGINAL_PATH,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";

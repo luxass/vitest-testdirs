@@ -1,23 +1,18 @@
-import type { fs } from "memfs";
 import {
-  type Dirent,
   lstatSync,
   readdirSync,
   readFileSync,
   readlinkSync,
-  type Stats,
   statSync,
 } from "node:fs";
 import { lstat, readdir, readFile, readlink, stat } from "node:fs/promises";
 import { join, normalize } from "node:path";
 import {
-  afterEach,
   describe,
   expect,
   it,
   onTestFinished,
   type Task,
-  vi,
 } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {

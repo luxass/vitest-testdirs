@@ -4,7 +4,6 @@
  */
 
 import type {
-  FIXTURE_ORIGINAL_PATH,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
