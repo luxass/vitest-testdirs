@@ -17,18 +17,20 @@
  * ```
  */
 
+export type { FromFileSystemOptions } from "./file-system";
+export { fromFileSystem, fromFileSystemSync } from "./file-system";
 export { createFileTree, createFileTreeSync } from "./file-tree";
+
 export type {
   DirectoryContent,
   DirectoryJSON,
   TestdirLink,
   TestdirSymlink,
 } from "./types";
+
 export {
   BASE_DIR,
   DIR_REGEX,
-  fromFileSystem,
-  fromFileSystemSync,
   getDirNameFromTask,
   isLink,
   isSymlink,

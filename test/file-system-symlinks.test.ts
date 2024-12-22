@@ -2,8 +2,8 @@ import { expect, it } from "vitest";
 import {
   fromFileSystem,
   fromFileSystemSync,
-  symlink,
-} from "../src/utils";
+} from "../src/file-system";
+import { symlink } from "../src/utils";
 
 it("should correctly handle symbolic links in the directory", () => {
   const mockFiles = {
