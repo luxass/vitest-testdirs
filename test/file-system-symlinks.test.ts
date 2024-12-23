@@ -48,6 +48,8 @@ describe("fromFileSystem", () => {
       dirname: "./three/levels/deep",
     });
 
+    console.log("PATH", path);
+
     const rootReadme = await readFile("./README.md", "utf8");
     const testdirReadme = await readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
