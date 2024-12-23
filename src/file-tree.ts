@@ -82,6 +82,8 @@ export async function createFileTree(
           const diff = pathLevels - originalLevels;
           data.path = `..${pathSeparator}`.repeat(diff) + data.path;
         }
+
+        console.log("data.path", data.path);
       }
 
       await symlink(
