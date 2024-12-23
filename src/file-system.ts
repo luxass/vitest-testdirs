@@ -1,6 +1,7 @@
 import type { DirectoryJSON } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
+import { normalize } from "node:path";
 import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { symlink } from "./utils";
 
@@ -43,7 +44,7 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
   }
 
   const files: DirectoryJSON = {
-    [FIXTURE_ORIGINAL_PATH]: path,
+    [FIXTURE_ORIGINAL_PATH]: normalize(path),
   };
 
   const dirFiles = await readdir(path, {
@@ -89,7 +90,7 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
   }
 
   const files: DirectoryJSON = {
-    [FIXTURE_ORIGINAL_PATH]: path,
+    [FIXTURE_ORIGINAL_PATH]: normalize(path),
   };
 
   const dirFiles = readdirSync(path, {

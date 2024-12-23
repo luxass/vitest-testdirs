@@ -56,6 +56,10 @@ export async function createFileTree(
       if (files[FIXTURE_ORIGINAL_PATH] != null) {
         const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
 
+        console.log("original", original);
+        console.log("path", path);
+
+        console.log("process.cwd", process.cwd());
         // we need to replace here due to the fact that we call `createFileTree` recursively,
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
