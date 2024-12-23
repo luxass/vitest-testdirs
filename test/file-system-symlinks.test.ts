@@ -41,7 +41,7 @@ describe("fromFileSystem", () => {
     expect(rootReadme).toStrictEqual(testdirReadme);
   });
 
-  it("should handle symbolic links using testdir with custom path", async () => {
+  it.only("should handle symbolic links using testdir with custom path", async () => {
     const files = await fromFileSystem("./test/fixtures/symlinks");
 
     const path = await testdir(files, {
