@@ -15,24 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
 
-      - name: Install pnpm
+      - name: install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Set node
+      - name: seyup node
         uses: actions/setup-node@v4.1.0
         with:
           node-version: lts/*
 
-      - name: Install
+      - name: install
         run: pnpm install --frozen-lockfile
 
-      - name: Build
+      - name: build
         run: pnpm build
 
-      - name: Lint
+      - name: lint
         run: pnpm lint
 
-      - name: Typecheck
+      - name: typecheck
         run: pnpm typecheck
 
   test:
@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: [20, 18]
+        node: [22, 20, 18]
         vitest:
           - latest
           - 2.0.0
@@ -54,22 +54,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
 
-      - name: Install pnpm
+      - name: install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Set node ${{ matrix.node }}
+      - name: setup node ${{ matrix.node }}
         uses: actions/setup-node@v4.1.0
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install
+      - name: install
         run: pnpm install --frozen-lockfile
 
-      - name: Install Vitest
+      - name: install Vitest
         run: pnpm add -D vitest@${{ matrix.vitest }}
 
-      - name: Build
+      - name: build
         run: pnpm build
 
-      - name: Test
+      - name: test
         run: pnpm test
