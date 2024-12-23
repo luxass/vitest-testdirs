@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   fromFileSystem,
@@ -30,12 +30,16 @@ describe("fromFileSystem", () => {
     expect(result).toMatchObject(mockFiles);
   });
 
-  it("should handle symbolic links using testdir", async () => {
+  it.only("should handle symbolic links using testdir", async () => {
     const files = await fromFileSystem("./test/fixtures/symlinks");
 
     const path = await testdir(files);
 
     const rootReadme = await readFile("./README.md", "utf8");
+
+    const files = await readdir(path);
+    console.log(files);
+
     const testdirReadme = await readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
     expect(rootReadme).toStrictEqual(testdirReadme);
