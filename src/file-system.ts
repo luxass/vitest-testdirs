@@ -1,7 +1,7 @@
 import type { DirectoryJSON } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
-import { normalize, sep as pathSeparator } from "node:path";
+import { normalize } from "node:path";
 import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { symlink } from "./utils";
 
