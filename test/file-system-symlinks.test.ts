@@ -30,18 +30,12 @@ describe("fromFileSystem", () => {
     expect(result).toMatchObject(mockFiles);
   });
 
-  it.only("should handle symbolic links using testdir", async () => {
+  it("should handle symbolic links using testdir", async () => {
     const files = await fromFileSystem("./test/fixtures/symlinks");
-
-    console.log(files);
 
     const path = await testdir(files);
 
     const rootReadme = await readFile("./README.md", "utf8");
-
-    const pathFiles = await readdir(path);
-    console.log(pathFiles);
-
     const testdirReadme = await readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
     expect(rootReadme).toStrictEqual(testdirReadme);
