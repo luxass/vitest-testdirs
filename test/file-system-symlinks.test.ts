@@ -37,8 +37,8 @@ describe("fromFileSystem", () => {
 
     const rootReadme = await readFile("./README.md", "utf8");
 
-    const files = await readdir(path);
-    console.log(files);
+    const pathFiles = await readdir(path);
+    console.log(pathFiles);
 
     const testdirReadme = await readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
