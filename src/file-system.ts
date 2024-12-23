@@ -58,7 +58,7 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
 
   for (const file of filteredFiles) {
     const filePath = file.name;
-    const fullPath = `${path}${pathSeparator}${filePath}`;
+    const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
       files[filePath] = await fromFileSystem(fullPath, options);
@@ -104,7 +104,7 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
 
   for (const file of filteredFiles) {
     const filePath = file.name;
-    const fullPath = `${path}${pathSeparator}${filePath}`;
+    const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
       files[filePath] = fromFileSystemSync(fullPath, options);
