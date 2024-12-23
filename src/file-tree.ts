@@ -27,7 +27,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
-import { dirname, normalize, resolve } from "node:path";
+import { dirname, normalize, sep as pathSeparator, resolve } from "node:path";
 import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { isLink, isSymlink } from "./utils";
 
@@ -67,18 +67,20 @@ export async function createFileTree(
           `${process.cwd()}/`,
           "",
         ));
-        const pathLevels = tmpPath.split("/").filter(Boolean).length;
-        const originalLevels = original.split("/").filter(Boolean).length;
+
+        console.log("tmpPath", tmpPath);
+        const pathLevels = tmpPath.split(/[/\\]/).filter(Boolean).length;
+        const originalLevels = original.split(/[/\\]/).filter(Boolean).length;
 
         console.log("pathLevels", pathLevels);
         console.log("originalLevels", originalLevels);
 
         if (pathLevels < originalLevels) {
           const diff = originalLevels - pathLevels;
-          data.path = data.path.replace("../".repeat(diff), "");
+          data.path = data.path.replace(`..${pathSeparator}`.repeat(diff), "");
         } else if (pathLevels > originalLevels) {
           const diff = pathLevels - originalLevels;
-          data.path = "../".repeat(diff) + data.path;
+          data.path = `..${pathSeparator}`.repeat(diff) + data.path;
         }
       }
 
