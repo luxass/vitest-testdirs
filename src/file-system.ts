@@ -1,7 +1,7 @@
 import type { DirectoryJSON } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
-import { normalize } from "node:path";
+import { normalize, sep as pathSeparator } from "node:path";
 import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { symlink } from "./utils";
 
@@ -58,7 +58,7 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
 
   for (const file of filteredFiles) {
     const filePath = file.name;
-    const fullPath = `${path}/${filePath}`;
+    const fullPath = `${path}${pathSeparator}${filePath}`;
 
     if (file.isDirectory()) {
       files[filePath] = await fromFileSystem(fullPath, options);
@@ -104,7 +104,7 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
 
   for (const file of filteredFiles) {
     const filePath = file.name;
-    const fullPath = `${path}/${filePath}`;
+    const fullPath = `${path}${pathSeparator}${filePath}`;
 
     if (file.isDirectory()) {
       files[filePath] = fromFileSystemSync(fullPath, options);

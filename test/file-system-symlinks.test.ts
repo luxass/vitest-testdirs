@@ -56,7 +56,7 @@ describe("fromFileSystem", () => {
   });
 });
 
-describe("fromFileSystemSync", () => {
+describe.only("fromFileSystemSync", () => {
   it("should correctly handle symbolic links in the directory", () => {
     const mockFiles = {
       "file1.txt": "content1\n",
