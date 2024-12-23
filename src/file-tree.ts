@@ -64,7 +64,7 @@ export async function createFileTree(
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
           // eslint-disable-next-line node/prefer-global/process
-          `${process.cwd()}/`,
+          `${process.cwd()}${pathSeparator}`,
           "",
         ));
 
