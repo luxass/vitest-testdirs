@@ -79,8 +79,6 @@ export async function testdir(
     ? normalize(`${BASE_DIR}/${options.dirname}`)
     : normalize(`${BASE_DIR}/${getDirNameFromTask(getCurrentTest()!)}`);
 
-  console.log("dirname", dirname);
-
   const allowOutside = options?.allowOutside ?? false;
 
   // if the dirname is escaped from BASE_DIR, throw an error
