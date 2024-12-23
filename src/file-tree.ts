@@ -56,10 +56,6 @@ export async function createFileTree(
       if (files[FIXTURE_ORIGINAL_PATH] != null) {
         const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
 
-        console.log("original", original);
-        console.log("path", path);
-
-        console.log("process.cwd", process.cwd());
         // we need to replace here due to the fact that we call `createFileTree` recursively,
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
@@ -68,12 +64,8 @@ export async function createFileTree(
           "",
         ));
 
-        console.log("tmpPath", tmpPath);
         const pathLevels = tmpPath.split(/[/\\]/).filter(Boolean).length;
         const originalLevels = original.split(/[/\\]/).filter(Boolean).length;
-
-        console.log("pathLevels", pathLevels);
-        console.log("originalLevels", originalLevels);
 
         if (pathLevels < originalLevels) {
           const diff = originalLevels - pathLevels;
@@ -82,8 +74,6 @@ export async function createFileTree(
           const diff = pathLevels - originalLevels;
           data.path = `..${pathSeparator}`.repeat(diff) + data.path;
         }
-
-        console.log("data.path", data.path);
       }
 
       await symlink(
@@ -147,18 +137,19 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
         const tmpPath = normalize(path.replace(
           // eslint-disable-next-line node/prefer-global/process
-          `${process.cwd()}/`,
+          `${process.cwd()}${pathSeparator}`,
           "",
         ));
-        const pathLevels = tmpPath.split("/").filter(Boolean).length;
-        const originalLevels = original.split("/").filter(Boolean).length;
+
+        const pathLevels = tmpPath.split(/[/\\]/).filter(Boolean).length;
+        const originalLevels = original.split(/[/\\]/).filter(Boolean).length;
 
         if (pathLevels < originalLevels) {
           const diff = originalLevels - pathLevels;
-          data.path = data.path.replace("../".repeat(diff), "");
+          data.path = data.path.replace(`..${pathSeparator}`.repeat(diff), "");
         } else if (pathLevels > originalLevels) {
           const diff = pathLevels - originalLevels;
-          data.path = "../".repeat(diff) + data.path;
+          data.path = `..${pathSeparator}`.repeat(diff) + data.path;
         }
       }
 
