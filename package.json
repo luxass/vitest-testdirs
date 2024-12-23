@@ -49,6 +49,16 @@
         "default": "./dist/file-tree.cjs"
       }
     },
+    "./file-system": {
+      "import": {
+        "types": "./dist/file-system.d.ts",
+        "default": "./dist/file-system.mjs"
+      },
+      "require": {
+        "types": "./dist/file-system.d.cts",
+        "default": "./dist/file-system.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",

@@ -4,7 +4,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./utils": "./src/utils.ts",
-    "./file-tree": "./src/file-tree.ts"
+    "./file-tree": "./src/file-tree.ts",
+    "./file-system": "./src/file-system.ts"
   },
   "exclude": [
     "tsup.config.ts",
