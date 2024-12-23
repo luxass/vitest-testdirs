@@ -70,6 +70,9 @@ export async function createFileTree(
         const pathLevels = tmpPath.split("/").filter(Boolean).length;
         const originalLevels = original.split("/").filter(Boolean).length;
 
+        console.log("pathLevels", pathLevels);
+        console.log("originalLevels", originalLevels);
+
         if (pathLevels < originalLevels) {
           const diff = originalLevels - pathLevels;
           data.path = data.path.replace("../".repeat(diff), "");
