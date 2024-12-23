@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
@@ -48,8 +49,6 @@ describe("fromFileSystem", () => {
       dirname: "./three/levels/deep",
     });
 
-    console.log("PATH", path);
-
     const rootReadme = await readFile("./README.md", "utf8");
     const testdirReadme = await readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
@@ -86,8 +85,8 @@ describe("fromFileSystemSync", () => {
 
     const path = testdirSync(files);
 
-    const rootReadme = readFile("./README.md", "utf8");
-    const testdirReadme = readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
+    const rootReadme = readFileSync("./README.md", "utf8");
+    const testdirReadme = readFileSync(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
     expect(rootReadme).toStrictEqual(testdirReadme);
   });
@@ -99,8 +98,8 @@ describe("fromFileSystemSync", () => {
       dirname: "./three/levels/deep-sync",
     });
 
-    const rootReadme = readFile("./README.md", "utf8");
-    const testdirReadme = readFile(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
+    const rootReadme = readFileSync("./README.md", "utf8");
+    const testdirReadme = readFileSync(`${path}/nested/double-nested/double-double-nested/README.md`, "utf8");
 
     expect(rootReadme).toStrictEqual(testdirReadme);
   });
