@@ -33,6 +33,8 @@ describe("fromFileSystem", () => {
   it.only("should handle symbolic links using testdir", async () => {
     const files = await fromFileSystem("./test/fixtures/symlinks");
 
+    console.log(files);
+
     const path = await testdir(files);
 
     const rootReadme = await readFile("./README.md", "utf8");
