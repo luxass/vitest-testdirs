@@ -9,7 +9,9 @@ export interface FromFileSystemOptions {
   /**
    * An array of file names to
    * ignore when reading the directory.
+   *
    * @default []
+   *
    * @example
    * ```ts
    * const files = await fromFileSystem("path/to/dir", {
@@ -24,6 +26,21 @@ export interface FromFileSystemOptions {
    * @default true
    */
   followLinks?: boolean;
+
+  /**
+   * An object with extra files to include in the directory structure.
+   * @default {}
+   *
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  extras: {
+   *   "extra-file.txt": "This is an extra file",
+   *  },
+   * });
+   * ```
+   */
+  extras?: DirectoryJSON;
 }
 
 /**
@@ -69,7 +86,10 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
     }
   }
 
-  return files;
+  return {
+    ...files,
+    ...options?.extras,
+  };
 }
 
 /**
@@ -115,7 +135,10 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
     }
   }
 
-  return files;
+  return {
+    ...files,
+    ...options?.extras,
+  };
 }
 
 async function isDirectory(path: string): Promise<boolean> {
