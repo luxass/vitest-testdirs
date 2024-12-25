@@ -1,3 +1,17 @@
+/**
+ * This module contains functions for creating json representations of file systems.
+ * @module file-system
+ *
+ * @example
+ * ```ts
+ * import { fromFileSystem, fromFileSystemSync } from "vitest-testdirs/file-system";
+ *
+ *
+ * await fromFileSystem("./path/to/dir");
+ * fromFileSystemSync("./path/to/dir");
+ * ```
+ */
+
 import type { DirectoryJSON } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
@@ -44,22 +58,23 @@ export interface FromFileSystemOptions {
 }
 
 /**
- * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
+ * Processes a directory and its contents recursively, creating a JSON representation of the file system.
  *
- * @param {string} path - The path to the directory to read.
- * @param {FromFileSystemOptions?} options - The options
- * @returns {Promise<DirectoryJSON} A promise that resolves to a `DirectoryJSON` object representing the directory structure.
+ * @param {string} path - The absolute path to the directory to process
+ * @param {Required<Omit<FromFileSystemOptions, "extras">>} options - Configuration options for processing the directory
  *
- * @remarks
- * - If the specified path is not a directory, an empty object is returned.
- * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
- * - This function uses `readdir` to read the directory contents and `readFile` to read file contents.
+ * @returns {Promise<DirectoryJSON>} A Promise that resolves to a DirectoryJSON object representing the directory structure
+ *          where keys are file/directory names and values are either:
+ *          - A string containing file contents for regular files
+ *          - A DirectoryJSON object for subdirectories
+ *          - A symbolic link representation for symlinks (when followLinks is true)
+ *
+ * @throws {Error} If there are issues reading the directory or its contents
  */
-export async function fromFileSystem(path: string, options?: FromFileSystemOptions): Promise<DirectoryJSON> {
-  if (!await isDirectory(path)) {
-    return {};
-  }
-
+async function processDirectory(
+  path: string,
+  options: Required<Omit<FromFileSystemOptions, "extras">>,
+): Promise<DirectoryJSON> {
   const files: DirectoryJSON = {
     [FIXTURE_ORIGINAL_PATH]: normalize(path),
   };
@@ -68,47 +83,42 @@ export async function fromFileSystem(path: string, options?: FromFileSystemOptio
     withFileTypes: true,
   });
 
-  const ignore = options?.ignore ?? [];
-  const followLinks = options?.followLinks ?? true;
-
-  const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
+  const filteredFiles = dirFiles.filter((file) => !options.ignore.includes(file.name));
 
   for (const file of filteredFiles) {
     const filePath = file.name;
     const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
-      files[filePath] = await fromFileSystem(fullPath, options);
-    } else if (followLinks && file.isSymbolicLink()) {
+      files[filePath] = await processDirectory(fullPath, options);
+    } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(await readlink(fullPath));
     } else {
       files[filePath] = await readFile(fullPath, "utf8");
     }
   }
 
-  return {
-    ...files,
-    ...options?.extras,
-  };
+  return files;
 }
 
 /**
- * Recursively reads the contents of a directory and returns a JSON representation of the directory structure.
+ * Recursively processes a directory and returns its structure as a JSON object.
  *
- * @param {string} path - The path to the directory to read.
- * @param {FromFileSystemOptions?} options - The options
- * @returns {DirectoryJSON} A `DirectoryJSON` object representing the directory structure.
+ * @param {string} path - The absolute path to the directory to process
+ * @param {Required<Omit<FromFileSystemOptions, "extras">>} options - Configuration options for processing the directory
  *
- * @remarks
- * - If the specified path is not a directory, an empty object is returned.
- * - Each directory is represented as an object where the keys are the file or directory names and the values are either the file contents or another directory object.
- * - This function uses `readdirSync` to read the directory contents and `readFileSync` to read file contents.
+ * @returns {DirectoryJSON} A DirectoryJSON object representing the directory structure where:
+ * - Keys are file/directory names
+ * - Values are either:
+ *   - String content for files
+ *   - Nested DirectoryJSON objects for directories
+ *   - Symlink objects for symbolic links (when followLinks is true)
+ * - Special key [FIXTURE_ORIGINAL_PATH] contains the normalized original path
  */
-export function fromFileSystemSync(path: string, options?: FromFileSystemOptions): DirectoryJSON {
-  if (!isDirectorySync(path)) {
-    return {};
-  }
-
+function processDirectorySync(
+  path: string,
+  options: Required<Omit<FromFileSystemOptions, "extras">>,
+): DirectoryJSON {
   const files: DirectoryJSON = {
     [FIXTURE_ORIGINAL_PATH]: normalize(path),
   };
@@ -117,24 +127,92 @@ export function fromFileSystemSync(path: string, options?: FromFileSystemOptions
     withFileTypes: true,
   });
 
-  const ignore = options?.ignore ?? [];
-  const followLinks = options?.followLinks ?? true;
-
-  const filteredFiles = dirFiles.filter((file) => !ignore.includes(file.name));
+  const filteredFiles = dirFiles.filter((file) => !options.ignore.includes(file.name));
 
   for (const file of filteredFiles) {
     const filePath = file.name;
     const fullPath = `${path}/${filePath}`;
 
     if (file.isDirectory()) {
-      files[filePath] = fromFileSystemSync(fullPath, options);
-    } else if (followLinks && file.isSymbolicLink()) {
+      files[filePath] = processDirectorySync(fullPath, options);
+    } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(readlinkSync(fullPath));
     } else {
       files[filePath] = readFileSync(fullPath, "utf-8");
     }
   }
 
+  return files;
+}
+
+/**
+ * Recursively reads a directory and returns a JSON representation of its structure
+ *
+ * @param {string} path - The path to the directory to read
+ * @param {FromFileSystemOptions?} options - Options for customizing the directory reading behavior
+ *
+ * @returns {Promise<DirectoryJSON>} A promise that resolves to a DirectoryJSON object representing the directory structure
+ * @throws Will throw an error if the path cannot be accessed or read
+ *
+ * @example
+ * ```ts
+ * const dirStructure = await fromFileSystem('./src', {
+ *   ignore: ['node_modules', '.git'],
+ *   followLinks: false
+ * });
+ * ```
+ */
+export async function fromFileSystem(
+  path: string,
+  options?: FromFileSystemOptions,
+): Promise<DirectoryJSON> {
+  if (!await isDirectory(path)) {
+    return {};
+  }
+
+  const processOptions = {
+    ignore: options?.ignore ?? [],
+    followLinks: options?.followLinks ?? true,
+  };
+
+  const files = await processDirectory(path, processOptions);
+  return {
+    ...files,
+    ...options?.extras,
+  };
+}
+
+/**
+ * Synchronously creates a DirectoryJSON object from a file system path.
+ *
+ * @param {string} path - The path to the directory to read
+ * @param {FromFileSystemOptions?} options - Options for customizing the directory reading behavior
+ *
+ * @returns {DirectoryJSON} A DirectoryJSON object representing the directory structure
+ * @throws Will throw an error if the path cannot be accessed or read
+ *
+ * @example
+ * ```ts
+ * const dirStructure = await fromFileSystem('./src', {
+ *   ignore: ['node_modules', '.git'],
+ *   followLinks: false
+ * });
+ * ```
+ */
+export function fromFileSystemSync(
+  path: string,
+  options?: FromFileSystemOptions,
+): DirectoryJSON {
+  if (!isDirectorySync(path)) {
+    return {};
+  }
+
+  const processOptions = {
+    ignore: options?.ignore ?? [],
+    followLinks: options?.followLinks ?? true,
+  };
+
+  const files = processDirectorySync(path, processOptions);
   return {
     ...files,
     ...options?.extras,
