@@ -15,7 +15,7 @@
  *
  * await createFileTree("./path/to/dir", files);
  * createFileTreeSync("./path/to/dir", files);
- *
+ * ```
  */
 
 import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
