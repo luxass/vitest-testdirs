@@ -99,11 +99,35 @@ export async function testdir(
   return dirname;
 }
 
+/**
+ * Cleans up the test directory after the test has finished.
+ * @param {DirectoryJSON} files - The directory structure to create.
+ * @returns {Promise<string>} The path of the created test directory.
+ *
+ * @example
+ * ```ts
+ * const dir = testdir.cleanup({
+ *  "file.txt": "Hello, World!",
+ * });
+ */
 testdir.cleanup = async (files: DirectoryJSON): Promise<string> =>
   testdir(files, {
     cleanup: true,
   });
 
+/**
+ * Creates a test directory with the specified files and options.
+ * @param {string} dirname - The directory name to use.
+ * @returns {Function} A function that creates a test directory with the specified files.
+ * @throws An error if `testdir` is called outside of a test.
+ *
+ * @example
+ * ```ts
+ * const dir = testdir.dir("my-dir")({
+ *  "file.txt": "Hello, World!",
+ * });
+ * ```
+ */
 testdir.dir = (
   dirname: string,
 ): ((files: DirectoryJSON) => Promise<string>) => {
@@ -152,11 +176,36 @@ export function testdirSync(
   return dirname;
 }
 
+/**
+ * Cleans up the test directory after the test has finished.
+ * @param {DirectoryJSON} files - The directory structure to create.
+ * @returns {string} The path of the created test directory.
+ *
+ * @example
+ * ```ts
+ * const dir = testdirSync.cleanup({
+ *  "file.txt": "Hello, World!",
+ * });
+ * ```
+ */
 testdirSync.cleanup = (files: DirectoryJSON): string =>
   testdirSync(files, {
     cleanup: true,
   });
 
+/**
+ * Creates a test directory with the specified files and options.
+ * @param {string} dirname - The directory name to use.
+ * @returns {Function} A function that creates a test directory with the specified files.
+ * @throws An error if `testdir` is called outside of a test.
+ *
+ * @example
+ * ```ts
+ * const dir = testdirSync.dir("my-dir")({
+ *  "file.txt": "Hello, World!",
+ * });
+ * ```
+ */
 testdirSync.dir = (dirname: string): ((files: DirectoryJSON) => string) => {
   return (files: DirectoryJSON) =>
     testdirSync(files, {
@@ -164,6 +213,9 @@ testdirSync.dir = (dirname: string): ((files: DirectoryJSON) => string) => {
     });
 };
 
+/**
+ * Regular expression for replacing invalid characters in directory names.
+ */
 export const DIR_REGEX = /[^\w\-]+/g;
 
 /**
