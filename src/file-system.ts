@@ -193,7 +193,7 @@ export async function fromFileSystem(
  *
  * @example
  * ```ts
- * const dirStructure = await fromFileSystem('./src', {
+ * const dirStructure = fromFileSystemSync('./src', {
  *   ignore: ['node_modules', '.git'],
  *   followLinks: false
  * });
