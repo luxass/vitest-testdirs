@@ -19,6 +19,9 @@ import { normalize } from "node:path";
 import { FIXTURE_ORIGINAL_PATH } from "./constants";
 import { symlink } from "./utils";
 
+/**
+ * Options for customizing the behavior of the fromFileSystem functions.
+ */
 export interface FromFileSystemOptions {
   /**
    * An array of file names to

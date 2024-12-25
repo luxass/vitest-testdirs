@@ -31,8 +31,14 @@ import {
 } from "./constants";
 import { createFileTree, createFileTreeSync } from "./file-tree";
 
+/**
+ * The base directory for test directories.
+ */
 export const BASE_DIR = ".vitest-testdirs";
 
+/**
+ * Options for creating a test directory.
+ */
 export interface TestdirOptions {
   /**
    * Whether to cleanup the directory after the test has finished.
@@ -57,7 +63,6 @@ export interface TestdirOptions {
    * @default false
    */
   allowOutside?: boolean;
-
 }
 
 /**
