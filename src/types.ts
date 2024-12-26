@@ -69,18 +69,26 @@ export interface DirectoryJSON<T extends DirectoryContent = DirectoryContent> {
 }
 
 /**
+ * Represents metadata for a file system entry.
+ */
+export interface FSMetadata {
+  /**
+   * The POSIX permission of the file system entry.
+   */
+  mode: number;
+}
+
+/**
  * Represents metadata for a test directory entry.
  */
 export interface TestdirMetadata {
   /**
    * Internally used to store and retrieve metadata about test fixture definitions.
    */
-  [key: symbol]: {
-    mode: number;
-  };
+  [key: symbol]: FSMetadata;
 
   /**
-   * The content of the test directory entry.
+   * The content of the definition.
    */
-  content: string;
+  content: DirectoryContent;
 }

@@ -19,7 +19,7 @@
  * ```
  */
 
-import type { DirectoryJSON, TestdirLink, TestdirMetadata, TestdirSymlink } from "./types";
+import type { DirectoryContent, DirectoryJSON, FSMetadata, TestdirLink, TestdirMetadata, TestdirSymlink } from "./types";
 import { rmSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
@@ -272,6 +272,20 @@ export function link(path: string): TestdirLink {
   return {
     [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
     path: normalize(path),
+  };
+}
+
+/**
+ * Combines directory JSON with metadata to create a TestdirMetadata object.
+ *
+ * @param {DirectoryContent} content - The content you want to add metadata to
+ * @param {FSMetadata} metadata - The FSMetadata object containing file system metadata
+ * @returns {TestdirMetadata} A TestdirMetadata object containing both the directory structure and metadata
+ */
+export function withMetadata(content: DirectoryContent, metadata: FSMetadata): TestdirMetadata {
+  return {
+    [FIXTURE_METADATA]: metadata,
+    content,
   };
 }
 

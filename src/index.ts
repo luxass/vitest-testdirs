@@ -24,7 +24,9 @@ export { createFileTree, createFileTreeSync } from "./file-tree";
 export type {
   DirectoryContent,
   DirectoryJSON,
+  FSMetadata,
   TestdirLink,
+  TestdirMetadata,
   TestdirSymlink,
 } from "./types";
 
@@ -32,12 +34,14 @@ export {
   BASE_DIR,
   DIR_REGEX,
   getDirNameFromTask,
+  hasMetadata,
   isLink,
   isSymlink,
   link,
   symlink,
   testdir,
   testdirSync,
+  withMetadata,
 } from "./utils";
 
 export type { TestdirOptions } from "./utils";
