@@ -19,9 +19,17 @@ export const FIXTURE_TYPE_LINK_SYMBOL = Symbol("testdir-link");
 export const FIXTURE_TYPE_SYMLINK_SYMBOL = Symbol("testdir-symlink");
 
 /**
- * Symbol representing the original file path of a test fixture directory.
+ * Symbol representing the original file path of a test fixture definition.
  * Used internally to track and restore the original paths of test directories.
  *
  * @const {symbol}
  */
 export const FIXTURE_ORIGINAL_PATH = Symbol("testdir-original-path");
+
+/**
+ * Symbol representing the metadata of a test fixture definition.
+ * Used internally to store and retrieve metadata about test definitions.
+ *
+ * @const {symbol}
+ */
+export const FIXTURE_METADATA = Symbol("testdir-metadata");

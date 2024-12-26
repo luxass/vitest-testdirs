@@ -19,13 +19,14 @@
  * ```
  */
 
-import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import type { DirectoryJSON, TestdirLink, TestdirMetadata, TestdirSymlink } from "./types";
 import { rmSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
 import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {
+  FIXTURE_METADATA,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
@@ -290,7 +291,7 @@ export function isSymlink(value: unknown): value is TestdirSymlink {
 
 /**
  * Check if value is a TestdirLink
- * @param value The value to check
+ * @param {unknown} value The value to check
  * @returns {value is TestdirLink} The same value
  */
 export function isLink(value: unknown): value is TestdirLink {
@@ -299,5 +300,18 @@ export function isLink(value: unknown): value is TestdirLink {
     && value !== null
     && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL]
     === FIXTURE_TYPE_LINK_SYMBOL
+  );
+}
+
+/**
+ * Check if value is a TestdirMetadata
+ * @param {unknown} value The value to check
+ * @returns {value is TestdirMetadata} The same value
+ */
+export function hasMetadata(value: unknown): value is TestdirMetadata {
+  return (
+    typeof value === "object"
+    && value !== null
+    && (value as TestdirMetadata)[FIXTURE_METADATA] != null
   );
 }
