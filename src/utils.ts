@@ -281,6 +281,10 @@ export function link(path: string): TestdirLink {
  * @param {DirectoryContent} content - The content you want to add metadata to
  * @param {FSMetadata} metadata - The FSMetadata object containing file system metadata
  * @returns {TestdirMetadata} A TestdirMetadata object containing both the directory structure and metadata
+ *
+ * @remarks
+ * due to how permissions work on windows and `libuv` doesn't support windows acl's.
+ * setting a directory to readonly on windows doesn't actually work, and will still be writable.
  */
 export function withMetadata(content: DirectoryContent | DirectoryJSON, metadata: FSMetadata): TestdirMetadata {
   return {
