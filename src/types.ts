@@ -21,7 +21,8 @@ export type DirectoryContent =
   | bigint
   | symbol
   | TestdirSymlink
-  | TestdirLink;
+  | TestdirLink
+  | TestdirMetadata;
 
 /**
  * Represents a symbolic link in a testing directory.
@@ -90,5 +91,5 @@ export interface TestdirMetadata {
   /**
    * The content of the definition.
    */
-  content: DirectoryContent;
+  content: DirectoryContent | DirectoryJSON;
 }
