@@ -18,7 +18,7 @@
  * ```
  */
 
-import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import type { DirectoryContent, DirectoryJSON, TestdirLink, TestdirMetadata, TestdirSymlink } from "./types";
 import {
   linkSync,
   mkdirSync,
@@ -28,8 +28,8 @@ import {
 } from "node:fs";
 import { link, mkdir, symlink, writeFile } from "node:fs/promises";
 import { dirname, normalize, sep as pathSeparator, resolve } from "node:path";
-import { FIXTURE_ORIGINAL_PATH } from "./constants";
-import { isLink, isSymlink } from "./utils";
+import { FIXTURE_METADATA, FIXTURE_ORIGINAL_PATH } from "./constants";
+import { hasMetadata, isLink, isSymlink } from "./utils";
 
 /**
  * Creates a file tree at the specified path using the provided files object.
@@ -44,6 +44,9 @@ export async function createFileTree(
 ): Promise<void> {
   for (let filename in files) {
     let data = files[filename];
+    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA] : undefined;
+    data = hasMetadata(data) ? data.content : data;
+
     filename = resolve(path, filename);
 
     // check if file is a object with the link symbol
@@ -86,6 +89,7 @@ export async function createFileTree(
 
     if (isPrimitive(data) || data instanceof Uint8Array) {
       const dir = dirname(filename);
+
       await mkdir(dir, {
         recursive: true,
       });
@@ -100,13 +104,16 @@ export async function createFileTree(
         data = String(data);
       }
 
-      await writeFile(filename, data);
+      await writeFile(filename, data, {
+        ...metadata,
+      });
     } else {
       await mkdir(filename, {
         recursive: true,
+        ...(metadata?.mode ? { mode: metadata.mode } : {}),
       });
 
-      await createFileTree(filename, data);
+      await createFileTree(filename, data as DirectoryJSON);
     }
   }
 }
@@ -121,6 +128,9 @@ export async function createFileTree(
 export function createFileTreeSync(path: string, files: DirectoryJSON): void {
   for (let filename in files) {
     let data = files[filename];
+    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA] : undefined;
+    data = hasMetadata(data) ? data.content : data;
+
     filename = resolve(path, filename);
 
     // check if file is a object with the link symbol
@@ -163,6 +173,7 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
 
     if (isPrimitive(data) || data instanceof Uint8Array) {
       const dir = dirname(filename);
+
       mkdirSync(dir, {
         recursive: true,
       });
@@ -177,13 +188,16 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
         data = String(data);
       }
 
-      writeFileSync(filename, data);
+      writeFileSync(filename, data, {
+        ...metadata,
+      });
     } else {
       mkdirSync(filename, {
         recursive: true,
+        ...(metadata?.mode ? { mode: metadata.mode } : {}),
       });
 
-      createFileTreeSync(filename, data);
+      createFileTreeSync(filename, data as DirectoryJSON);
     }
   }
 }
@@ -193,9 +207,9 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
  *
  * @internal
  * @param {unknown} data - The data to be checked.
- * @returns {data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON>} `true` if the data is a primitive value, `false` otherwise.
+ * @returns {data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON | TestdirMetadata>} `true` if the data is a primitive value, `false` otherwise.
  */
-function isPrimitive(data: unknown): data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON> {
+function isPrimitive(data: unknown): data is Exclude<DirectoryContent, TestdirSymlink | TestdirLink | DirectoryJSON | TestdirMetadata> {
   return (
     typeof data === "string"
     || typeof data === "number"
