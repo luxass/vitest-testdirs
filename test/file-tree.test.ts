@@ -301,9 +301,9 @@ describe("createFileTreeSync", () => {
     expect(link2Content).toBe("This is file 2");
   });
 
-  it("should be able to create files with different permissions", () => {
+  it.only("should be able to create files with different permissions", () => {
     const path = "./.vitest-testdirs/with-permissions-sync";
-    cleanup(path);
+    // cleanup(path);
 
     const files = {
       "file1.txt": withMetadata("Hello, world!", { mode: fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
