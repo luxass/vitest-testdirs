@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import fsAsync from "node:fs/promises";
+import { platform } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, onTestFailed, onTestFinished, vi } from "vitest";
 import { createFileTree, createFileTreeSync } from "../src/file-tree";
@@ -138,17 +139,17 @@ describe("createFileTree", () => {
     expect(link2Content).toBe("This is file 2");
   });
 
-  it("should be able to create files with different permissions", async () => {
+  it.runIf(platform() !== "win32")("should be able to create files with different permissions", async () => {
     const path = "./.vitest-testdirs/with-permissions";
     cleanup(path);
 
     const files = {
-      "file1.txt": withMetadata("Hello, world!", { mode: fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
+      "file1.txt": withMetadata("Hello, world!", { mode: 0o644 }),
       "dir1": {
-        "file2.txt": withMetadata("This is file 2", { mode: fs.constants.S_IRUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
+        "file2.txt": withMetadata("This is file 2", { mode: 0o444 }),
         "dir2": withMetadata({
           "file3.txt": "This is file 3",
-        }, { mode: fs.constants.S_IRUSR | fs.constants.S_IXUSR | fs.constants.S_IRGRP | fs.constants.S_IXGRP | fs.constants.S_IROTH | fs.constants.S_IXOTH }),
+        }, { mode: 0o555 }),
       },
     };
 
@@ -301,36 +302,19 @@ describe("createFileTreeSync", () => {
     expect(link2Content).toBe("This is file 2");
   });
 
-  it("should be able to create files with different permissions", () => {
+  it.runIf(platform() !== "win32")("should be able to create files with different permissions", () => {
     const path = "./.vitest-testdirs/with-permissions-sync";
-    // cleanup(path);
+    cleanup(path);
 
     const files = {
-      "file1.txt": withMetadata("Hello, world!", { mode: fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
+      "file1.txt": withMetadata("Hello, world!", { mode: 0o644 }),
       "dir1": {
-        "file2.txt": withMetadata("This is file 2", { mode: fs.constants.S_IRUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
+        "file2.txt": withMetadata("This is file 2", { mode: 0o444 }),
         "dir2": withMetadata({
           "file3.txt": "This is file 3",
-        }, { mode: fs.constants.S_IRUSR | fs.constants.S_IXUSR | fs.constants.S_IRGRP | fs.constants.S_IXGRP | fs.constants.S_IROTH | fs.constants.S_IXOTH }),
+        }, { mode: 0o555 }),
       },
     };
-
-    onTestFailed(() => {
-      const dirStats = fs.statSync(path);
-      console.error(dirStats);
-
-      const file1Stats = fs.statSync(resolve(path, "file1.txt"));
-      console.error(file1Stats);
-
-      const file2Stats = fs.statSync(resolve(path, "dir1/file2.txt"));
-      console.error(file2Stats);
-
-      const dir2Stats = fs.statSync(resolve(path, "dir1/dir2"));
-      console.error(dir2Stats);
-
-      const file3Stats = fs.statSync(resolve(path, "dir1/dir2/file3.txt"));
-      console.error(file3Stats);
-    });
 
     expect(() => createFileTreeSync(path, files)).toThrowError("EACCES: permission denied");
 
