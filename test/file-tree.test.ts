@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsAsync from "node:fs/promises";
 import { resolve } from "node:path";
-import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
+import { afterEach, describe, expect, it, onTestFailed, onTestFinished, vi } from "vitest";
 import { createFileTree, createFileTreeSync } from "../src/file-tree";
 import { link, symlink, withMetadata } from "../src/utils";
 
@@ -314,6 +314,23 @@ describe("createFileTreeSync", () => {
         }, { mode: fs.constants.S_IRUSR | fs.constants.S_IXUSR | fs.constants.S_IRGRP | fs.constants.S_IXGRP | fs.constants.S_IROTH | fs.constants.S_IXOTH }),
       },
     };
+
+    onTestFailed(() => {
+      const dirStats = fs.statSync(path);
+      console.error(dirStats);
+
+      const file1Stats = fs.statSync(resolve(path, "file1.txt"));
+      console.error(file1Stats);
+
+      const file2Stats = fs.statSync(resolve(path, "dir1/file2.txt"));
+      console.error(file2Stats);
+
+      const dir2Stats = fs.statSync(resolve(path, "dir1/dir2"));
+      console.error(dir2Stats);
+
+      const file3Stats = fs.statSync(resolve(path, "dir1/dir2/file3.txt"));
+      console.error(file3Stats);
+    });
 
     expect(() => createFileTreeSync(path, files)).toThrowError("EACCES: permission denied");
 
