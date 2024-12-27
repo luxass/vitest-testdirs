@@ -54,8 +54,9 @@ describe("testdirSync", () => {
 
 ## Metadata on Windows
 
-When you are using `withMetadata` on a Windows filesystem, the permission is not set correctly.
-This is because how windows work, and libuv not supporting Windows ACLs.
+When you are using `withMetadata` on a Windows filesystem, the permission is not set correctly on directories. This is not something that can be fixed, in this library as the issue is either coming from node or libuv.
+
+It mostly happens on Directories. You can try out the following example to see the issue.
 
 ```ts
 import { readFile, writeFile } from "node:fs/promises";
@@ -64,21 +65,36 @@ import { testdir, withMetadata } from "../src";
 
 it("windows", async () => {
   const path = await testdir({
-    "file1.txt": withMetadata("Hello, World!", { mode: 0o444 }),
+    "file.txt": withMetadata("Hello, World!", { mode: 0o444 }), // This works
+    "nested": withMetadata({
+      "file.txt": "Hello, World!",
+    }, { mode: 0o555 }), // This doesn't work.
   });
 
   try {
-    await writeFile(`${path}/file1.txt`, "Hello, Vitest!");
+    await writeFile(`${path}/file.txt`, "Hello, Vitest!");
+    // This should throw an error
+  } catch (err) {
+    console.log(err);
+  }
+
+  const content = await readFile(`${path}/file.txt`, "utf8");
+
+  expect(content).not.toBe("Hello, Vitest!");
+  expect(content).toBe("Hello, World!");
+
+  try {
+    await writeFile(`${path}/nested/file.txt`, "Hello, Vitest!");
     // This should throw an error, but not on Windows
   } catch (err) {
     console.log(err);
   }
 
-  const content = await readFile(`${path}/file1.txt`, "utf8");
-  // The content is now changes, but it should not be possible to write to the file
+  const nestedContent = await readFile(`${path}/nested/file.txt`, "utf8");
+  // The content is now changed, but it should not be possible to write to the file
 
-  expect(content).not.toBe("Hello, Vitest!");
-  expect(content).toBe("Hello, World!");
+  expect(nestedContent).not.toBe("Hello, Vitest!");
+  expect(nestedContent).toBe("Hello, World!");
 });
 ```
 
