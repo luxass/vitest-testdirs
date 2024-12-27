@@ -19,13 +19,14 @@
  * ```
  */
 
-import type { DirectoryJSON, TestdirLink, TestdirSymlink } from "./types";
+import type { DirectoryContent, DirectoryJSON, FSMetadata, TestdirLink, TestdirMetadata, TestdirSymlink } from "./types";
 import { rmSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { normalize } from "node:path";
 import { onTestFinished, type Task } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {
+  FIXTURE_METADATA,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
@@ -275,6 +276,24 @@ export function link(path: string): TestdirLink {
 }
 
 /**
+ * Combines directory JSON with metadata to create a TestdirMetadata object.
+ *
+ * @param {DirectoryContent} content - The content you want to add metadata to
+ * @param {FSMetadata} metadata - The FSMetadata object containing file system metadata
+ * @returns {TestdirMetadata} A TestdirMetadata object containing both the directory structure and metadata
+ *
+ * @remarks
+ * due to how permissions work on windows and `libuv` doesn't support windows acl's.
+ * setting a directory to readonly on windows doesn't actually work, and will still be writable.
+ */
+export function withMetadata(content: DirectoryContent | DirectoryJSON, metadata: FSMetadata): TestdirMetadata {
+  return {
+    [FIXTURE_METADATA]: metadata,
+    content,
+  };
+}
+
+/**
  * Check if value is a TestdirSymlink
  * @param {unknown} value The value to check
  * @returns {value is TestdirSymlink} The same value
@@ -290,7 +309,7 @@ export function isSymlink(value: unknown): value is TestdirSymlink {
 
 /**
  * Check if value is a TestdirLink
- * @param value The value to check
+ * @param {unknown} value The value to check
  * @returns {value is TestdirLink} The same value
  */
 export function isLink(value: unknown): value is TestdirLink {
@@ -299,5 +318,18 @@ export function isLink(value: unknown): value is TestdirLink {
     && value !== null
     && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL]
     === FIXTURE_TYPE_LINK_SYMBOL
+  );
+}
+
+/**
+ * Check if value is a TestdirMetadata
+ * @param {unknown} value The value to check
+ * @returns {value is TestdirMetadata} The same value
+ */
+export function hasMetadata(value: unknown): value is TestdirMetadata {
+  return (
+    typeof value === "object"
+    && value !== null
+    && (value as TestdirMetadata)[FIXTURE_METADATA] != null
   );
 }

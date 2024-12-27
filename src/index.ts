@@ -17,16 +17,29 @@
  * ```
  */
 
-export { FIXTURE_ORIGINAL_PATH, FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "./constants";
+export {
+  FIXTURE_METADATA,
+  FIXTURE_ORIGINAL_PATH,
+  FIXTURE_TYPE_LINK_SYMBOL,
+  FIXTURE_TYPE_SYMLINK_SYMBOL,
+} from "./constants";
 export type { FromFileSystemOptions } from "./file-system";
-export { fromFileSystem, fromFileSystemSync } from "./file-system";
+export {
+  fromFileSystem,
+  fromFileSystemSync,
+} from "./file-system";
 
-export { createFileTree, createFileTreeSync } from "./file-tree";
+export {
+  createFileTree,
+  createFileTreeSync,
+} from "./file-tree";
 
 export type {
   DirectoryContent,
   DirectoryJSON,
+  FSMetadata,
   TestdirLink,
+  TestdirMetadata,
   TestdirSymlink,
 } from "./types";
 
@@ -34,12 +47,14 @@ export {
   BASE_DIR,
   DIR_REGEX,
   getDirNameFromTask,
+  hasMetadata,
   isLink,
   isSymlink,
   link,
   symlink,
   testdir,
   testdirSync,
+  withMetadata,
 } from "./utils";
 
 export type { TestdirOptions } from "./utils";
