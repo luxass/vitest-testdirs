@@ -15,10 +15,10 @@ npm install vitest-testdirs --save-dev
 ## 🚀 Usage
 
 ```js
-import { readFileSync } from "node:fs";
 // index.test.ts
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { describe, expect, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { testdir, testdirSync } from "vitest-testdirs";
 
 describe("testdir", () => {
@@ -49,6 +49,34 @@ describe("testdirSync", () => {
     const file = readFileSync(`${path}/file1.txt`, "utf8");
     expect(file).toBe("Hello, World!");
   });
+});
+```
+
+## Metadata on Windows
+
+When you are using `withMetadata` on a Windows filesystem, the permission is not set correctly.
+This is because how windows work, and libuv not supporting Windows ACLs.
+
+```ts
+import { readFile, writeFile } from "node:fs/promises";
+import { expect, it } from "vitest";
+import { testdir, withMetadata } from "../src";
+
+it("windows", async () => {
+  const path = await testdir({
+    "file1.txt": withMetadata("Hello, World!", { mode: 0o444 }),
+  });
+
+  try {
+    await writeFile(`${path}/file1.txt`, "Hello, Vitest!");
+    // This should throw an error, but not on Windows
+  } catch {}
+
+  const content = await readFile(`${path}/file1.txt`, "utf8");
+  // The content is now changes, but it should not be possible to write to the file
+
+  expect(content).not.toBe("Hello, Vitest!");
+  expect(content).toBe("Hello, World!");
 });
 ```
 
