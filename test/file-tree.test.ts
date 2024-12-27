@@ -143,12 +143,12 @@ describe("createFileTree", () => {
     cleanup(path);
 
     const files = {
-      "file1.txt": withMetadata("Hello, world!", { mode: 0o644 }),
+      "file1.txt": withMetadata("Hello, world!", { mode: fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
       "dir1": {
-        "file2.txt": withMetadata("This is file 2", { mode: 0o444 }),
+        "file2.txt": withMetadata("This is file 2", { mode: fs.constants.S_IRUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
         "dir2": withMetadata({
           "file3.txt": "This is file 3",
-        }, { mode: 0o555 }),
+        }, { mode: fs.constants.S_IRUSR | fs.constants.S_IXUSR | fs.constants.S_IRGRP | fs.constants.S_IXGRP | fs.constants.S_IROTH | fs.constants.S_IXOTH }),
       },
     };
 
@@ -306,12 +306,12 @@ describe("createFileTreeSync", () => {
     cleanup(path);
 
     const files = {
-      "file1.txt": withMetadata("Hello, world!", { mode: 0o644 }),
+      "file1.txt": withMetadata("Hello, world!", { mode: fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
       "dir1": {
-        "file2.txt": withMetadata("This is file 2", { mode: 0o444 }),
+        "file2.txt": withMetadata("This is file 2", { mode: fs.constants.S_IRUSR | fs.constants.S_IRGRP | fs.constants.S_IROTH }),
         "dir2": withMetadata({
           "file3.txt": "This is file 3",
-        }, { mode: 0o555 }),
+        }, { mode: fs.constants.S_IRUSR | fs.constants.S_IXUSR | fs.constants.S_IRGRP | fs.constants.S_IXGRP | fs.constants.S_IROTH | fs.constants.S_IXOTH }),
       },
     };
 
