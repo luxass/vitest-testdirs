@@ -1,11 +1,5 @@
-import {
-  lstatSync,
-  readdirSync,
-  readFileSync,
-  readlinkSync,
-  statSync,
-} from "node:fs";
-import { lstat, readdir, readFile, readlink, stat } from "node:fs/promises";
+import fs from "node:fs";
+import fsAsync from "node:fs/promises";
 import { join, normalize } from "node:path";
 import {
   describe,
@@ -16,6 +10,7 @@ import {
 } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import {
+  FIXTURE_METADATA,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "../src/constants";
@@ -27,6 +22,7 @@ import {
   symlink,
   testdir,
   testdirSync,
+  withMetadata,
 } from "../src/utils";
 
 describe("getDirNameFromTask", () => {
@@ -131,13 +127,13 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
 
-    expect(await readdir(dirname)).toEqual(
+    expect(await fsAsync.readdir(dirname)).toEqual(
       expect.arrayContaining(["file1.txt", "file2.txt", "subdir"]),
     );
-    expect(await readdir(join(dirname, "subdir"))).toEqual(["file3.txt"]);
-    expect(await readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
-    expect(await readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(await readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+    expect(await fsAsync.readdir(join(dirname, "subdir"))).toEqual(["file3.txt"]);
+    expect(await fsAsync.readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(await fsAsync.readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(await fsAsync.readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
       "content3",
     );
   });
@@ -174,11 +170,11 @@ describe("testdir", () => {
     // which means that our onTestFinished callback will be called before the one from testdir
     onTestFinished(() => {
       const dirname = getDirNameFromTask(getCurrentTest()!);
-      expect(readdir(dirname)).rejects.toThrow();
+      expect(fsAsync.readdir(dirname)).rejects.toThrow();
     });
 
     const dirname = await testdir(files, { cleanup: true });
-    expect(await readdir(dirname)).toEqual(["file.txt"]);
+    expect(await fsAsync.readdir(dirname)).toEqual(["file.txt"]);
   });
 
   it("should allow the directory to be created outside of the `.vitest-testdirs` directory if allowOutside is true", async () => {
@@ -187,7 +183,7 @@ describe("testdir", () => {
     };
 
     const dirname = await testdir(files, { allowOutside: true });
-    expect(await readdir(dirname)).toEqual(["file.txt"]);
+    expect(await fsAsync.readdir(dirname)).toEqual(["file.txt"]);
   });
 
   it("should throw error if directory will be created outside of `.vitest-testdirs` by default", async () => {
@@ -219,7 +215,7 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
 
-    expect(await readdir(dirname)).toEqual(
+    expect(await fsAsync.readdir(dirname)).toEqual(
       expect.arrayContaining([
         "file1.txt",
         "file2.txt",
@@ -229,37 +225,37 @@ describe("testdir", () => {
       ]),
     );
 
-    expect(await readdir(join(dirname, "subdir"))).toEqual([
+    expect(await fsAsync.readdir(join(dirname, "subdir"))).toEqual([
       "file3.txt",
       "file4.txt",
       "file5.txt",
     ]);
-    expect(await readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
-    expect(await readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(await readFile(join(dirname, "link4.txt"), "utf8")).toBe("content1");
-    expect((await stat(join(dirname, "link4.txt"))).isFile()).toBe(true);
+    expect(await fsAsync.readFile(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(await fsAsync.readFile(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(await fsAsync.readFile(join(dirname, "link4.txt"), "utf8")).toBe("content1");
+    expect((await fsAsync.stat(join(dirname, "link4.txt"))).isFile()).toBe(true);
 
-    expect(await readlink(join(dirname, "link5.txt"), "utf8")).toBeDefined();
-    expect((await lstat(join(dirname, "link5.txt"))).isSymbolicLink()).toBe(
+    expect(await fsAsync.readlink(join(dirname, "link5.txt"), "utf8")).toBeDefined();
+    expect((await fsAsync.lstat(join(dirname, "link5.txt"))).isSymbolicLink()).toBe(
       true,
     );
 
-    expect(await readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+    expect(await fsAsync.readFile(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
       "content3",
     );
 
-    expect(await readFile(join(dirname, "subdir", "file4.txt"), "utf8")).toBe(
+    expect(await fsAsync.readFile(join(dirname, "subdir", "file4.txt"), "utf8")).toBe(
       "content1",
     );
-    expect((await stat(join(dirname, "subdir", "file4.txt"))).isFile()).toBe(
+    expect((await fsAsync.stat(join(dirname, "subdir", "file4.txt"))).isFile()).toBe(
       true,
     );
 
     expect(
-      await readlink(join(dirname, "subdir", "file5.txt"), "utf8"),
+      await fsAsync.readlink(join(dirname, "subdir", "file5.txt"), "utf8"),
     ).toBeDefined();
     expect(
-      (await lstat(join(dirname, "subdir", "file5.txt"))).isSymbolicLink(),
+      (await fsAsync.lstat(join(dirname, "subdir", "file5.txt"))).isSymbolicLink(),
     ).toBe(true);
   });
 });
@@ -276,13 +272,13 @@ describe("testdirSync", () => {
 
     const dirname = testdirSync(files);
 
-    expect(readdirSync(dirname)).toEqual(
+    expect(fs.readdirSync(dirname)).toEqual(
       expect.arrayContaining(["file1.txt", "file2.txt", "subdir"]),
     );
-    expect(readdirSync(join(dirname, "subdir"))).toEqual(["file3.txt"]);
-    expect(readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
-    expect(readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+    expect(fs.readdirSync(join(dirname, "subdir"))).toEqual(["file3.txt"]);
+    expect(fs.readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(fs.readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(fs.readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
       "content3",
     );
   });
@@ -319,11 +315,11 @@ describe("testdirSync", () => {
     // which means that our onTestFinished callback will be called before the one from testdir
     onTestFinished(() => {
       const dirname = getDirNameFromTask(getCurrentTest()!);
-      expect(readdir(dirname)).rejects.toThrow();
+      expect(fsAsync.readdir(dirname)).rejects.toThrow();
     });
 
     const dirname = testdirSync(files, { cleanup: true });
-    expect(readdirSync(dirname)).toEqual(["file.txt"]);
+    expect(fs.readdirSync(dirname)).toEqual(["file.txt"]);
   });
 
   it("should allow the directory to be created outside of the `.vitest-testdirs` directory if allowOutside is true", () => {
@@ -332,7 +328,7 @@ describe("testdirSync", () => {
     };
 
     const dirname = testdirSync(files, { allowOutside: true });
-    expect(readdirSync(dirname)).toEqual(["file.txt"]);
+    expect(fs.readdirSync(dirname)).toEqual(["file.txt"]);
   });
 
   it("should throw error if directory will be created outside of `.vitest-testdirs` by default", () => {
@@ -362,7 +358,7 @@ describe("testdirSync", () => {
 
     const dirname = testdirSync(files);
 
-    expect(readdirSync(dirname)).toEqual(
+    expect(fs.readdirSync(dirname)).toEqual(
       expect.arrayContaining([
         "file1.txt",
         "file2.txt",
@@ -372,33 +368,33 @@ describe("testdirSync", () => {
       ]),
     );
 
-    expect(readdirSync(join(dirname, "subdir"))).toEqual([
+    expect(fs.readdirSync(join(dirname, "subdir"))).toEqual([
       "file3.txt",
       "file4.txt",
       "file5.txt",
     ]);
-    expect(readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
-    expect(readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
-    expect(readFileSync(join(dirname, "link4.txt"), "utf8")).toBe("content1");
-    expect(statSync(join(dirname, "link4.txt")).isFile()).toBe(true);
+    expect(fs.readFileSync(join(dirname, "file1.txt"), "utf8")).toBe("content1");
+    expect(fs.readFileSync(join(dirname, "file2.txt"), "utf8")).toBe("content2");
+    expect(fs.readFileSync(join(dirname, "link4.txt"), "utf8")).toBe("content1");
+    expect(fs.statSync(join(dirname, "link4.txt")).isFile()).toBe(true);
 
-    expect(readlinkSync(join(dirname, "link5.txt"), "utf8")).toBeDefined();
-    expect(lstatSync(join(dirname, "link5.txt")).isSymbolicLink()).toBe(true);
+    expect(fs.readlinkSync(join(dirname, "link5.txt"), "utf8")).toBeDefined();
+    expect(fs.lstatSync(join(dirname, "link5.txt")).isSymbolicLink()).toBe(true);
 
-    expect(readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
+    expect(fs.readFileSync(join(dirname, "subdir", "file3.txt"), "utf8")).toBe(
       "content3",
     );
 
-    expect(readFileSync(join(dirname, "subdir", "file4.txt"), "utf8")).toBe(
+    expect(fs.readFileSync(join(dirname, "subdir", "file4.txt"), "utf8")).toBe(
       "content1",
     );
-    expect(statSync(join(dirname, "subdir", "file4.txt")).isFile()).toBe(true);
+    expect(fs.statSync(join(dirname, "subdir", "file4.txt")).isFile()).toBe(true);
 
     expect(
-      readlinkSync(join(dirname, "subdir", "file5.txt"), "utf8"),
+      fs.readlinkSync(join(dirname, "subdir", "file5.txt"), "utf8"),
     ).toBeDefined();
     expect(
-      lstatSync(join(dirname, "subdir", "file5.txt")).isSymbolicLink(),
+      fs.lstatSync(join(dirname, "subdir", "file5.txt")).isSymbolicLink(),
     ).toBe(true);
   });
 });
@@ -542,5 +538,16 @@ it("should create a TestdirSymlink object with the specified path", () => {
   expect(result).toEqual({
     [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
     path: normalize(path),
+  });
+});
+
+it("should create a TestdirMetadata object with the content and mode", () => {
+  const result = withMetadata("content", { mode: 0o400 });
+
+  expect(result).toEqual({
+    [FIXTURE_METADATA]: {
+      mode: 0o400,
+    },
+    content: "content",
   });
 });
