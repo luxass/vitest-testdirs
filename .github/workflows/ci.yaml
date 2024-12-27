@@ -74,8 +74,8 @@ jobs:
       - name: test
         run: pnpm test -- --allowOnly
 
-      - name: output test results
-        if: matrix.os == 'windows-latest'
+      - name: output test results (windows only)
+        if: runner.os == 'Windows'
         run: |
           ls -la .vitest-testdirs
           ls -la .vitest-testdirs/with-permissions-sync
