@@ -2,7 +2,7 @@ import fs from "node:fs";
 import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
 import { resolve } from "node:path";
-import { afterEach, describe, expect, it, onTestFailed, onTestFinished, vi } from "vitest";
+import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
 import { createFileTree, createFileTreeSync } from "../src/file-tree";
 import { link, symlink, withMetadata } from "../src/utils";
 
