@@ -282,7 +282,7 @@ export function link(path: string): TestdirLink {
  * @param {FSMetadata} metadata - The FSMetadata object containing file system metadata
  * @returns {TestdirMetadata} A TestdirMetadata object containing both the directory structure and metadata
  */
-export function withMetadata(content: DirectoryContent, metadata: FSMetadata): TestdirMetadata {
+export function withMetadata(content: DirectoryContent | DirectoryJSON, metadata: FSMetadata): TestdirMetadata {
   return {
     [FIXTURE_METADATA]: metadata,
     content,
