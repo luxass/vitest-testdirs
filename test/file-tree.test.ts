@@ -301,7 +301,7 @@ describe("createFileTreeSync", () => {
     expect(link2Content).toBe("This is file 2");
   });
 
-  it.only("should be able to create files with different permissions", () => {
+  it("should be able to create files with different permissions", () => {
     const path = "./.vitest-testdirs/with-permissions-sync";
     // cleanup(path);
 
