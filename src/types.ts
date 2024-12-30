@@ -76,7 +76,12 @@ export interface FSMetadata {
   /**
    * The POSIX permission of the file system entry.
    */
-  mode: number;
+  mode?: number;
+
+  /**
+   * The encoding of the file system entry.
+   */
+  encoding?: BufferEncoding | null;
 }
 
 /**
