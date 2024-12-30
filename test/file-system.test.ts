@@ -160,4 +160,44 @@ describe("map file contents", () => {
 
     expect(result).toMatchObject(mockFiles);
   });
+
+  it("should use different encodings when using `getEncodingForFile`", async () => {
+    const mockFiles = {
+      "file.txt": "this is just a file!\n",
+      "README.md": "# vitest-testdirs\n",
+      "nested": {
+        "README.md": "# Nested Fixture Folder\n",
+        // eslint-disable-next-line node/prefer-global/buffer
+        "image.txt": Buffer.from([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33, 10]),
+      },
+    };
+
+    const result = await fromFileSystem("./test/fixtures/file-system/test-dir", {
+      getEncodingForFile: (path) => {
+        return path.endsWith("image.txt") ? null : "utf8";
+      },
+    });
+
+    expect(result).toMatchObject(mockFiles);
+  });
+
+  it("should use different encodings when using `getEncodingForFile` (sync)", () => {
+    const mockFiles = {
+      "file.txt": "this is just a file!\n",
+      "README.md": "# vitest-testdirs\n",
+      "nested": {
+        "README.md": "# Nested Fixture Folder\n",
+        // eslint-disable-next-line node/prefer-global/buffer
+        "image.txt": Buffer.from([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33, 10]),
+      },
+    };
+
+    const result = fromFileSystemSync("./test/fixtures/file-system/test-dir", {
+      getEncodingForFile: (path) => {
+        return path.endsWith("image.txt") ? null : "utf8";
+      },
+    });
+
+    expect(result).toMatchObject(mockFiles);
+  });
 });
