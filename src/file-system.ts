@@ -78,9 +78,9 @@ const DEFAULT_ENCODING_FOR_FILE_FN = () => "utf-8" as BufferEncoding;
 /**
  * A function type that determines the encoding for a given file path.
  * @param {string} path - The path to the file.
- * @returns {BufferEncoding} The encoding to be used for the file, as a {@link BufferEncoding}.
+ * @returns {BufferEncoding | null} The encoding to be used for the file, as a {@link BufferEncoding}.
  */
-export type EncodingForFileFn = (path: string) => BufferEncoding;
+export type EncodingForFileFn = (path: string) => BufferEncoding | null;
 
 /**
  * Processes a directory and its contents recursively, creating a JSON representation of the file system.
@@ -119,7 +119,7 @@ async function processDirectory(
     } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(await readlink(fullPath));
     } else {
-      files[filePath] = await readFile(fullPath, options.getEncodingForFile(fullPath) ?? "utf8");
+      files[filePath] = await readFile(fullPath, options.getEncodingForFile(fullPath));
     }
   }
 
@@ -163,7 +163,7 @@ function processDirectorySync(
     } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(readlinkSync(fullPath));
     } else {
-      files[filePath] = readFileSync(fullPath, options.getEncodingForFile(fullPath) ?? "utf8");
+      files[filePath] = readFileSync(fullPath, options.getEncodingForFile(fullPath));
     }
   }
 
