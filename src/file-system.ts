@@ -58,7 +58,29 @@ export interface FromFileSystemOptions {
    * ```
    */
   extras?: DirectoryJSON;
+
+  /**
+   * A function that determines the encoding to be used for a file.
+   * @default utf-8
+   *
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  getEncodingForFile: (path) => "utf-8",
+   * });
+   * ```
+   */
+  getEncodingForFile?: EncodingForFileFn;
 }
+
+const DEFAULT_ENCODING_FOR_FILE_FN = () => "utf-8" as BufferEncoding;
+
+/**
+ * A function type that determines the encoding for a given file path.
+ * @param {string} path - The path to the file.
+ * @returns {BufferEncoding} The encoding to be used for the file, as a {@link BufferEncoding}.
+ */
+export type EncodingForFileFn = (path: string) => BufferEncoding;
 
 /**
  * Processes a directory and its contents recursively, creating a JSON representation of the file system.
@@ -97,7 +119,7 @@ async function processDirectory(
     } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(await readlink(fullPath));
     } else {
-      files[filePath] = await readFile(fullPath, "utf8");
+      files[filePath] = await readFile(fullPath, options.getEncodingForFile(fullPath) ?? "utf8");
     }
   }
 
@@ -141,7 +163,7 @@ function processDirectorySync(
     } else if (options.followLinks && file.isSymbolicLink()) {
       files[filePath] = symlink(readlinkSync(fullPath));
     } else {
-      files[filePath] = readFileSync(fullPath, "utf-8");
+      files[filePath] = readFileSync(fullPath, options.getEncodingForFile(fullPath) ?? "utf8");
     }
   }
 
@@ -173,12 +195,12 @@ export async function fromFileSystem(
     return {};
   }
 
-  const processOptions = {
+  const files = await processDirectory(path, {
     ignore: options?.ignore ?? [],
     followLinks: options?.followLinks ?? true,
-  };
+    getEncodingForFile: options?.getEncodingForFile ?? DEFAULT_ENCODING_FOR_FILE_FN,
+  });
 
-  const files = await processDirectory(path, processOptions);
   return {
     ...files,
     ...options?.extras,
@@ -210,12 +232,12 @@ export function fromFileSystemSync(
     return {};
   }
 
-  const processOptions = {
+  const files = processDirectorySync(path, {
     ignore: options?.ignore ?? [],
     followLinks: options?.followLinks ?? true,
-  };
+    getEncodingForFile: options?.getEncodingForFile ?? DEFAULT_ENCODING_FOR_FILE_FN,
+  });
 
-  const files = processDirectorySync(path, processOptions);
   return {
     ...files,
     ...options?.extras,

@@ -23,7 +23,7 @@ export {
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
-export type { FromFileSystemOptions } from "./file-system";
+export type { EncodingForFileFn, FromFileSystemOptions } from "./file-system";
 export {
   fromFileSystem,
   fromFileSystemSync,
