@@ -1,7 +1,6 @@
 /**
- * @module
- *
  * Vitest Testdirs - A utility to create a temporary directory with files and directories for testing.
+ * @module index
  *
  * @example
  * ```ts
