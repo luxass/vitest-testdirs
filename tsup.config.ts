@@ -6,7 +6,6 @@ export default defineConfig({
     "./src/utils.ts",
     "./src/file-tree.ts",
     "./src/file-system.ts",
-    "./src/constants.ts",
   ],
   format: ["cjs", "esm"],
   clean: true,

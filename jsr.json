@@ -5,8 +5,7 @@
     ".": "./src/index.ts",
     "./utils": "./src/utils.ts",
     "./file-tree": "./src/file-tree.ts",
-    "./file-system": "./src/file-system.ts",
-    "./constants": "./src/constants.ts"
+    "./file-system": "./src/file-system.ts"
   },
   "exclude": [
     "tsup.config.ts",

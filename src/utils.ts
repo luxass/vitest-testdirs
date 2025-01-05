@@ -29,7 +29,7 @@ import {
   FIXTURE_METADATA,
   FIXTURE_TYPE_LINK_SYMBOL,
   FIXTURE_TYPE_SYMLINK_SYMBOL,
-} from "./constants";
+} from "./";
 import { createFileTree, createFileTreeSync } from "./file-tree";
 
 /**
