@@ -1,4 +1,4 @@
-import type { RunnerTestCase, SuiteCollector } from "vitest";
+import type { RunnerTask, RunnerTestCase, SuiteCollector, Task } from "vitest";
 import type {
   DirectoryContent,
   DirectoryJSON,
@@ -8,6 +8,7 @@ import type {
   TestdirSymlink,
 } from "./types";
 import { randomBytes } from "node:crypto";
+import { statSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { normalize } from "node:path";
 import {
@@ -128,7 +129,7 @@ export function isPrimitive(data: unknown): data is Exclude<DirectoryContent, Te
  * - For test files without suite: `vitest-[file name]-[test name]`
  * - For test files with suite: `vitest-[file name]-[suite name]-[test name]`
  */
-export function createDirnameFromTask(suiteOrTest: RunnerTestCase | SuiteCollector): string {
+export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector): string {
   if (suiteOrTest.type === "collector") {
     const suiteName = suiteOrTest.name || "unnamed suite";
 
@@ -176,6 +177,30 @@ export function createDirnameFromTask(suiteOrTest: RunnerTestCase | SuiteCollect
 export async function isDirectory(path: string): Promise<boolean> {
   try {
     const result = await stat(path);
+    return result.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Synchronously checks if the given path is a directory.
+ *
+ * @param {string} path - The file system path to check
+ * @returns {boolean} `true` if the path is a directory, `false` if it's not or if there was an error accessing the path
+ *
+ * @example
+ * ```ts
+ * // Check if a path is a directory
+ * const isDir = isDirectorySync('./some/path');
+ * if (isDir) {
+ *   // Handle directory case
+ * }
+ * ```
+ */
+export function isDirectorySync(path: string): boolean {
+  try {
+    const result = statSync(path);
     return result.isDirectory();
   } catch {
     return false;

@@ -17,7 +17,17 @@
  */
 
 import type { DirectoryJSON } from "./types";
-import { link, mkdir, readdir, readFile, readlink, rm, symlink, writeFile } from "node:fs/promises";
+import { linkSync, mkdirSync, readdirSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  link,
+  mkdir,
+  readdir,
+  readFile,
+  readlink,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import {
   dirname,
   join,
@@ -34,15 +44,16 @@ import {
   getCurrentTest,
 } from "vitest/suite";
 import { FIXTURE_ORIGINAL_PATH } from "./";
+
 import {
   BASE_DIR,
   FIXTURE_METADATA,
 } from "./constants";
-
 import {
   createDirnameFromTask,
   hasMetadata,
   isDirectory,
+  isDirectorySync,
   isLink,
   isPrimitive,
   isSymlink,
@@ -116,24 +127,73 @@ export async function testdir(
   await createFileTree(dirname, files!);
 
   if (options?.cleanup ?? true) {
-    onTestFinished(async () => {
-      await rm(dirname, {
-        recursive: true,
-      });
-    });
-  }
-
-  if (options?.cleanup ?? true) {
-    if (getCurrentTest() != null) {
+    if (test != null) {
       onTestFinished(async () => {
         await rm(dirname, {
           recursive: true,
           force: true,
         });
       });
-    } else if (getCurrentSuite() != null) {
+    } else if (suite != null) {
       afterAll(async () => {
         await rm(dirname, {
+          recursive: true,
+          force: true,
+        });
+      });
+    } else {
+      throw new Error("testdir must be called inside vitest context");
+    }
+  }
+
+  return dirname;
+}
+
+/**
+ * Creates a test directory with the specified files and options.
+ *
+ * @param {DirectoryJSON} files - The directory structure to create.
+ * @param {TestdirOptions?} options - The options for creating the test directory.
+ * @returns {string} The path of the created test directory.
+ * @throws An error if `testdir` is called outside of a test.
+ */
+export function testdirSync(
+  files: DirectoryJSON,
+  options?: TestdirOptions,
+): string {
+  if (!isInVitest()) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  const test = getCurrentTest();
+  const suite = getCurrentSuite();
+
+  const dirname = options?.dirname
+    ? normalize(join(BASE_DIR, options.dirname))
+    : normalize(join(BASE_DIR, createDirnameFromTask(
+        (test?.type === "test" ? test : suite) || suite,
+      )));
+
+  const allowOutside = options?.allowOutside ?? false;
+
+  // if the dirname is escaped from BASE_DIR, throw an error
+  if (!allowOutside && !dirname.startsWith(BASE_DIR)) {
+    throw new Error(`The directory name must start with '${BASE_DIR}'`);
+  }
+
+  createFileTreeSync(dirname, files!);
+
+  if (options?.cleanup ?? true) {
+    if (test != null) {
+      onTestFinished(() => {
+        rmSync(dirname, {
+          recursive: true,
+          force: true,
+        });
+      });
+    } else if (suite != null) {
+      afterAll(() => {
+        rmSync(dirname, {
           recursive: true,
           force: true,
         });
@@ -198,7 +258,6 @@ export async function createFileTree(
         data.path,
         filename,
         await isDirectory(filename) ? "junction" : "file",
-        // isDir(filename, data.path) ? "junction" : "file",
       );
       continue;
     }
@@ -230,6 +289,90 @@ export async function createFileTree(
       });
 
       await createFileTree(filename, data as DirectoryJSON);
+    }
+  }
+}
+
+/**
+ * Creates a file tree at the specified path using the provided files object.
+ * The files object represents the directory structure and file contents of the tree.
+ *
+ * @param {string} path - The path where the file tree should be created.
+ * @param {DirectoryJSON} files - The files object representing the file tree.
+ */
+export function createFileTreeSync(path: string, files: DirectoryJSON): void {
+  for (let filename in files) {
+    let data = files[filename];
+    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA] : undefined;
+    data = hasMetadata(data) ? data.content : data;
+
+    filename = resolve(path, filename);
+
+    // check if file is a object with the link symbol
+    if (isLink(data)) {
+      linkSync(resolve(dirname(filename), data.path), filename);
+      continue;
+    }
+
+    if (isSymlink(data)) {
+      if (files[FIXTURE_ORIGINAL_PATH] != null) {
+        const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+
+        // we need to replace here due to the fact that we call `createFileTree` recursively,
+        // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
+        const tmpPath = normalize(path.replace(
+          // eslint-disable-next-line node/prefer-global/process
+          `${process.cwd()}${pathSeparator}`,
+          "",
+        ));
+
+        const pathLevels = tmpPath.split(/[/\\]/).filter(Boolean).length;
+        const originalLevels = original.split(/[/\\]/).filter(Boolean).length;
+
+        if (pathLevels < originalLevels) {
+          const diff = originalLevels - pathLevels;
+          data.path = data.path.replace(`..${pathSeparator}`.repeat(diff), "");
+        } else if (pathLevels > originalLevels) {
+          const diff = pathLevels - originalLevels;
+          data.path = `..${pathSeparator}`.repeat(diff) + data.path;
+        }
+      }
+
+      symlinkSync(
+        data.path,
+        filename,
+        isDirectorySync(filename) ? "junction" : "file",
+      );
+      continue;
+    }
+
+    if (isPrimitive(data) || data instanceof Uint8Array) {
+      const dir = dirname(filename);
+
+      mkdirSync(dir, {
+        recursive: true,
+      });
+
+      if (
+        typeof data === "number"
+        || typeof data === "boolean"
+        || data == null
+        || typeof data === "bigint"
+        || typeof data === "symbol"
+      ) {
+        data = String(data);
+      }
+
+      writeFileSync(filename, data, {
+        ...metadata,
+      });
+    } else {
+      mkdirSync(filename, {
+        recursive: true,
+        ...(metadata?.mode ? { mode: metadata.mode } : {}),
+      });
+
+      createFileTreeSync(filename, data as DirectoryJSON);
     }
   }
 }
@@ -346,6 +489,50 @@ async function processDirectory(
 }
 
 /**
+ * Recursively processes a directory and returns its structure as a JSON object.
+ *
+ * @param {string} path - The absolute path to the directory to process
+ * @param {Required<Omit<FromFileSystemOptions, "extras">>} options - Configuration options for processing the directory
+ *
+ * @returns {DirectoryJSON} A DirectoryJSON object representing the directory structure where:
+ * - Keys are file/directory names
+ * - Values are either:
+ *   - String content for files
+ *   - Nested DirectoryJSON objects for directories
+ *   - Symlink objects for symbolic links (when followLinks is true)
+ * - Special key [FIXTURE_ORIGINAL_PATH] contains the normalized original path
+ */
+export function processDirectorySync(
+  path: string,
+  options: Required<Omit<FromFileSystemOptions, "extras">>,
+): DirectoryJSON {
+  const files: DirectoryJSON = {
+    [FIXTURE_ORIGINAL_PATH]: normalize(path),
+  };
+
+  const dirFiles = readdirSync(path, {
+    withFileTypes: true,
+  });
+
+  const filteredFiles = dirFiles.filter((file) => !options.ignore.includes(file.name));
+
+  for (const file of filteredFiles) {
+    const filePath = file.name;
+    const fullPath = `${path}/${filePath}`;
+
+    if (file.isDirectory()) {
+      files[filePath] = processDirectorySync(fullPath, options);
+    } else if (options.followLinks && file.isSymbolicLink()) {
+      files[filePath] = symlinkFn(readlinkSync(fullPath));
+    } else {
+      files[filePath] = readFileSync(fullPath, options.getEncodingForFile(fullPath));
+    }
+  }
+
+  return files;
+}
+
+/**
  * Recursively reads a directory and returns a JSON representation of its structure
  *
  * @param {string} path - The path to the directory to read
@@ -371,6 +558,43 @@ export async function fromFileSystem(
   }
 
   const files = await processDirectory(path, {
+    ignore: options?.ignore ?? [],
+    followLinks: options?.followLinks ?? true,
+    getEncodingForFile: options?.getEncodingForFile ?? DEFAULT_ENCODING_FOR_FILE_FN,
+  });
+
+  return {
+    ...files,
+    ...options?.extras,
+  };
+}
+
+/**
+ * Synchronously creates a DirectoryJSON object from a file system path.
+ *
+ * @param {string} path - The path to the directory to read
+ * @param {FromFileSystemOptions?} options - Options for customizing the directory reading behavior
+ *
+ * @returns {DirectoryJSON} A DirectoryJSON object representing the directory structure
+ * @throws Will throw an error if the path cannot be accessed or read
+ *
+ * @example
+ * ```ts
+ * const dirStructure = fromFileSystemSync('./src', {
+ *   ignore: ['node_modules', '.git'],
+ *   followLinks: false
+ * });
+ * ```
+ */
+export function fromFileSystemSync(
+  path: string,
+  options?: FromFileSystemOptions,
+): DirectoryJSON {
+  if (!isDirectorySync(path)) {
+    return {};
+  }
+
+  const files = processDirectorySync(path, {
     ignore: options?.ignore ?? [],
     followLinks: options?.followLinks ?? true,
     getEncodingForFile: options?.getEncodingForFile ?? DEFAULT_ENCODING_FOR_FILE_FN,
