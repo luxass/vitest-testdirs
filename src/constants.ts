@@ -14,13 +14,13 @@ export const FIXTURE_TYPE_SYMLINK_SYMBOL = Symbol("testdir-symlink");
  * Symbol representing the original file path of a test fixture definition.
  * Used internally to track and restore the original paths of test directories.
  */
-export const FIXTURE_ORIGINAL_PATH = Symbol("testdir-original-path");
+export const FIXTURE_ORIGINAL_PATH_SYMBOL = Symbol("testdir-original-path");
 
 /**
  * Symbol representing the metadata of a test fixture definition.
  * Used internally to store and retrieve metadata about test definitions.
  */
-export const FIXTURE_METADATA = Symbol("testdir-metadata");
+export const FIXTURE_METADATA_SYMBOL = Symbol("testdir-metadata");
 
 /**
  * The base directory for test directories.
