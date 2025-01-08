@@ -1,4 +1,4 @@
-import type { RunnerTask, RunnerTestCase, SuiteCollector, Task } from "vitest";
+import type { RunnerTask, SuiteCollector } from "vitest";
 import type {
   DirectoryContent,
   DirectoryJSON,
