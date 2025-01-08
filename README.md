@@ -105,12 +105,36 @@ it("windows", async () => {
 
 Version 2 brings several improvements and breaking changes. Here is a list of changes you need to make to migrate to V2.
 
-- require Vitest v2.0.5 or higher
-- `withMetadata` is now `metadata`
+- Dropped Support for Vitest under v2.0.5
+- `withMetadata` is renamed to `metadata`
 - removed `vitest-testdirs/file-system` & `vitest-testdirs/file-tree` exports.
+
   > You can now just import them directly from `vitest-testdirs`.
+
 - removed `vitest-testdirs/utils` export and replaced it with `vitest-testdirs/helpers` import.
+
   > This is where we export the different helper functions, like `metadata`, `symlink` and so on.
+
+### Migrating from `withMetadata` to `metadata`
+
+```diff
+- import { withMetadata } from "vitest-testdirs/utils";
++ import { metadata } from "vitest-testdirs/helpers";
+```
+
+### Migrating from `vitest-testdirs/file-system` to `vitest-testdirs`
+
+```diff
+- import { fromFileSystem, fromFileSystemSync } from "vitest-testdirs/file-system";
++ import { fromFileSystem, fromFileSystemSync } from "vitest-testdirs";
+```
+
+### Migrating from `vitest-testdirs/file-tree` to `vitest-testdirs`
+
+```diff
+- import { createFileTree, createFileTreeSync } from "vitest-testdirs/file-tree";
++ import { createFileTree, createFileTreeSync } from "vitest-testdirs";
+```
 
 ## 📄 License
 
