@@ -1,9 +1,9 @@
-import type { RunnerTask, SuiteCollector } from "vitest";
 import type { DirectoryJSON, FromFileSystemOptions } from "./types";
-import { randomBytes } from "node:crypto";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
 import { normalize } from "node:path";
+import process from "node:process";
+import { expect, type RunnerTask, type SuiteCollector } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
   FIXTURE_ORIGINAL_PATH_SYMBOL,
@@ -42,7 +42,14 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
   if (suiteOrTest.type === "collector") {
     const suiteName = suiteOrTest.name || "unnamed suite";
 
-    const dirName = `vitest-${randomBytes(4).toString("hex")}-${suiteName.replace(DIR_REGEX, "-")}`;
+    const fileName = (expect.getState().testPath || "unnamed")
+      .replace(`${process.cwd()}/`, "")
+      .split("/")
+      .pop()!
+      .replace(/\.test\.ts$/, "")
+      .replace(DIR_REGEX, "-");
+
+    const dirName = `vitest-${fileName}-${suiteName.replace(DIR_REGEX, "-")}`;
 
     // trim trailing hyphen and multiple hyphens
     return dirName.replace(/-{2,}/g, "-").replace(/-+$/, "");

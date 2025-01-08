@@ -1,12 +1,6 @@
-import { describe, expect, it, type RunnerTask, type SuiteCollector, vi } from "vitest";
+import { describe, expect, it, type RunnerTask, type SuiteCollector } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import { createDirnameFromTask } from "../src/utils";
-
-vi.mock("node:crypto", () => ({
-  randomBytes: vi.fn().mockReturnValue({
-    toString: () => "abc123",
-  }),
-}));
 
 function createSuiteCollectorMock(name?: string) {
   return {
@@ -30,12 +24,12 @@ function createTestMock(name: string, extra: DeepPartial<RunnerTask> = {}) {
 describe("createDirnameFromTask", () => {
   it("should create dirname for collector type", () => {
     const collector = createSuiteCollectorMock("test suite");
-    expect(createDirnameFromTask(collector)).toBe("vitest-abc123-test-suite");
+    expect(createDirnameFromTask(collector)).toBe("vitest-utils-test-suite");
   });
 
   it("should use \"unnamed suite\" for collector without name", () => {
     const collector = createSuiteCollectorMock();
-    expect(createDirnameFromTask(collector)).toBe("vitest-abc123-unnamed-suite");
+    expect(createDirnameFromTask(collector)).toBe("vitest-utils-unnamed-suite");
   });
 
   it("should create dirname for test without suite", () => {
