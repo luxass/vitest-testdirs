@@ -4,16 +4,38 @@
  *
  * @example
  * ```ts
- * import { testdir } from "vitest-testdirs/helpers";
+ * import { isSymlink } from "vitest-testdirs/helpers";
+ * import { fromFileSystem } from "vitest-testdirs"
  *
- * const dir = await testdir({
- *   nested: {
- *     "file.txt": "Hello, World!",
- *   },
- * });
+ * const files = {
+ *   "test.txt": "Hello, World!",
+ *   "symlink.txt": symlink("test.txt"),
+ * }
  *
- * console.log(dir);
+ * if (isSymlink(files["test.txt"])) {
+ *   console.log("test.txt is a symlink");
+ * }
+ *
+ * if (isSymlink(files["symlink.txt"])) {
+ *   console.log("symlink.txt is a symlink");
+ * }
+ *
+ * // -> symlink.txt is a symlink
  * ```
+ *
+ * @example
+ * ```ts
+ * import { metadata, hasMetadata } from "vitest-testdirs/helpers";
+ *
+ * const files = {
+ *   "test.txt": "Hello, World!",
+ *   "readonly.txt": metadata("Hello, World!", { mode: 0o444 }), // read-only file
+ * }
+ *
+ * if (hasMetadata(files["readonly.txt"])) {
+ *   console.log("readonly.txt is read-only");
+ * }
+ *
  */
 
 import type {
