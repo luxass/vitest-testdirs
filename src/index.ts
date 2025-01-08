@@ -17,13 +17,10 @@
  */
 
 import type { DirectoryJSON, FromFileSystemOptions } from "./types";
-import { linkSync, mkdirSync, readdirSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { linkSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import {
   link,
   mkdir,
-  readdir,
-  readFile,
-  readlink,
   rm,
   symlink,
   writeFile,
