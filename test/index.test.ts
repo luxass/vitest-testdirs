@@ -5,7 +5,6 @@ import { join, normalize, resolve } from "node:path";
 import { describe, expect, it, onTestFinished } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
-  createDirnameFromTask,
   createFileTree,
   createFileTreeSync,
   fromFileSystem,
@@ -16,6 +15,7 @@ import {
   testdir,
   testdirSync,
 } from "../src";
+import { createDirnameFromTask } from "../src/utils";
 
 function cleanup(path: string) {
   onTestFinished(async () => {

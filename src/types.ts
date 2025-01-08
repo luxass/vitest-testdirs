@@ -98,3 +98,64 @@ export interface TestdirMetadata {
    */
   content: DirectoryContent | DirectoryJSON;
 }
+
+/**
+ * Options for customizing the behavior of the fromFileSystem functions.
+ */
+export interface FromFileSystemOptions {
+  /**
+   * An array of file names to
+   * ignore when reading the directory.
+   *
+   * @default []
+   *
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  ignore: ["node_modules", ".git"],
+   * });
+   * ```
+   */
+  ignore?: string[];
+
+  /**
+   * Whether to follow symbolic links.
+   * @default true
+   */
+  followLinks?: boolean;
+
+  /**
+   * An object with extra files to include in the directory structure.
+   * @default {}
+   *
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  extras: {
+   *   "extra-file.txt": "This is an extra file",
+   *  },
+   * });
+   * ```
+   */
+  extras?: DirectoryJSON;
+
+  /**
+   * A function that determines the encoding to be used for a file.
+   * @default utf-8
+   *
+   * @example
+   * ```ts
+   * const files = await fromFileSystem("path/to/dir", {
+   *  getEncodingForFile: (path) => "utf-8",
+   * });
+   * ```
+   */
+  getEncodingForFile?: EncodingForFileFn;
+}
+
+/**
+ * A function type that determines the encoding for a given file path.
+ * @param {string} path - The path to the file.
+ * @returns {BufferEncoding | null} The encoding to be used for the file, as a {@link BufferEncoding}.
+ */
+export type EncodingForFileFn = (path: string) => BufferEncoding | null;

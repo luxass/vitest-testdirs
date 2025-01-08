@@ -16,7 +16,7 @@
  * ```
  */
 
-import type { DirectoryJSON } from "./types";
+import type { DirectoryJSON, FromFileSystemOptions } from "./types";
 import { linkSync, mkdirSync, readdirSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import {
   link,
@@ -43,25 +43,12 @@ import {
   getCurrentSuite,
   getCurrentTest,
 } from "vitest/suite";
-import { FIXTURE_ORIGINAL_PATH } from "./";
-
-import {
-  BASE_DIR,
-  FIXTURE_METADATA,
-} from "./constants";
-import {
-  createDirnameFromTask,
-  hasMetadata,
-  isDirectory,
-  isDirectorySync,
-  isLink,
-  isPrimitive,
-  isSymlink,
-  symlink as symlinkFn,
-} from "./utils";
+import { BASE_DIR, FIXTURE_METADATA_SYMBOL, FIXTURE_ORIGINAL_PATH_SYMBOL } from "./constants";
+import { hasMetadata, isLink, isPrimitive, isSymlink } from "./helpers";
+import { createDirnameFromTask, isDirectory, isDirectorySync, isInVitest, processDirectory, processDirectorySync } from "./utils";
 
 export * from "./constants";
-export * from "./utils";
+export * from "./helpers";
 
 /**
  * Options for creating a test directory.
@@ -219,7 +206,7 @@ export async function createFileTree(
 ): Promise<void> {
   for (let filename in files) {
     let data = files[filename];
-    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA] : undefined;
+    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA_SYMBOL] : undefined;
     data = hasMetadata(data) ? data.content : data;
 
     filename = resolve(path, filename);
@@ -231,8 +218,8 @@ export async function createFileTree(
     }
 
     if (isSymlink(data)) {
-      if (files[FIXTURE_ORIGINAL_PATH] != null) {
-        const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+      if (files[FIXTURE_ORIGINAL_PATH_SYMBOL] != null) {
+        const original = normalize(files[FIXTURE_ORIGINAL_PATH_SYMBOL]);
 
         // we need to replace here due to the fact that we call `createFileTree` recursively,
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
@@ -303,7 +290,7 @@ export async function createFileTree(
 export function createFileTreeSync(path: string, files: DirectoryJSON): void {
   for (let filename in files) {
     let data = files[filename];
-    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA] : undefined;
+    const metadata = hasMetadata(data) ? data[FIXTURE_METADATA_SYMBOL] : undefined;
     data = hasMetadata(data) ? data.content : data;
 
     filename = resolve(path, filename);
@@ -315,8 +302,8 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
     }
 
     if (isSymlink(data)) {
-      if (files[FIXTURE_ORIGINAL_PATH] != null) {
-        const original = normalize(files[FIXTURE_ORIGINAL_PATH]);
+      if (files[FIXTURE_ORIGINAL_PATH_SYMBOL] != null) {
+        const original = normalize(files[FIXTURE_ORIGINAL_PATH_SYMBOL]);
 
         // we need to replace here due to the fact that we call `createFileTree` recursively,
         // and when we do it with a nested directory, the path is now the full path, and not just the relative path.
@@ -377,160 +364,7 @@ export function createFileTreeSync(path: string, files: DirectoryJSON): void {
   }
 }
 
-function isInVitest(): boolean {
-  return getCurrentSuite() != null || getCurrentTest() != null;
-}
-
-/**
- * Options for customizing the behavior of the fromFileSystem functions.
- */
-export interface FromFileSystemOptions {
-  /**
-   * An array of file names to
-   * ignore when reading the directory.
-   *
-   * @default []
-   *
-   * @example
-   * ```ts
-   * const files = await fromFileSystem("path/to/dir", {
-   *  ignore: ["node_modules", ".git"],
-   * });
-   * ```
-   */
-  ignore?: string[];
-
-  /**
-   * Whether to follow symbolic links.
-   * @default true
-   */
-  followLinks?: boolean;
-
-  /**
-   * An object with extra files to include in the directory structure.
-   * @default {}
-   *
-   * @example
-   * ```ts
-   * const files = await fromFileSystem("path/to/dir", {
-   *  extras: {
-   *   "extra-file.txt": "This is an extra file",
-   *  },
-   * });
-   * ```
-   */
-  extras?: DirectoryJSON;
-
-  /**
-   * A function that determines the encoding to be used for a file.
-   * @default utf-8
-   *
-   * @example
-   * ```ts
-   * const files = await fromFileSystem("path/to/dir", {
-   *  getEncodingForFile: (path) => "utf-8",
-   * });
-   * ```
-   */
-  getEncodingForFile?: EncodingForFileFn;
-}
-
 const DEFAULT_ENCODING_FOR_FILE_FN = () => "utf-8" as BufferEncoding;
-
-/**
- * A function type that determines the encoding for a given file path.
- * @param {string} path - The path to the file.
- * @returns {BufferEncoding | null} The encoding to be used for the file, as a {@link BufferEncoding}.
- */
-export type EncodingForFileFn = (path: string) => BufferEncoding | null;
-
-/**
- * Processes a directory and its contents recursively, creating a JSON representation of the file system.
- *
- * @param {string} path - The absolute path to the directory to process
- * @param {Required<Omit<FromFileSystemOptions, "extras">>} options - Configuration options for processing the directory
- *
- * @returns {Promise<DirectoryJSON>} A Promise that resolves to a DirectoryJSON object representing the directory structure
- *          where keys are file/directory names and values are either:
- *          - A string containing file contents for regular files
- *          - A DirectoryJSON object for subdirectories
- *          - A symbolic link representation for symlinks (when followLinks is true)
- *
- * @throws {Error} If there are issues reading the directory or its contents
- */
-async function processDirectory(
-  path: string,
-  options: Required<Omit<FromFileSystemOptions, "extras">>,
-): Promise<DirectoryJSON> {
-  const files: DirectoryJSON = {
-    [FIXTURE_ORIGINAL_PATH]: normalize(path),
-  };
-
-  const dirFiles = await readdir(path, {
-    withFileTypes: true,
-  });
-
-  const filteredFiles = dirFiles.filter((file) => !options.ignore.includes(file.name));
-
-  for (const file of filteredFiles) {
-    const filePath = file.name;
-    const fullPath = `${path}/${filePath}`;
-
-    if (file.isDirectory()) {
-      files[filePath] = await processDirectory(fullPath, options);
-    } else if (options.followLinks && file.isSymbolicLink()) {
-      files[filePath] = symlinkFn(await readlink(fullPath));
-    } else {
-      files[filePath] = await readFile(fullPath, options.getEncodingForFile(fullPath));
-    }
-  }
-
-  return files;
-}
-
-/**
- * Recursively processes a directory and returns its structure as a JSON object.
- *
- * @param {string} path - The absolute path to the directory to process
- * @param {Required<Omit<FromFileSystemOptions, "extras">>} options - Configuration options for processing the directory
- *
- * @returns {DirectoryJSON} A DirectoryJSON object representing the directory structure where:
- * - Keys are file/directory names
- * - Values are either:
- *   - String content for files
- *   - Nested DirectoryJSON objects for directories
- *   - Symlink objects for symbolic links (when followLinks is true)
- * - Special key [FIXTURE_ORIGINAL_PATH] contains the normalized original path
- */
-export function processDirectorySync(
-  path: string,
-  options: Required<Omit<FromFileSystemOptions, "extras">>,
-): DirectoryJSON {
-  const files: DirectoryJSON = {
-    [FIXTURE_ORIGINAL_PATH]: normalize(path),
-  };
-
-  const dirFiles = readdirSync(path, {
-    withFileTypes: true,
-  });
-
-  const filteredFiles = dirFiles.filter((file) => !options.ignore.includes(file.name));
-
-  for (const file of filteredFiles) {
-    const filePath = file.name;
-    const fullPath = `${path}/${filePath}`;
-
-    if (file.isDirectory()) {
-      files[filePath] = processDirectorySync(fullPath, options);
-    } else if (options.followLinks && file.isSymbolicLink()) {
-      files[filePath] = symlinkFn(readlinkSync(fullPath));
-    } else {
-      files[filePath] = readFileSync(fullPath, options.getEncodingForFile(fullPath));
-    }
-  }
-
-  return files;
-}
 
 /**
  * Recursively reads a directory and returns a JSON representation of its structure

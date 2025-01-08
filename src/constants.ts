@@ -26,11 +26,3 @@ export const FIXTURE_METADATA_SYMBOL = Symbol("testdir-metadata");
  * The base directory for test directories.
  */
 export const BASE_DIR = ".vitest-testdirs";
-
-/**
- * Regular expression that matches any character that is not a word character or hyphen.
- * Used for validating and sanitizing directory names.
- * - Matches any character that is not [A-Za-z0-9_-]
- * - Global flag (g) enables matching all occurrences
- */
-export const DIR_REGEX = /[^\w\-]+/g;
