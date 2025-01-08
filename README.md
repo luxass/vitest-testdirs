@@ -6,6 +6,9 @@
 
 A utility for Vitest to create isolated test directories
 
+> [!NOTE]
+> Version 2.0 has been released with breaking changes! See the [migration guide](#migrating-to-v2) below.
+
 ## 📦 Installation
 
 ```bash
@@ -97,6 +100,17 @@ it("windows", async () => {
   expect(nestedContent).toBe("Hello, World!");
 });
 ```
+
+## Migrating to V2
+
+Version 2 brings several improvements and breaking changes. Here is a list of changes you need to make to migrate to V2.
+
+- require Vitest v2.0.5 or higher
+- `withMetadata` is now `metadata`
+- removed `vitest-testdirs/file-system` & `vitest-testdirs/file-tree` exports.
+  > You can now just import them directly from `vitest-testdirs`.
+- removed `vitest-testdirs/utils` export and replaced it with `vitest-testdirs/helpers` import.
+  > This is where we export the different helper functions, like `metadata`, `symlink` and so on.
 
 ## 📄 License
 
