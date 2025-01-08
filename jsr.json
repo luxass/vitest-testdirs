@@ -3,7 +3,7 @@
   "version": "1.6.0",
   "exports": {
     ".": "./src/index.ts",
-    "./utils": "./src/utils.ts"
+    "./helpers": "./src/helpers.ts"
   },
   "exclude": [
     "tsup.config.ts",

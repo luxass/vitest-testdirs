@@ -2,7 +2,6 @@ import type { RunnerTask, SuiteCollector } from "vitest";
 import type {
   DirectoryContent,
   DirectoryJSON,
-  FSMetadata,
   TestdirLink,
   TestdirMetadata,
   TestdirSymlink,
@@ -10,96 +9,9 @@ import type {
 import { randomBytes } from "node:crypto";
 import { statSync } from "node:fs";
 import { stat } from "node:fs/promises";
-import { normalize } from "node:path";
 import {
   DIR_REGEX,
-  FIXTURE_METADATA,
-  FIXTURE_TYPE_LINK_SYMBOL,
-  FIXTURE_TYPE_SYMLINK_SYMBOL,
 } from "./constants";
-
-/**
- * Create a symlink to a file or directory
- * @param {string} path The path to link to
- * @returns {TestdirSymlink} A TestdirSymlink object
- */
-export function symlink(path: string): TestdirSymlink {
-  return {
-    [FIXTURE_TYPE_SYMLINK_SYMBOL]: FIXTURE_TYPE_SYMLINK_SYMBOL,
-    path: normalize(path),
-  };
-}
-
-/**
- * Create a link to a file or directory
- * @param {string} path The path to link to
- * @returns {TestdirLink} A TestdirLink object
- */
-export function link(path: string): TestdirLink {
-  return {
-    [FIXTURE_TYPE_LINK_SYMBOL]: FIXTURE_TYPE_LINK_SYMBOL,
-    path: normalize(path),
-  };
-}
-
-/**
- * Combines directory JSON with metadata to create a TestdirMetadata object.
- *
- * @param {DirectoryContent} content - The content you want to add metadata to
- * @param {FSMetadata} metadata - The FSMetadata object containing file system metadata
- * @returns {TestdirMetadata} A TestdirMetadata object containing both the directory structure and metadata
- *
- * @remarks
- * due to how permissions work on windows and `libuv` doesn't support windows acl's.
- * setting a directory to readonly on windows doesn't actually work, and will still be writable.
- */
-export function metadata(content: DirectoryContent | DirectoryJSON, metadata: FSMetadata): TestdirMetadata {
-  return {
-    [FIXTURE_METADATA]: metadata,
-    content,
-  };
-}
-
-/**
- * Check if value is a TestdirSymlink
- * @param {unknown} value The value to check
- * @returns {value is TestdirSymlink} The same value
- */
-export function isSymlink(value: unknown): value is TestdirSymlink {
-  return (
-    typeof value === "object"
-    && value !== null
-    && (value as TestdirSymlink)[FIXTURE_TYPE_SYMLINK_SYMBOL]
-    === FIXTURE_TYPE_SYMLINK_SYMBOL
-  );
-}
-
-/**
- * Check if value is a TestdirLink
- * @param {unknown} value The value to check
- * @returns {value is TestdirLink} The same value
- */
-export function isLink(value: unknown): value is TestdirLink {
-  return (
-    typeof value === "object"
-    && value !== null
-    && (value as TestdirLink)[FIXTURE_TYPE_LINK_SYMBOL]
-    === FIXTURE_TYPE_LINK_SYMBOL
-  );
-}
-
-/**
- * Check if value is a TestdirMetadata
- * @param {unknown} value The value to check
- * @returns {value is TestdirMetadata} The same value
- */
-export function hasMetadata(value: unknown): value is TestdirMetadata {
-  return (
-    typeof value === "object"
-    && value !== null
-    && (value as TestdirMetadata)[FIXTURE_METADATA] != null
-  );
-}
 
 /**
  * Checks if the given data is a primitive value.

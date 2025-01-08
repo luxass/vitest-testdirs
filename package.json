@@ -29,14 +29,14 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./utils": {
+    "./helpers": {
       "import": {
-        "types": "./dist/utils.d.ts",
-        "default": "./dist/utils.mjs"
+        "types": "./dist/helpers.d.ts",
+        "default": "./dist/helpers.mjs"
       },
       "require": {
-        "types": "./dist/utils.d.cts",
-        "default": "./dist/utils.cjs"
+        "types": "./dist/helpers.d.cts",
+        "default": "./dist/helpers.cjs"
       }
     },
     "./package.json": "./package.json"
