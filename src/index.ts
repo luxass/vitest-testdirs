@@ -46,6 +46,7 @@ import { createDirnameFromTask, isDirectory, isDirectorySync, isInVitest, proces
 
 export * from "./constants";
 export * from "./helpers";
+export type * from "./types";
 
 /**
  * Options for creating a test directory.
