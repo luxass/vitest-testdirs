@@ -3,9 +3,7 @@
   "version": "1.6.0",
   "exports": {
     ".": "./src/index.ts",
-    "./utils": "./src/utils.ts",
-    "./file-tree": "./src/file-tree.ts",
-    "./file-system": "./src/file-system.ts"
+    "./utils": "./src/utils.ts"
   },
   "exclude": [
     "tsup.config.ts",
