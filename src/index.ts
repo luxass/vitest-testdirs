@@ -27,7 +27,6 @@ import {
 } from "node:fs/promises";
 import {
   dirname,
-  join,
   normalize,
   sep as pathSeparator,
   resolve,
@@ -42,7 +41,7 @@ import {
 } from "vitest/suite";
 import { BASE_DIR, FIXTURE_METADATA_SYMBOL, FIXTURE_ORIGINAL_PATH_SYMBOL } from "./constants";
 import { hasMetadata, isLink, isPrimitive, isSymlink } from "./helpers";
-import { createDirnameFromTask, isDirectory, isDirectorySync, isInVitest, processDirectory, processDirectorySync } from "./utils";
+import { internalGenerateDirname, isDirectory, isDirectorySync, isInVitest, processDirectory, processDirectorySync } from "./utils";
 
 export * from "./constants";
 export * from "./helpers";
@@ -96,11 +95,7 @@ export async function testdir(
   const test = getCurrentTest();
   const suite = getCurrentSuite();
 
-  const dirname = options?.dirname
-    ? normalize(join(BASE_DIR, options.dirname))
-    : normalize(join(BASE_DIR, createDirnameFromTask(
-        (test?.type === "test" ? test : suite) || suite,
-      )));
+  const dirname = internalGenerateDirname(options?.dirname);
 
   const allowOutside = options?.allowOutside ?? false;
 
@@ -135,6 +130,24 @@ export async function testdir(
 }
 
 /**
+ * Generates the path for a test directory.
+ *
+ * @param {string?} dirname - The directory name to use.
+ *
+ * If not provided, a directory name will be generated based on the test name.
+ *
+ * @returns {string} The path of the current test directory.
+ * @throws An error if `testdir` is called outside of a test.
+ */
+testdir.dirname = (dirname?: string): string => {
+  if (!isInVitest()) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return internalGenerateDirname(dirname);
+};
+
+/**
  * Creates a test directory with the specified files and options.
  *
  * @param {DirectoryJSON} files - The directory structure to create.
@@ -153,11 +166,7 @@ export function testdirSync(
   const test = getCurrentTest();
   const suite = getCurrentSuite();
 
-  const dirname = options?.dirname
-    ? normalize(join(BASE_DIR, options.dirname))
-    : normalize(join(BASE_DIR, createDirnameFromTask(
-        (test?.type === "test" ? test : suite) || suite,
-      )));
+  const dirname = internalGenerateDirname(options?.dirname);
 
   const allowOutside = options?.allowOutside ?? false;
 
@@ -190,6 +199,24 @@ export function testdirSync(
 
   return dirname;
 }
+
+/**
+ * Generates the path for a test directory.
+ *
+ * @param {string?} dirname - The directory name to use.
+ *
+ * If not provided, a directory name will be generated based on the test name.
+ *
+ * @returns {string} The path of the current test directory.
+ * @throws An error if `testdir` is called outside of a test.
+ */
+testdirSync.dirname = (dirname?: string): string => {
+  if (!isInVitest()) {
+    throw new Error("testdirSync must be called inside vitest context");
+  }
+
+  return internalGenerateDirname(dirname);
+};
 
 /**
  * Creates a file tree at the specified path using the provided files object.

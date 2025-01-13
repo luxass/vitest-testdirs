@@ -1,11 +1,12 @@
 import type { DirectoryJSON, FromFileSystemOptions } from "./types";
 import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
 import { readdir, readFile, readlink, stat } from "node:fs/promises";
-import { normalize } from "node:path";
+import { join, normalize } from "node:path";
 import process from "node:process";
 import { expect, type RunnerTask, type SuiteCollector } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
+  BASE_DIR,
   FIXTURE_ORIGINAL_PATH_SYMBOL,
 } from "./constants";
 import { symlink } from "./helpers";
@@ -209,4 +210,25 @@ export function processDirectorySync(
   }
 
   return files;
+}
+
+/**
+ * Generates a normalized directory path based on the provided dirname or the current test/suite context.
+ * This function must be called within a Vitest context.
+ *
+ * @param {string?} dirname - Optional directory name to use as the base path
+ * @returns {string} A normalized absolute path combining the base directory with either the provided dirname or a generated name from the current test/suite
+ * @internal
+ */
+export function internalGenerateDirname(dirname?: string): string {
+  const test = getCurrentTest();
+  const suite = getCurrentSuite();
+
+  if (dirname != null) {
+    return normalize(join(BASE_DIR, dirname));
+  }
+
+  return normalize(join(BASE_DIR, createDirnameFromTask(
+    (test?.type === "test" ? test : suite) || suite,
+  )));
 }
