@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
-import { join, normalize, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, expect, it, onTestFinished } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
