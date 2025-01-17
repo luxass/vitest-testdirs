@@ -62,6 +62,7 @@ export {
 };
 
 export * from "./constants";
+export * from "./helpers";
 
 /**
  * Options for creating a test directory.
