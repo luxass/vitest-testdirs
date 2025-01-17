@@ -20,6 +20,9 @@ importers:
       eslint-plugin-format:
         specifier: ^1.0.0
         version: 1.0.1(eslint@9.17.0)
+      testdirs:
+        specifier: ^0.1.4
+        version: 0.1.4
       tsup:
         specifier: ^8.3.0
         version: 8.3.5(postcss@8.4.49)(typescript@5.7.3)(yaml@2.7.0)
@@ -1920,6 +1923,10 @@ packages:
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
     engines: {node: '>=6'}
+
+  testdirs@0.1.4:
+    resolution: {integrity: sha512-6ITYziGX1OmfR2HGJgjFwxnKIWdytUuVZV3JwkCal7m2v9kw+r+CZcwjIzjn5Q8Bxdm60a3L3tLDhUOuEwklsQ==}
+    engines: {node: '>=20'}
 
   thenify-all@1.6.0:
     resolution: {integrity: sha512-RNxQH/qI8/t3thXJDwcstUO4zeqo64+Uy/+sNVRBx4Xn2OX+OZ9oP+iJnNFqplFra2ZUVeKCSa2oVWi3T4uVmA==}
@@ -4161,6 +4168,8 @@ snapshots:
       tslib: 2.8.1
 
   tapable@2.2.1: {}
+
+  testdirs@0.1.4: {}
 
   thenify-all@1.6.0:
     dependencies:

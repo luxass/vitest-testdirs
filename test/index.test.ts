@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
-import { join, normalize, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, expect, it, onTestFinished } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
@@ -53,7 +53,7 @@ describe("testdir", () => {
 
     const dirname = await testdir(files);
     expect(dirname).toBe(
-      normalize(
+      resolve(
         ".vitest-testdirs/vitest-index-testdir-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided",
       ),
     );
@@ -65,7 +65,7 @@ describe("testdir", () => {
     };
 
     const dirname = await testdir(files, { dirname: "custom-dirname" });
-    expect(dirname).toBe(normalize(".vitest-testdirs/custom-dirname"));
+    expect(dirname).toBe(resolve(".vitest-testdirs/custom-dirname"));
   });
 
   it("should cleanup the directory after the test has finished if cleanup option is true", async () => {
@@ -198,7 +198,7 @@ describe("testdirSync", () => {
 
     const dirname = testdirSync(files);
     expect(dirname).toBe(
-      normalize(
+      resolve(
         ".vitest-testdirs/vitest-index-testdirSync-should-generate-a-directory-name-based-on-the-test-name-if-dirname-is-not-provided",
       ),
     );
@@ -210,7 +210,7 @@ describe("testdirSync", () => {
     };
 
     const dirname = testdirSync(files, { dirname: "custom-dirname" });
-    expect(dirname).toBe(normalize(".vitest-testdirs/custom-dirname"));
+    expect(dirname).toBe(resolve(".vitest-testdirs/custom-dirname"));
   });
 
   it("should cleanup the directory after the test has finished if cleanup option is true", () => {
