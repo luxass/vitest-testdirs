@@ -1,14 +1,10 @@
-import { readdirSync, readFileSync, readlinkSync, statSync } from "node:fs";
-import { readdir, readFile, readlink, stat } from "node:fs/promises";
 import { join, normalize } from "node:path";
 import process from "node:process";
-import { type DirectoryJSON, FIXTURE_ORIGINAL_PATH_SYMBOL, type FromFileSystemOptions } from "testdirs";
 import { expect, type RunnerTask, type SuiteCollector } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
   BASE_DIR,
 } from "./constants";
-import { symlink } from "./helpers";
 
 /**
  * Regular expression that matches any character that is not a word character or hyphen.
