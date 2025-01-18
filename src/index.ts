@@ -17,21 +17,11 @@
  */
 
 import type {
-  DirectoryContent,
   DirectoryJSON,
-  EncodingForFileFn,
-  FromFileSystemOptions,
-  FSMetadata,
-  TestdirFn,
   TestdirFromOptions,
-  TestdirLink,
-  TestdirMetadata,
-  TestdirResult,
-  TestdirSymlink,
 } from "testdirs";
-import { createFileTree, fromFileSystem, testdir as originalTestdir } from "testdirs";
-import { createFileTreeSync, fromFileSystemSync, testdirSync as originalTestdirSync } from "testdirs/sync";
-
+import { fromFileSystem, testdir as originalTestdir } from "testdirs";
+import { fromFileSystemSync, testdirSync as originalTestdirSync } from "testdirs/sync";
 import {
   afterAll,
   onTestFinished,
@@ -43,15 +33,15 @@ import {
 import { BASE_DIR } from "./constants";
 import { internalGenerateDirname, isInVitest } from "./utils";
 
+export * from "./constants";
+export * from "./helpers";
 export {
   createFileTree,
-  createFileTreeSync,
   type DirectoryContent,
   type DirectoryJSON,
   type EncodingForFileFn,
   fromFileSystem,
   type FromFileSystemOptions,
-  fromFileSystemSync,
   type FSMetadata,
   type TestdirFn,
   type TestdirFromOptions,
@@ -59,11 +49,13 @@ export {
   type TestdirMetadata,
   type TestdirResult,
   type TestdirSymlink,
-};
-
-export * from "./constants";
-export * from "./helpers";
-
+} from "testdirs";
+export {
+  createFileTreeSync,
+  fromFileSystemSync,
+  type TestdirSyncFn,
+  type TestdirSyncResult,
+} from "testdirs/sync";
 /**
  * Options for creating a test directory.
  */
