@@ -138,7 +138,7 @@ export async function testdir(
  * Creates a test directory from an existing filesystem path
  *
  * @param {string} fsPath - The filesystem path to create the test directory from
- * @param {TestdirFromOptions} options - Configuration options
+ * @param {TestdirFromOptions & TestdirOptions} options - Configuration options
  * @returns {Promise<string>} A test directory instance initialized with the contents from the specified path
  *
  * @example
@@ -146,11 +146,13 @@ export async function testdir(
  * const dir = testdir.from('./fixtures/basic');
  * ```
  */
-testdir.from = async (fsPath: string, options?: TestdirFromOptions): Promise<string> => {
+testdir.from = async (fsPath: string, options?: TestdirFromOptions & TestdirOptions): Promise<string> => {
   return testdir(await fromFileSystem(fsPath, {
     ...options?.fromFS,
   }), {
     dirname: options?.dirname,
+    allowOutside: options?.allowOutside,
+    cleanup: options?.cleanup,
   });
 };
 
@@ -225,7 +227,7 @@ export function testdirSync(
  * Creates a test directory from an existing filesystem path
  *
  * @param {string} fsPath - The filesystem path to create the test directory from
- * @param {TestdirFromOptions} options - Configuration options
+ * @param {TestdirFromOptions & TestdirOptions} options - Configuration options
  * @returns {string} A test directory instance initialized with the contents from the specified path
  *
  * @example
@@ -233,11 +235,13 @@ export function testdirSync(
  * const dir = testdirSync.from('./fixtures/basic');
  * ```
  */
-testdirSync.from = (fsPath: string, options?: TestdirFromOptions): string => {
+testdirSync.from = (fsPath: string, options?: TestdirFromOptions & TestdirOptions): string => {
   return testdirSync(fromFileSystemSync(fsPath, {
     ...options?.fromFS,
   }), {
     dirname: options?.dirname,
+    allowOutside: options?.allowOutside,
+    cleanup: options?.cleanup,
   });
 };
 
