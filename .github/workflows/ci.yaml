@@ -42,8 +42,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: [22, 20, 18]
-        vitest: [latest, 2.0.5, 2.1.3, beta]
+        node: [18, 20, 22]
+        vitest: [latest, 3.0.0, 2.1.8, 2.0.5]
         os:
           - ubuntu-latest
           - macos-latest
