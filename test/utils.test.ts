@@ -1,4 +1,5 @@
-import { describe, expect, it, type RunnerTask, type SuiteCollector } from "vitest";
+import type { RunnerTask, SuiteCollector } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import { createDirnameFromTask } from "../src/utils";
 

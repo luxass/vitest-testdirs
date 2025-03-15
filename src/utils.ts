@@ -1,6 +1,7 @@
+import type { RunnerTask, SuiteCollector } from "vitest";
 import { join, normalize } from "node:path";
 import process from "node:process";
-import { expect, type RunnerTask, type SuiteCollector } from "vitest";
+import { expect } from "vitest";
 import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
   BASE_DIR,
