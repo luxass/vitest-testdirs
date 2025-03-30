@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
 import { join, resolve } from "node:path";
