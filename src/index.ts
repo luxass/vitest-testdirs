@@ -21,7 +21,6 @@ import type {
   TestdirFromOptions,
 } from "testdirs";
 import { fromFileSystem, testdir as originalTestdir } from "testdirs";
-import { fromFileSystemSync, testdirSync as originalTestdirSync } from "testdirs/sync";
 import {
   afterAll,
   onTestFinished,
@@ -50,12 +49,7 @@ export {
   type TestdirResult,
   type TestdirSymlink,
 } from "testdirs";
-export {
-  createFileTreeSync,
-  fromFileSystemSync,
-  type TestdirSyncFn,
-  type TestdirSyncResult,
-} from "testdirs/sync";
+
 /**
  * Options for creating a test directory.
  */
@@ -169,95 +163,6 @@ testdir.from = async (fsPath: string, options?: TestdirFromOptions & TestdirOpti
 testdir.dirname = (dirname?: string): string => {
   if (!isInVitest()) {
     throw new Error("testdir must be called inside vitest context");
-  }
-
-  return internalGenerateDirname(dirname);
-};
-
-/**
- * Creates a test directory with the specified files and options.
- *
- * @param {DirectoryJSON} files - The directory structure to create.
- * @param {TestdirOptions?} options - The options for creating the test directory.
- * @returns {string} The path of the created test directory.
- * @throws An error if `testdir` is called outside of a test.
- */
-export function testdirSync(
-  files: DirectoryJSON,
-  options?: TestdirOptions,
-): string {
-  if (!isInVitest()) {
-    throw new Error("testdir must be called inside vitest context");
-  }
-
-  const test = getCurrentTest();
-  const suite = getCurrentSuite();
-
-  const dirname = internalGenerateDirname(options?.dirname);
-
-  const allowOutside = options?.allowOutside ?? false;
-
-  // if the dirname is escaped from BASE_DIR, throw an error
-  if (!allowOutside && !dirname.startsWith(BASE_DIR)) {
-    throw new Error(`The directory name must start with '${BASE_DIR}'`);
-  }
-
-  const { path, remove } = originalTestdirSync(files, {
-    dirname,
-  });
-
-  if (options?.cleanup ?? true) {
-    if (test != null) {
-      onTestFinished(() => {
-        remove();
-      });
-    } else if (suite != null) {
-      afterAll(() => {
-        remove();
-      });
-    } else {
-      throw new Error("testdir must be called inside vitest context");
-    }
-  }
-
-  return path;
-}
-
-/**
- * Creates a test directory from an existing filesystem path
- *
- * @param {string} fsPath - The filesystem path to create the test directory from
- * @param {TestdirFromOptions & TestdirOptions} options - Configuration options
- * @returns {string} A test directory instance initialized with the contents from the specified path
- *
- * @example
- * ```ts
- * const dir = testdirSync.from('./fixtures/basic');
- * ```
- */
-testdirSync.from = (fsPath: string, options?: TestdirFromOptions & TestdirOptions): string => {
-  return testdirSync(fromFileSystemSync(fsPath, {
-    ...options?.fromFS,
-  }), {
-    dirname: options?.dirname,
-    allowOutside: options?.allowOutside,
-    cleanup: options?.cleanup,
-  });
-};
-
-/**
- * Generates the path for a test directory.
- *
- * @param {string?} dirname - The directory name to use.
- *
- * If not provided, a directory name will be generated based on the test name.
- *
- * @returns {string} The path of the current test directory.
- * @throws An error if `testdir` is called outside of a test.
- */
-testdirSync.dirname = (dirname?: string): string => {
-  if (!isInVitest()) {
-    throw new Error("testdirSync must be called inside vitest context");
   }
 
   return internalGenerateDirname(dirname);
