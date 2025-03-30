@@ -62,7 +62,7 @@
     "vitest": ">=2.0.5 <4.0.0"
   },
   "dependencies": {
-    "testdirs": "^1.0.0"
+    "testdirs": "^2.0.0"
   },
   "devDependencies": {
     "@luxass/eslint-config": "^4.18.1",
