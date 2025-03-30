@@ -37,6 +37,14 @@ jobs:
       - name: typecheck
         run: pnpm typecheck
 
+      - name: test with coverage
+        run: pnpm test --coverage
+
+      - name: upload coverage reports to codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   test:
     name: "test (os: ${{ matrix.os }}, node: ${{ matrix.node }}, vitest: ${{ matrix.vitest }})"
     runs-on: ${{ matrix.os }}
@@ -73,3 +81,4 @@ jobs:
 
       - name: test
         run: pnpm test
+
