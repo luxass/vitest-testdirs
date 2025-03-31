@@ -44,13 +44,28 @@ let currentTestOptions: Partial<TestdirOptions> = {};
 export const test = baseTest.extend<{
   testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }>({
-      testdir: async ({ task }, use) => {
+      // eslint-disable-next-line no-empty-pattern
+      testdir: async ({}, use) => {
         const testdirFn = async (files: DirectoryJSON, options?: TestdirOptions) => {
-          return testdir(files, {
-            ...currentTestOptions,
+          const opts = {
+            ...(currentTestOptions.dirname == null
+              ? {}
+              : {
+                  dirname: currentTestOptions.dirname,
+                }),
+            ...(currentTestOptions.allowOutside == null
+              ? {}
+              : {
+                  allowOutside: currentTestOptions.allowOutside,
+                }),
+            ...(currentTestOptions.cleanup == null
+              ? {}
+              : {
+                  cleanup: currentTestOptions.cleanup,
+                }),
             ...options,
-            dirname: options?.dirname || currentTestOptions.dirname || task.name,
-          });
+          };
+          return testdir(files, opts);
         };
         await use(testdirFn);
       },
