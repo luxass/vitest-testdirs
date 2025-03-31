@@ -18,7 +18,7 @@
  * ```
  */
 
-import type { TestContext, TestOptions } from "vitest";
+import type { TestContext } from "vitest";
 import type { DirectoryJSON, TestdirOptions } from "./index";
 import { test as baseTest } from "vitest";
 import { testdir } from "./index";
