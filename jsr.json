@@ -3,7 +3,8 @@
   "version": "2.2.0",
   "exports": {
     ".": "./src/index.ts",
-    "./helpers": "./src/helpers.ts"
+    "./helpers": "./src/helpers.ts",
+    "./vitest": "./src/vitest.ts"
   },
   "exclude": [
     "tsup.config.ts",
