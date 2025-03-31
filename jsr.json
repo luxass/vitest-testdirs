@@ -1,6 +1,6 @@
 {
   "name": "@luxass/vitest-testdirs",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "exports": {
     ".": "./src/index.ts",
     "./helpers": "./src/helpers.ts",
