@@ -18,7 +18,7 @@
  * ```
  */
 
-import type { TestContext } from "vitest";
+import type { TestAPI, TestContext } from "vitest";
 import type { DirectoryJSON, TestdirOptions } from "./index";
 import { test as baseTest } from "vitest";
 import { testdir } from "./index";
@@ -27,7 +27,9 @@ interface TestWithOptionsContext extends TestContext {
   testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }
 
-export const test = baseTest.extend<{
+export const test: TestAPI<{
+  testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
+}> = baseTest.extend<{
   testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }>({
       // eslint-disable-next-line no-empty-pattern

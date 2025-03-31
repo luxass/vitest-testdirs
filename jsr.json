@@ -12,6 +12,7 @@
     "pnpm-lock.yaml",
     ".github/**",
     "vitest.config.ts",
-    "test"
+    "test",
+    ".gitattributes"
   ]
 }
