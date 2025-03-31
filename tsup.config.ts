@@ -4,6 +4,7 @@ export default defineConfig({
   entry: [
     "./src/index.ts",
     "./src/helpers.ts",
+    "./src/vitest.ts",
   ],
   format: ["cjs", "esm"],
   clean: true,
