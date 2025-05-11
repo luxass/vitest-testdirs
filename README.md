@@ -6,9 +6,6 @@
 
 A utility for Vitest to create isolated test directories
 
-> [!NOTE]
-> Version 2.0 has been released with breaking changes! See the [migration guide](#migrating-to-v2) below.
-
 ## 📦 Installation
 
 ```bash
