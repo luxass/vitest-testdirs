@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: [18, 20, 22]
+        node: [20, 22, 24]
         vitest: [latest, 3.0.0, 2.1.8, 2.0.5]
         os:
           - ubuntu-latest
