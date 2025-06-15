@@ -19,7 +19,7 @@ npm install vitest-testdirs --save-dev
 import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { testdir, testdirSync } from "vitest-testdirs";
+import { testdir } from "vitest-testdirs";
 
 describe("testdir", () => {
   it("isolated-test", async () => {
@@ -32,21 +32,6 @@ describe("testdir", () => {
     expect(path).toContain(".vitest-testdirs/vitest-testdir-isolated-test");
 
     const file = await readFile(`${path}/file1.txt`, "utf8");
-    expect(file).toBe("Hello, World!");
-  });
-});
-
-describe("testdirSync", () => {
-  it("isolated-test", () => {
-    const path = testdirSync({
-      "file1.txt": "Hello, World!",
-      "file2.txt": "Hello, Vitest!",
-    });
-
-    expect(path).toBeDefined();
-    expect(path).toContain(".vitest-testdirs/vitest-testdirSync-isolated-test");
-
-    const file = readFileSync(`${path}/file1.txt`, "utf8");
     expect(file).toBe("Hello, World!");
   });
 });
@@ -97,33 +82,6 @@ it("windows", async () => {
   expect(nestedContent).toBe("Hello, World!");
 });
 ```
-
-## Migrating to V2
-
-Version 2 brings several improvements and breaking changes. Here is a list of changes you need to make to migrate to V2.
-
-- Dropped Support for Vitest under v2.0.5
-
-- `withMetadata` is renamed to `metadata`
-
-  ```diff
-  - import { withMetadata } from "vitest-testdirs/utils";
-  + import { metadata } from "vitest-testdirs/helpers";
-  ```
-
-- removed `vitest-testdirs/file-system` & `vitest-testdirs/file-tree` exports.
-
-  > You can now just import them directly from `vitest-testdirs`.
-
-  ```diff
-  - import { fromFileSystem, fromFileSystemSync } from "vitest-testdirs/file-system";
-  - import { createFileTree, createFileTreeSync } from "vitest-testdirs/file-tree";
-  + import { fromFileSystem, fromFileSystemSync, createFileTree, createFileTreeSync } from "vitest-testdirs";
-  ```
-
-- removed `vitest-testdirs/utils` export and replaced it with `vitest-testdirs/helpers` import.
-
-  > This is where we export the different helper functions, like `metadata`, `symlink` and so on.
 
 ## 📄 License
 
