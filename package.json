@@ -48,7 +48,7 @@
     "testdirs": "^3.0.0"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "^4.19.0",
+    "@luxass/eslint-config": "^5.0.0",
     "@types/node": "^20.14.9",
     "@vitest/coverage-v8": "^3.2.3",
     "eslint": "^9.29.0",
