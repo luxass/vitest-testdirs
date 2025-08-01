@@ -38,21 +38,13 @@ jobs:
       - name: typecheck
         run: pnpm typecheck
 
-      - name: test with coverage
-        run: pnpm test --coverage
-
-      - name: upload coverage reports to codecov
-        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   test:
     name: "test (os: ${{ matrix.os }}, node: ${{ matrix.node }}, vitest: ${{ matrix.vitest }})"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node: [20, 22, 24]
-        vitest: [latest, 3.0.0, 2.1.8, 2.0.5]
+        vitest: [3.0.0, 3.2.4, latest]
         os:
           - ubuntu-latest
           - macos-latest
@@ -70,7 +62,6 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ matrix.node }}
-          cache: pnpm
 
       - name: install
         run: pnpm install --frozen-lockfile
@@ -79,4 +70,15 @@ jobs:
         run: pnpm add -D vitest@${{ matrix.vitest }}
 
       - name: test
+        if: matrix.os != 'ubuntu-latest' && matrix.node != 22 && matrix.vitest != 'latest'
         run: pnpm test
+
+      - name: test with coverage
+        if: matrix.os == 'ubuntu-latest' || matrix.node == 22 || matrix.vitest == 'latest'
+        run: pnpm test --coverage
+
+      - name: upload coverage reports to codecov
+        if: matrix.os == 'ubuntu-latest' || matrix.node == 22 || matrix.vitest == 'latest'
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
