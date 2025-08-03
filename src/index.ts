@@ -104,7 +104,7 @@ export interface TestdirOptions {
  * @throws An error if `testdir` is called outside of a test.
  */
 export async function testdir(
-  files: DirectoryJSON,
+  files: DirectoryJSON = {},
   options?: TestdirOptions,
 ): Promise<string> {
   if (!isInVitest()) {
