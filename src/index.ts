@@ -32,8 +32,24 @@ import {
 import { BASE_DIR } from "./constants";
 import { internalGenerateDirname, isInVitest } from "./utils";
 
-export * from "./constants";
-export * from "./helpers";
+export {
+  BASE_DIR,
+  FIXTURE_METADATA_SYMBOL,
+  FIXTURE_ORIGINAL_PATH_SYMBOL,
+  FIXTURE_TYPE_LINK_SYMBOL,
+  FIXTURE_TYPE_SYMLINK_SYMBOL,
+} from "./constants";
+
+export {
+  hasMetadata,
+  isLink,
+  isPrimitive,
+  isSymlink,
+  link,
+  metadata,
+  symlink,
+} from "./helpers";
+
 export {
   createFileTree,
   type DirectoryContent,
