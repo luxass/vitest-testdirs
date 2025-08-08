@@ -179,7 +179,11 @@ export const testdir = createCustomTestdir(async ({ files, fixturePath, options 
       fromFS?: FromFileSystemOptions;
     }): Promise<string> => {
       const files = await fromFileSystem(fsPath, options?.fromFS);
-      return testdir(files, options);
+      return testdir(files, {
+        allowOutside: options?.allowOutside,
+        cleanup: options?.cleanup,
+        dirname: options?.dirname,
+      });
     },
     /**
      * Generates the path for a test directory.
