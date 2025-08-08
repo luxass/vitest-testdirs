@@ -77,7 +77,9 @@ describe("testdir", () => {
       expect(fsAsync.readdir(dirname)).rejects.toThrow();
     });
 
-    const dirname = await testdir(files, { cleanup: true });
+    const dirname = await testdir(files, {
+      cleanup: true,
+    });
     expect(await fsAsync.readdir(dirname)).toEqual(["file.txt"]);
   });
 

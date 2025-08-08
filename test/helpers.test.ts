@@ -1,6 +1,10 @@
 import { normalize } from "node:path";
 import { describe, expect, it } from "vitest";
-import { FIXTURE_METADATA_SYMBOL, FIXTURE_TYPE_LINK_SYMBOL, FIXTURE_TYPE_SYMLINK_SYMBOL } from "../src/constants";
+import {
+  FIXTURE_METADATA_SYMBOL,
+  FIXTURE_TYPE_LINK_SYMBOL,
+  FIXTURE_TYPE_SYMLINK_SYMBOL,
+} from "../src/constants";
 import { hasMetadata, isLink, isPrimitive, isSymlink, link, metadata, symlink } from "../src/helpers";
 
 describe("symlinks", () => {

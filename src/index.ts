@@ -16,11 +16,10 @@
  * ```
  */
 
-import type {
-  DirectoryJSON,
-  TestdirFromOptions,
-} from "testdirs";
+import type { FromFileSystemOptions } from "testdirs";
+import { relative, resolve } from "node:path";
 import { fromFileSystem, testdir as originalTestdir } from "testdirs";
+import { createCustomTestdir } from "testdirs/factory";
 import {
   afterAll,
   onTestFinished,
@@ -29,6 +28,7 @@ import {
   getCurrentSuite,
   getCurrentTest,
 } from "vitest/suite";
+import { z } from "zod";
 import { BASE_DIR } from "./constants";
 import { internalGenerateDirname, isInVitest } from "./utils";
 
@@ -56,19 +56,40 @@ export {
   type DirectoryJSON,
   type EncodingForFileFn,
   fromFileSystem,
-  type FromFileSystemOptions,
   type FSMetadata,
   type TestdirFn,
-  type TestdirFromOptions,
   type TestdirLink,
   type TestdirMetadata,
   type TestdirResult,
   type TestdirSymlink,
 } from "testdirs";
 
-/**
- * Options for creating a test directory.
- */
+const optionsSchema = z.object({
+  /**
+   * The directory name to use.
+   *
+   * If not provided, a directory name will be generated based on the test name.
+   */
+  dirname: z.string().optional(),
+
+  /**
+   * Whether to cleanup the directory after the test has finished.
+   * @default true
+   */
+  cleanup: z.boolean().default(true),
+
+  /**
+   * Whether to allow the directory to be created outside of the `.vitest-testdirs` directory.
+   *
+   * WARN:
+   * This can be dangerous as it can delete files, folders, etc. where it shouldn't.
+   * Use with caution.
+   *
+   * @default false
+   */
+  allowOutside: z.boolean().default(false),
+});
+
 export interface TestdirOptions {
   /**
    * Whether to cleanup the directory after the test has finished.
@@ -103,10 +124,7 @@ export interface TestdirOptions {
  * @returns {Promise<string>} The path of the created test directory.
  * @throws An error if `testdir` is called outside of a test.
  */
-export async function testdir(
-  files: DirectoryJSON = {},
-  options?: TestdirOptions,
-): Promise<string> {
+export const testdir = createCustomTestdir(async ({ files, fixturePath, options }) => {
   if (!isInVitest()) {
     throw new Error("testdir must be called inside vitest context");
   }
@@ -114,17 +132,21 @@ export async function testdir(
   const test = getCurrentTest();
   const suite = getCurrentSuite();
 
-  const dirname = internalGenerateDirname(options?.dirname);
-
   const allowOutside = options?.allowOutside ?? false;
 
   // if the dirname is escaped from BASE_DIR, throw an error
-  if (!allowOutside && !dirname.startsWith(BASE_DIR)) {
-    throw new Error(`The directory name must start with '${BASE_DIR}'`);
+  if (!allowOutside) {
+    const resolvedBase = resolve(BASE_DIR);
+    const resolvedTarget = resolve(fixturePath);
+    const rel = relative(resolvedBase, resolvedTarget);
+    const isInside = rel !== "" && !rel.startsWith("..") && !resolve(resolvedBase, rel).startsWith("..");
+    if (!isInside) {
+      throw new Error(`The directory name must start with '${BASE_DIR}'`);
+    }
   }
 
   const { path, remove } = await originalTestdir(files, {
-    dirname,
+    dirname: fixturePath,
   });
 
   if (options?.cleanup ?? true) {
@@ -142,44 +164,47 @@ export async function testdir(
   }
 
   return path;
-}
+}, {
+  dirname(options) {
+    return internalGenerateDirname(options?.dirname);
+  },
+  optionsSchema,
+  extensions: {
+    /**
+     * Creates a test directory from an existing filesystem path
+     *
+     * @param {string} fsPath - The filesystem path to create the test directory from
+     * @param {TestdirFromOptions & TestdirOptions} options - Configuration options
+     * @returns {Promise<string>} A test directory instance initialized with the contents from the specified path
+     *
+     * @example
+     * ```ts
+     * const dir = testdir.from('./fixtures/basic');
+     * ```
+     */
+    from: async (fsPath: string, options?: TestdirOptions & {
+      fromFS?: FromFileSystemOptions;
+    }): Promise<string> => {
+      const { fromFS, ...rest } = options ?? {};
+      const files = await fromFileSystem(fsPath, fromFS);
+      return testdir(files, rest);
+    },
+    /**
+     * Generates the path for a test directory.
+     *
+     * @param {string?} dirname - The directory name to use.
+     *
+     * If not provided, a directory name will be generated based on the test name.
+     *
+     * @returns {string} The path of the current test directory.
+     * @throws An error if `testdir` is called outside of a test.
+     */
+    dirname: (dirname?: string): string => {
+      if (!isInVitest()) {
+        throw new Error("testdir must be called inside vitest context");
+      }
 
-/**
- * Creates a test directory from an existing filesystem path
- *
- * @param {string} fsPath - The filesystem path to create the test directory from
- * @param {TestdirFromOptions & TestdirOptions} options - Configuration options
- * @returns {Promise<string>} A test directory instance initialized with the contents from the specified path
- *
- * @example
- * ```ts
- * const dir = testdir.from('./fixtures/basic');
- * ```
- */
-testdir.from = async (fsPath: string, options?: TestdirFromOptions & TestdirOptions): Promise<string> => {
-  return testdir(await fromFileSystem(fsPath, {
-    ...options?.fromFS,
-  }), {
-    dirname: options?.dirname,
-    allowOutside: options?.allowOutside,
-    cleanup: options?.cleanup,
-  });
-};
-
-/**
- * Generates the path for a test directory.
- *
- * @param {string?} dirname - The directory name to use.
- *
- * If not provided, a directory name will be generated based on the test name.
- *
- * @returns {string} The path of the current test directory.
- * @throws An error if `testdir` is called outside of a test.
- */
-testdir.dirname = (dirname?: string): string => {
-  if (!isInVitest()) {
-    throw new Error("testdir must be called inside vitest context");
-  }
-
-  return internalGenerateDirname(dirname);
-};
+      return internalGenerateDirname(dirname);
+    },
+  },
+});
