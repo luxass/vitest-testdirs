@@ -17,6 +17,7 @@
  */
 
 import type { FromFileSystemOptions } from "testdirs";
+import { relative, resolve } from "node:path";
 import { fromFileSystem, testdir as originalTestdir } from "testdirs";
 import { createCustomTestdir } from "testdirs/factory";
 import {
@@ -134,8 +135,14 @@ export const testdir = createCustomTestdir(async ({ files, fixturePath, options 
   const allowOutside = options?.allowOutside ?? false;
 
   // if the dirname is escaped from BASE_DIR, throw an error
-  if (!allowOutside && !fixturePath.startsWith(BASE_DIR)) {
-    throw new Error(`The directory name must start with '${BASE_DIR}'`);
+  if (!allowOutside) {
+    const resolvedBase = resolve(BASE_DIR);
+    const resolvedTarget = resolve(fixturePath);
+    const rel = relative(resolvedBase, resolvedTarget);
+    const isInside = rel !== "" && !rel.startsWith("..") && !resolve(resolvedBase, rel).startsWith("..");
+    if (!isInside) {
+      throw new Error(`The directory name must start with '${BASE_DIR}'`);
+    }
   }
 
   const { path, remove } = await originalTestdir(files, {
@@ -178,12 +185,9 @@ export const testdir = createCustomTestdir(async ({ files, fixturePath, options 
     from: async (fsPath: string, options?: TestdirOptions & {
       fromFS?: FromFileSystemOptions;
     }): Promise<string> => {
-      const files = await fromFileSystem(fsPath, options?.fromFS);
-      return testdir(files, {
-        allowOutside: options?.allowOutside,
-        cleanup: options?.cleanup,
-        dirname: options?.dirname,
-      });
+      const { fromFS, ...rest } = options ?? {};
+      const files = await fromFileSystem(fsPath, fromFS);
+      return testdir(files, rest);
     },
     /**
      * Generates the path for a test directory.
