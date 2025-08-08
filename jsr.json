@@ -7,12 +7,13 @@
     "./vitest": "./src/vitest.ts"
   },
   "exclude": [
-    "tsup.config.ts",
     "eslint.config.mjs",
     "pnpm-lock.yaml",
     ".github/**",
     "vitest.config.ts",
     "test",
-    ".gitattributes"
+    ".gitattributes",
+    "tsdown.config.ts",
+    "tsconfig.json"
   ]
 }

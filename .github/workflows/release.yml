@@ -60,7 +60,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: publish to jsr
-        run: npx jsr publish --allow-dirty
+        run: npx jsr publish --allow-dirty --allow-slow-types
 
       - name: print dirty files
         run: git status --porcelain
