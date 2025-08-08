@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       testdirs:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0-beta.4
+        version: 3.1.0-beta.4
     devDependencies:
       '@luxass/eslint-config':
         specifier: ^5.2.5
@@ -39,6 +39,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.7)(jiti@2.4.2)(yaml@2.8.0)
+      zod:
+        specifier: ^4.0.15
+        version: 4.0.15
 
 packages:
 
@@ -1956,8 +1959,8 @@ packages:
     resolution: {integrity: sha512-pFYqmTw68LXVjeWJMST4+borgQP2AyMNbg1BpZh9LbyhUeNkeaPF9gzfPGUAnSMV3qPYdWUwDIjjCLiSDOl7vg==}
     engines: {node: '>=18'}
 
-  testdirs@3.0.1:
-    resolution: {integrity: sha512-5lRUgfJYC//XTPKbCOBdP6AV/1KYfUmTm9GkwrB854TVMatbdkJgPSnH1Yf1R8dRngO5szgROVQ3x5XNbsYCuA==}
+  testdirs@3.1.0-beta.4:
+    resolution: {integrity: sha512-NAX1/lq2RWn8RpjiLrZdjITJr++BzTL2hVspIF5oSbYxDxxfB1d0uC2gNDAGYD/xaOH/rGOwCtq1npwUHNfYag==}
     engines: {node: '>=20'}
 
   tinybench@2.9.0:
@@ -2193,6 +2196,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zod@4.0.15:
+    resolution: {integrity: sha512-2IVHb9h4Mt6+UXkyMs0XbfICUh1eUrlJJAOupBHUhLRnKkruawyDddYRCs0Eizt900ntIMk9/4RksYl+FgSpcQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -4307,7 +4313,7 @@ snapshots:
       glob: 10.4.5
       minimatch: 9.0.5
 
-  testdirs@3.0.1: {}
+  testdirs@3.1.0-beta.4: {}
 
   tinybench@2.9.0: {}
 
@@ -4538,5 +4544,7 @@ snapshots:
   yaml@2.8.0: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.0.15: {}
 
   zwitch@2.0.4: {}
