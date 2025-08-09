@@ -90,31 +90,7 @@ const optionsSchema = z.object({
   allowOutside: z.boolean().default(false),
 });
 
-export interface TestdirOptions {
-  /**
-   * Whether to cleanup the directory after the test has finished.
-   * @default true
-   */
-  cleanup?: boolean;
-
-  /**
-   * The directory name to use.
-   *
-   * If not provided, a directory name will be generated based on the test name.
-   */
-  dirname?: string;
-
-  /**
-   * Whether to allow the directory to be created outside of the `.vitest-testdirs` directory.
-   *
-   * WARN:
-   * This can be dangerous as it can delete files, folders, etc. where it shouldn't.
-   * Use with caution.
-   *
-   * @default false
-   */
-  allowOutside?: boolean;
-}
+export type TestdirOptions = z.input<typeof optionsSchema>;
 
 /**
  * Creates a test directory with the specified files and options.
