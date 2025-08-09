@@ -24,17 +24,17 @@ import { test as baseTest } from "vitest";
 import { testdir } from "./index";
 
 interface TestWithOptionsContext extends TestContext {
-  testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
+  testdir: (files?: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }
 
-export const test: TestAPI<{
-  testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
-}> = baseTest.extend<{
-  testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
-}>({
+interface VitestTestExtended {
+  testdir: (files?: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
+}
+
+export const test: TestAPI<VitestTestExtended> = baseTest.extend<VitestTestExtended>({
   // eslint-disable-next-line no-empty-pattern
   testdir: async ({}, use) => {
-    const testdirFn = async (files: DirectoryJSON, options?: TestdirOptions) => {
+    const testdirFn = async (files?: DirectoryJSON, options?: TestdirOptions) => {
       return testdir(files, options);
     };
     await use(testdirFn);
