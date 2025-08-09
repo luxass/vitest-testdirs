@@ -32,14 +32,14 @@ export const test: TestAPI<{
 }> = baseTest.extend<{
   testdir: (files: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }>({
-      // eslint-disable-next-line no-empty-pattern
-      testdir: async ({}, use) => {
-        const testdirFn = async (files: DirectoryJSON, options?: TestdirOptions) => {
-          return testdir(files, options);
-        };
-        await use(testdirFn);
-      },
-    });
+  // eslint-disable-next-line no-empty-pattern
+  testdir: async ({}, use) => {
+    const testdirFn = async (files: DirectoryJSON, options?: TestdirOptions) => {
+      return testdir(files, options);
+    };
+    await use(testdirFn);
+  },
+});
 
 export const it = test;
 
