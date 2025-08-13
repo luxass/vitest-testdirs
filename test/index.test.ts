@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
 import { join, resolve } from "node:path";
@@ -422,7 +423,6 @@ describe("create mapping of fs contents", () => {
         "README.md": "# vitest-testdirs\n",
         "nested": {
           "README.md": "# Nested Fixture Folder\n",
-          // eslint-disable-next-line node/prefer-global/buffer
           "image.txt": Buffer.from([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33, 10]),
         },
       };
@@ -435,5 +435,132 @@ describe("create mapping of fs contents", () => {
 
       expect(result).toMatchObject(mockFiles);
     });
+  });
+});
+
+describe("withMetadata encoding tests", () => {
+  it("should create files with UTF-8 encoding using withMetadata", async () => {
+    const utf8Content = "Hello, 世界! 🌍";
+    const files = {
+      "utf8-file.txt": metadata(utf8Content, { encoding: "utf8" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "utf8-file.txt"), "utf8");
+
+    expect(fileContent).toBe(utf8Content);
+  });
+
+  it("should create files with UTF-16LE encoding using withMetadata", async () => {
+    const utf16Content = "Hello, UTF-16! 🚀";
+    const files = {
+      "utf16le-file.txt": metadata(utf16Content, { encoding: "utf16le" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "utf16le-file.txt"), "utf16le");
+
+    expect(fileContent).toBe(utf16Content);
+  });
+
+  it("should create files with ASCII encoding using withMetadata", async () => {
+    const asciiContent = "Hello, ASCII World!";
+    const files = {
+      "ascii-file.txt": metadata(asciiContent, { encoding: "ascii" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "ascii-file.txt"), "ascii");
+
+    expect(fileContent).toBe(asciiContent);
+  });
+
+  it("should create files with base64 encoding using withMetadata", async () => {
+    const base64Content = "SGVsbG8sIEJhc2U2NCE="; // "Hello, Base64!" in base64
+    const files = {
+      "base64-file.txt": metadata(base64Content, { encoding: "base64" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "base64-file.txt"), "base64");
+
+    expect(fileContent).toBe(base64Content);
+  });
+
+  it("should create files with binary encoding using withMetadata", async () => {
+    const binaryContent = Buffer.from("Hello, Binary!", "utf8").toString("binary");
+    const files = {
+      "binary-file.txt": metadata(binaryContent, { encoding: "binary" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "binary-file.txt"), "binary");
+
+    expect(fileContent).toBe(binaryContent);
+  });
+
+  it("should create files with hex encoding using withMetadata", async () => {
+    const hexContent = Buffer.from("Hello, Hex!", "utf8").toString("hex");
+    const files = {
+      "hex-file.txt": metadata(hexContent, { encoding: "hex" }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "hex-file.txt"), "hex");
+
+    expect(fileContent).toBe(hexContent);
+  });
+
+  it("should create files with null encoding (binary) using withMetadata", async () => {
+    const binaryBuffer = new Uint8Array([72, 101, 108, 108, 111, 44, 32, 66, 105, 110, 97, 114, 121, 33]); // "Hello, Binary!"
+    const files = {
+      "null-encoding-file.bin": metadata(binaryBuffer, { encoding: null }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "null-encoding-file.bin"));
+
+    expect(fileContent).toEqual(Buffer.from(binaryBuffer));
+  });
+
+  it("should create multiple files with different encodings in one testdir", async () => {
+    const files = {
+      "utf8.txt": metadata("UTF-8: 你好", { encoding: "utf8" }),
+      "utf16le.txt": metadata("UTF-16LE: Hëllø", { encoding: "utf16le" }),
+      "ascii.txt": metadata("ASCII: Hello", { encoding: "ascii" }),
+      "base64.txt": metadata("SGVsbG8gQmFzZTY0", { encoding: "base64" }),
+      "folder": {
+        "nested-utf8.txt": metadata("Nested UTF-8: 🌟", { encoding: "utf8" }),
+      },
+    };
+
+    const dirname = await testdir(files);
+
+    // Test each file with its respective encoding
+    expect(await fsAsync.readFile(join(dirname, "utf8.txt"), "utf8")).toBe("UTF-8: 你好");
+    expect(await fsAsync.readFile(join(dirname, "utf16le.txt"), "utf16le")).toBe("UTF-16LE: Hëllø");
+    expect(await fsAsync.readFile(join(dirname, "ascii.txt"), "ascii")).toBe("ASCII: Hello");
+    expect(await fsAsync.readFile(join(dirname, "base64.txt"), "base64")).toBe("SGVsbG8gQmFzZTY0");
+    expect(await fsAsync.readFile(join(dirname, "folder", "nested-utf8.txt"), "utf8")).toBe("Nested UTF-8: 🌟");
+  });
+
+  it("should combine encoding with file permissions using withMetadata", async () => {
+    const files = {
+      "encoded-readonly.txt": metadata("UTF-8 read-only: 🔒", {
+        encoding: "utf8",
+        mode: 0o444,
+      }),
+    };
+
+    const dirname = await testdir(files);
+    const fileContent = await fsAsync.readFile(join(dirname, "encoded-readonly.txt"), "utf8");
+
+    expect(fileContent).toBe("UTF-8 read-only: 🔒");
+
+    // Check that file has correct permissions (non-Windows only)
+    if (platform() !== "win32") {
+      const stats = await fsAsync.stat(join(dirname, "encoded-readonly.txt"));
+      expect((stats.mode & 0o444).toString(8)).toBe("444");
+    }
   });
 });
