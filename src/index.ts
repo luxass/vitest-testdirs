@@ -16,8 +16,7 @@
  * ```
  */
 
-import type { DirectoryJSON, FromFileSystemOptions } from "testdirs";
-import { readdir } from "node:fs/promises";
+import type { FromFileSystemOptions } from "testdirs";
 import { relative, resolve } from "node:path";
 import { fromFileSystem, testdir as originalTestdir } from "testdirs";
 import { createCustomTestdir } from "testdirs/factory";
@@ -42,6 +41,7 @@ export {
 } from "./constants";
 
 export {
+  captureSnapshot,
   hasMetadata,
   isLink,
   isPrimitive,
@@ -182,37 +182,6 @@ export const testdir = createCustomTestdir(async ({ files, fixturePath, options 
       }
 
       return internalGenerateDirname(dirname);
-    },
-    snapshots: async (files: DirectoryJSON, options: TestdirOptions) => {
-      const dir = await testdir(files, options);
-      return {
-        path: dir,
-        snapshot: async (): Promise<string> => {
-          // read entire directory
-          const directory = await readdir(dir, {
-            withFileTypes: true,
-            recursive: true,
-          });
-
-          let tree = "";
-
-          const buildTree = (dir: string, depth: number) => {
-            const indent = "  ".repeat(depth);
-            for (const entry of directory) {
-              if (entry.isDirectory()) {
-                tree += `${indent}├── ${entry.name}/\n`;
-                buildTree(`${dir}/${entry.name}`, depth + 1);
-              } else {
-                tree += `${indent}├── ${entry.name}\n`;
-              }
-            }
-          };
-
-          buildTree(dir, 0);
-
-          return tree;
-        },
-      };
     },
   },
 });

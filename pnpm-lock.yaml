@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       testdirs:
-        specifier: ^3.1.1
-        version: 3.1.1
+        specifier: ^3.2.0
+        version: 3.2.0
     devDependencies:
       '@luxass/eslint-config':
         specifier: ^5.3.0
@@ -1976,8 +1976,8 @@ packages:
     resolution: {integrity: sha512-pFYqmTw68LXVjeWJMST4+borgQP2AyMNbg1BpZh9LbyhUeNkeaPF9gzfPGUAnSMV3qPYdWUwDIjjCLiSDOl7vg==}
     engines: {node: '>=18'}
 
-  testdirs@3.1.1:
-    resolution: {integrity: sha512-roM2UJUe6FvEdySN2GdzV6k08H5aIQMn60LhAOwL/V6k5hozt8pkOBdEQhEfek6OuIxEtNc3sx1afZKf/V3dVg==}
+  testdirs@3.2.0:
+    resolution: {integrity: sha512-+4t632ZA7L588ZlIu5lZbaX8GkqtqCdtEybEIaQWn9ZblH/q5cXSxcsEvgHkIIiTTZ43GLcSwizbErJz1SfJqg==}
     engines: {node: '>=20'}
 
   tinybench@2.9.0:
@@ -4352,7 +4352,7 @@ snapshots:
       glob: 10.4.5
       minimatch: 9.0.5
 
-  testdirs@3.1.1: {}
+  testdirs@3.2.0: {}
 
   tinybench@2.9.0: {}
 
