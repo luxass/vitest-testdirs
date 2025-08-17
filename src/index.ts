@@ -41,6 +41,7 @@ export {
 } from "./constants";
 
 export {
+  captureSnapshot,
   hasMetadata,
   isLink,
   isPrimitive,
