@@ -8,7 +8,7 @@
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@10.16.0",
+  "packageManager": "pnpm@10.19.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "tsdown",
@@ -42,21 +42,21 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "vitest": ">=3.0.0 <4.0.0"
+    "vitest": ">=3.0.0 <4.0.0 || >=4.0.0 <5.0.0"
   },
   "dependencies": {
-    "testdirs": "3.2.0"
+    "testdirs": "4.0.0"
   },
   "devDependencies": {
-    "@luxass/eslint-config": "5.3.2",
-    "@types/node": "20.19.7",
-    "@vitest/coverage-v8": "3.2.4",
-    "eslint": "^9.35.0",
-    "eslint-plugin-format": "^1.0.1",
-    "publint": "0.3.12",
-    "tsdown": "0.15.1",
-    "typescript": "5.9.2",
-    "vitest": "3.2.4",
-    "zod": "4.1.8"
+    "@luxass/eslint-config": "6.0.1",
+    "@types/node": "22.16.0",
+    "@vitest/coverage-v8": "4.0.1",
+    "eslint": "9.38.0",
+    "eslint-plugin-format": "1.0.2",
+    "publint": "0.3.15",
+    "tsdown": "0.15.9",
+    "typescript": "5.9.3",
+    "vitest": "4.0.1",
+    "zod": "4.1.12"
   }
 }

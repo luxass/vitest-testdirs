@@ -1,0 +1,41 @@
+name: GitHub Actions Security Analysis
+
+permissions: {}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - ".github/workflows/**"
+  push:
+    branches:
+      - main
+      - "renovate/**"
+    paths:
+      - ".github/workflows/**"
+
+jobs:
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: install uv
+        uses: astral-sh/setup-uv@3259c6206f993105e3a61b142c2d97bf4b9ef83d # v7.1.0
+
+      - name: run zizmor
+        run: uvx zizmor --format sarif . > results.sarif
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: upload sarif file
+        uses: github/codeql-action/upload-sarif@80cb6b56b93de3e779c7d476d9100d06fb87c877 # codeql-bundle-v2.23.2
+        with:
+          sarif_file: results.sarif
+          category: zizmor
