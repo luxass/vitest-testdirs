@@ -20,23 +20,27 @@ function loadFromVitest(loader: "suite" | "test" | "both"): boolean {
       };
     };
     const testRunner = vitest.TestRunner;
+    let suiteLoaded = false;
+    let testLoaded = false;
     if (testRunner) {
       if (loader !== "test" && typeof testRunner.getCurrentSuite === "function") {
         currentSuiteGetter = testRunner.getCurrentSuite;
         loadedSuite = true;
+        suiteLoaded = true;
       }
       if (loader !== "suite" && typeof testRunner.getCurrentTest === "function") {
         currentTestGetter = testRunner.getCurrentTest;
         loadedTest = true;
+        testLoaded = true;
       }
     }
     if (loader === "suite") {
-      return loadedSuite === true;
+      return suiteLoaded;
     }
     if (loader === "test") {
-      return loadedTest === true;
+      return testLoaded;
     }
-    return loadedSuite === true && loadedTest === true;
+    return suiteLoaded && testLoaded;
   } catch {
     return false;
   }
