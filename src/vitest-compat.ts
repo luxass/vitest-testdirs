@@ -19,19 +19,16 @@ function loadFromVitest(): boolean {
         getCurrentTest?: CurrentTestGetter;
       };
     };
-    let loaded = false;
     const testRunner = vitest.TestRunner;
     if (testRunner && typeof testRunner.getCurrentSuite === "function") {
       currentSuiteGetter = testRunner.getCurrentSuite;
       loadedSuite = true;
-      loaded = true;
     }
     if (testRunner && typeof testRunner.getCurrentTest === "function") {
       currentTestGetter = testRunner.getCurrentTest;
       loadedTest = true;
-      loaded = true;
     }
-    return loaded;
+    return loadedSuite === true || loadedTest === true;
   } catch {
     return false;
   }
