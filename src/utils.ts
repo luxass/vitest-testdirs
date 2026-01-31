@@ -88,7 +88,11 @@ export function internalGenerateDirname(dirname?: string): string {
     return normalize(join(BASE_DIR, dirname));
   }
 
-  return normalize(join(BASE_DIR, createDirnameFromTask(
-    (test?.type === "test" ? test : suite) || suite,
-  )));
+  const task = (test?.type === "test" ? test : suite) || suite;
+
+  if (!task) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return normalize(join(BASE_DIR, createDirnameFromTask(task)));
 }
