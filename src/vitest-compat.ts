@@ -97,7 +97,7 @@ function ensureLoadedSuite(): void {
 
   const loaded = loadFromVitest() || loadFromRunners() || loadFromSuite();
   if (!loaded) {
-    throw new Error("testdir must be called inside vitest context");
+    throw new Error("getCurrentSuite must be called inside vitest context");
   }
 }
 
@@ -108,14 +108,14 @@ function ensureLoadedTest(): void {
 
   const loaded = loadFromVitest() || loadFromRunners() || loadFromSuite();
   if (!loaded) {
-    throw new Error("testdir must be called inside vitest context");
+    throw new Error("getCurrentTest must be called inside vitest context");
   }
 }
 
 function getSuiteGetter(): CurrentSuiteGetter {
   ensureLoadedSuite();
   if (!currentSuiteGetter) {
-    throw new Error("testdir must be called inside vitest context");
+    throw new Error("getCurrentSuite must be called inside vitest context");
   }
 
   return currentSuiteGetter;
@@ -124,7 +124,7 @@ function getSuiteGetter(): CurrentSuiteGetter {
 function getTestGetter(): CurrentTestGetter {
   ensureLoadedTest();
   if (!currentTestGetter) {
-    throw new Error("testdir must be called inside vitest context");
+    throw new Error("getCurrentTest must be called inside vitest context");
   }
 
   return currentTestGetter;
