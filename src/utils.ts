@@ -23,7 +23,17 @@ const DIR_REGEX = /[^\w\-]+/g;
  * @returns {boolean} True if code is running within a Vitest test, false otherwise
  */
 export function isInVitest(): boolean {
-  return getCurrentTest() != null || getCurrentSuite() != null;
+  try {
+    getCurrentTest();
+    return true;
+  } catch {
+    try {
+      getCurrentSuite();
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 /**

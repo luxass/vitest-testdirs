@@ -1,11 +1,13 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { createRequire } from "node:module";
 
-type CurrentSuiteGetter = () => SuiteCollector | undefined;
-type CurrentTestGetter = () => RunnerTask | undefined;
+type CurrentSuiteGetter = () => SuiteCollector;
+type CurrentTestGetter = () => RunnerTask;
 
 let currentSuiteGetter: CurrentSuiteGetter | null = null;
 let currentTestGetter: CurrentTestGetter | null = null;
+let loadedSuite = false;
+let loadedTest = false;
 
 const require = createRequire(import.meta.url);
 
@@ -17,14 +19,16 @@ function loadFromVitest(): boolean {
         getCurrentTest?: CurrentTestGetter;
       };
     };
-    if (
-      vitest.TestRunner
-      && typeof vitest.TestRunner.getCurrentSuite === "function"
-      && typeof vitest.TestRunner.getCurrentTest === "function"
-    ) {
-      currentSuiteGetter = vitest.TestRunner.getCurrentSuite;
-      currentTestGetter = vitest.TestRunner.getCurrentTest;
-      return true;
+    if (vitest.TestRunner) {
+      if (typeof vitest.TestRunner.getCurrentSuite === "function") {
+        currentSuiteGetter = vitest.TestRunner.getCurrentSuite;
+        loadedSuite = true;
+      }
+      if (typeof vitest.TestRunner.getCurrentTest === "function") {
+        currentTestGetter = vitest.TestRunner.getCurrentTest;
+        loadedTest = true;
+      }
+      return loadedSuite || loadedTest;
     }
   } catch {
     return false;
@@ -46,10 +50,16 @@ function loadFromRunners(): boolean {
       };
     };
     const runner = runnerModule.TestRunner || runnerModule.VitestTestRunner;
-    if (runner && typeof runner.getCurrentSuite === "function" && typeof runner.getCurrentTest === "function") {
-      currentSuiteGetter = runner.getCurrentSuite;
-      currentTestGetter = runner.getCurrentTest;
-      return true;
+    if (runner) {
+      if (typeof runner.getCurrentSuite === "function") {
+        currentSuiteGetter = runner.getCurrentSuite;
+        loadedSuite = true;
+      }
+      if (typeof runner.getCurrentTest === "function") {
+        currentTestGetter = runner.getCurrentTest;
+        loadedTest = true;
+      }
+      return loadedSuite || loadedTest;
     }
   } catch {
     return false;
@@ -64,11 +74,15 @@ function loadFromSuite(): boolean {
       getCurrentSuite?: CurrentSuiteGetter;
       getCurrentTest?: CurrentTestGetter;
     };
-    if (typeof suite.getCurrentSuite === "function" && typeof suite.getCurrentTest === "function") {
+    if (typeof suite.getCurrentSuite === "function") {
       currentSuiteGetter = suite.getCurrentSuite;
-      currentTestGetter = suite.getCurrentTest;
-      return true;
+      loadedSuite = true;
     }
+    if (typeof suite.getCurrentTest === "function") {
+      currentTestGetter = suite.getCurrentTest;
+      loadedTest = true;
+    }
+    return loadedSuite || loadedTest;
   } catch {
     return false;
   }
@@ -76,22 +90,50 @@ function loadFromSuite(): boolean {
   return false;
 }
 
-function ensureLoaded(): void {
-  if (currentSuiteGetter && currentTestGetter) {
+function ensureLoadedSuite(): void {
+  if (loadedSuite) {
     return;
   }
 
-  if (!loadFromVitest() && !loadFromRunners()) {
-    loadFromSuite();
+  const loaded = loadFromVitest() || loadFromRunners() || loadFromSuite();
+  if (!loaded) {
+    throw new Error("testdir must be called inside vitest context");
   }
 }
 
-export function getCurrentSuite(): SuiteCollector | undefined {
-  ensureLoaded();
-  return currentSuiteGetter?.();
+function ensureLoadedTest(): void {
+  if (loadedTest) {
+    return;
+  }
+
+  const loaded = loadFromVitest() || loadFromRunners() || loadFromSuite();
+  if (!loaded) {
+    throw new Error("testdir must be called inside vitest context");
+  }
 }
 
-export function getCurrentTest(): RunnerTask | undefined {
-  ensureLoaded();
-  return currentTestGetter?.();
+function getSuiteGetter(): CurrentSuiteGetter {
+  ensureLoadedSuite();
+  if (!currentSuiteGetter) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return currentSuiteGetter;
+}
+
+function getTestGetter(): CurrentTestGetter {
+  ensureLoadedTest();
+  if (!currentTestGetter) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return currentTestGetter;
+}
+
+export function getCurrentSuite(): SuiteCollector {
+  return getSuiteGetter()();
+}
+
+export function getCurrentTest(): RunnerTask {
+  return getTestGetter()();
 }
