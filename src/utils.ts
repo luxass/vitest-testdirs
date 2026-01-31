@@ -2,10 +2,10 @@ import type { RunnerTask, SuiteCollector } from "vitest";
 import { join, normalize } from "node:path";
 import process from "node:process";
 import { expect } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "vitest/suite";
 import {
   BASE_DIR,
 } from "./constants";
+import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
 
 /**
  * Regular expression that matches any character that is not a word character or hyphen.
@@ -23,7 +23,17 @@ const DIR_REGEX = /[^\w\-]+/g;
  * @returns {boolean} True if code is running within a Vitest test, false otherwise
  */
 export function isInVitest(): boolean {
-  return getCurrentTest() != null || getCurrentSuite() != null;
+  try {
+    getCurrentTest();
+    return true;
+  } catch {
+    try {
+      getCurrentSuite();
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 /**
@@ -88,7 +98,11 @@ export function internalGenerateDirname(dirname?: string): string {
     return normalize(join(BASE_DIR, dirname));
   }
 
-  return normalize(join(BASE_DIR, createDirnameFromTask(
-    (test?.type === "test" ? test : suite) || suite,
-  )));
+  const task = (test?.type === "test" ? test : suite) || suite;
+
+  if (!task) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return normalize(join(BASE_DIR, createDirnameFromTask(task)));
 }
