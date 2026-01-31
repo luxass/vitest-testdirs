@@ -8,6 +8,8 @@ let currentSuiteGetter: CurrentSuiteGetter | null = null;
 let currentTestGetter: CurrentTestGetter | null = null;
 let loadedSuite = false;
 let loadedTest = false;
+let suiteLoadAttempted = false;
+let testLoadAttempted = false;
 
 const require = createRequire(import.meta.url);
 
@@ -125,7 +127,11 @@ function loadSuiteFromSuiteModule(): boolean {
 
 export function getCurrentSuite(): SuiteCollector {
   if (!loadedSuite) {
-    const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
+    if (!suiteLoadAttempted) {
+      suiteLoadAttempted = true;
+      loadedSuite = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
+    }
+    const loaded = loadedSuite;
     if (!loaded) {
       throw new Error("Failed to load Vitest suite methods");
     }
@@ -140,7 +146,11 @@ export function getCurrentSuite(): SuiteCollector {
 
 export function getCurrentTest(): RunnerTask {
   if (!loadedTest) {
-    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
+    if (!testLoadAttempted) {
+      testLoadAttempted = true;
+      loadedTest = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
+    }
+    const loaded = loadedTest;
     if (!loaded) {
       throw new Error("Failed to load Vitest test methods");
     }
