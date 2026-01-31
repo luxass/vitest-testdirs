@@ -131,8 +131,7 @@ export function getCurrentSuite(): SuiteCollector {
       suiteLoadAttempted = true;
       loadedSuite = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     }
-    const loaded = loadedSuite;
-    if (!loaded) {
+    if (!loadedSuite) {
       throw new Error("Failed to load Vitest suite methods");
     }
   }
@@ -150,8 +149,7 @@ export function getCurrentTest(): RunnerTask {
       testLoadAttempted = true;
       loadedTest = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
     }
-    const loaded = loadedTest;
-    if (!loaded) {
+    if (!loadedTest) {
       throw new Error("Failed to load Vitest test methods");
     }
   }
