@@ -1,6 +1,6 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { describe, expect, it } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "vitest/suite";
+import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
 import { createDirnameFromTask } from "../src/utils";
 
 function createSuiteCollectorMock(name?: string) {
@@ -68,8 +68,8 @@ describe("createDirnameFromTask", () => {
     expect(createDirnameFromTask(test)).toBe("vitest-file-unnamed-test");
   });
 
-  it("should work with vitest/suite helpers", () => {
-    expect(createDirnameFromTask(getCurrentTest() || getCurrentSuite())).toBe("vitest-utils-createDirnameFromTask-should-work-with-vitest-suite-helpers");
+  it("should work with vitest current suite helpers", () => {
+    expect(createDirnameFromTask(getCurrentTest() || getCurrentSuite())).toBe("vitest-utils-createDirnameFromTask-should-work-with-vitest-current-suite-helpers");
   });
 
   it("should remove '.test.ts' from the file name", () => {
