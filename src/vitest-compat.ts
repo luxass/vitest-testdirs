@@ -11,37 +11,26 @@ let loadedTest: boolean | null = null;
 
 const require = createRequire(import.meta.url);
 
-function loadTestFromVitest(): boolean {
-  try {
-    const vitest = require("vitest") as {
-      TestRunner?: {
-        getCurrentTest?: CurrentTestGetter;
-      };
-    };
-    if (vitest.TestRunner && typeof vitest.TestRunner.getCurrentTest === "function") {
-      currentTestGetter = vitest.TestRunner.getCurrentTest;
-      loadedTest = true;
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-function loadSuiteFromVitest(): boolean {
+function loadFromVitest(): boolean {
   try {
     const vitest = require("vitest") as {
       TestRunner?: {
         getCurrentSuite?: CurrentSuiteGetter;
+        getCurrentTest?: CurrentTestGetter;
       };
     };
+    let loaded = false;
     if (vitest.TestRunner && typeof vitest.TestRunner.getCurrentSuite === "function") {
       currentSuiteGetter = vitest.TestRunner.getCurrentSuite;
       loadedSuite = true;
-      return true;
+      loaded = true;
     }
-    return false;
+    if (vitest.TestRunner && typeof vitest.TestRunner.getCurrentTest === "function") {
+      currentTestGetter = vitest.TestRunner.getCurrentTest;
+      loadedTest = true;
+      loaded = true;
+    }
+    return loaded;
   } catch {
     return false;
   }
@@ -126,7 +115,7 @@ function loadSuiteFromSuiteModule(): boolean {
 export function getCurrentSuite(): SuiteCollector {
   if (loadedSuite !== true) {
     if (loadedSuite === null) {
-      loadedSuite = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
+      loadedSuite = loadFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     }
     if (!loadedSuite) {
       throw new Error("Failed to load Vitest suite methods");
@@ -143,7 +132,7 @@ export function getCurrentSuite(): SuiteCollector {
 export function getCurrentTest(): RunnerTask {
   if (loadedTest !== true) {
     if (loadedTest === null) {
-      loadedTest = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
+      loadedTest = loadFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
     }
     if (!loadedTest) {
       throw new Error("Failed to load Vitest test methods");
