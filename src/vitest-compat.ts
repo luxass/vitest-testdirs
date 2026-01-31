@@ -36,7 +36,7 @@ function loadFromVitest(loader: "suite" | "test" | "both"): boolean {
     if (loader === "test") {
       return loadedTest === true;
     }
-    return loadedSuite === true || loadedTest === true;
+    return loadedSuite === true && loadedTest === true;
   } catch {
     return false;
   }
