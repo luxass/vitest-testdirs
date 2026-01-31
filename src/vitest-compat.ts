@@ -23,11 +23,10 @@ function loadTestFromVitest(): boolean {
       loadedTest = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function loadSuiteFromVitest(): boolean {
@@ -42,11 +41,10 @@ function loadSuiteFromVitest(): boolean {
       loadedSuite = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function loadTestFromRunners(): boolean {
@@ -65,11 +63,10 @@ function loadTestFromRunners(): boolean {
       loadedTest = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function loadSuiteFromRunners(): boolean {
@@ -88,11 +85,10 @@ function loadSuiteFromRunners(): boolean {
       loadedSuite = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function loadTestFromSuite(): boolean {
@@ -105,11 +101,10 @@ function loadTestFromSuite(): boolean {
       loadedTest = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function loadSuiteFromSuite(): boolean {
@@ -122,11 +117,10 @@ function loadSuiteFromSuite(): boolean {
       loadedSuite = true;
       return true;
     }
+    return false;
   } catch {
     return false;
   }
-
-  return false;
 }
 
 function getSuiteGetter(): CurrentSuiteGetter {
