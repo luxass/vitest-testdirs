@@ -11,7 +11,7 @@ let loadedTest: boolean | null = null;
 
 const require = createRequire(import.meta.url);
 
-function loadFromVitest(): boolean {
+function loadFromVitest(loader: "suite" | "test" | "both"): boolean {
   try {
     const vitest = require("vitest") as {
       TestRunner?: {
@@ -21,14 +21,20 @@ function loadFromVitest(): boolean {
     };
     const testRunner = vitest.TestRunner;
     if (testRunner) {
-      if (typeof testRunner.getCurrentSuite === "function") {
+      if (loader !== "test" && typeof testRunner.getCurrentSuite === "function") {
         currentSuiteGetter = testRunner.getCurrentSuite;
         loadedSuite = true;
       }
-      if (typeof testRunner.getCurrentTest === "function") {
+      if (loader !== "suite" && typeof testRunner.getCurrentTest === "function") {
         currentTestGetter = testRunner.getCurrentTest;
         loadedTest = true;
       }
+    }
+    if (loader === "suite") {
+      return loadedSuite === true;
+    }
+    if (loader === "test") {
+      return loadedTest === true;
     }
     return loadedSuite === true || loadedTest === true;
   } catch {
@@ -115,7 +121,7 @@ function loadSuiteFromSuiteModule(): boolean {
 export function getCurrentSuite(): SuiteCollector {
   if (loadedSuite !== true) {
     if (loadedSuite === null) {
-      loadedSuite = loadFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
+      loadedSuite = loadFromVitest("suite") || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     }
     if (!loadedSuite) {
       throw new Error("Failed to load Vitest suite methods");
@@ -132,7 +138,7 @@ export function getCurrentSuite(): SuiteCollector {
 export function getCurrentTest(): RunnerTask {
   if (loadedTest !== true) {
     if (loadedTest === null) {
-      loadedTest = loadFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
+      loadedTest = loadFromVitest("test") || loadTestFromRunners() || loadTestFromSuiteModule();
     }
     if (!loadedTest) {
       throw new Error("Failed to load Vitest test methods");
