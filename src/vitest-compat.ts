@@ -30,6 +30,11 @@ async function tryLoad() {
     }
   } catch {}
 
+  // If both were loaded, no need to continue
+  if (loadedSuite === true && loadedTest === true) {
+    return;
+  }
+
   try {
     const suite = (await import("vitest/suite"));
     if (loadedSuite !== true && typeof suite.getCurrentSuite === "function") {
