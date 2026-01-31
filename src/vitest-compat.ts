@@ -91,7 +91,7 @@ function loadSuiteFromRunners(): boolean {
   }
 }
 
-function loadTestFromSuite(): boolean {
+function loadTestFromSuiteModule(): boolean {
   try {
     const suite = require("vitest/suite") as {
       getCurrentTest?: CurrentTestGetter;
@@ -107,7 +107,7 @@ function loadTestFromSuite(): boolean {
   }
 }
 
-function loadSuiteFromSuite(): boolean {
+function loadSuiteFromSuiteModule(): boolean {
   try {
     const suite = require("vitest/suite") as {
       getCurrentSuite?: CurrentSuiteGetter;
@@ -125,7 +125,7 @@ function loadSuiteFromSuite(): boolean {
 
 function getSuiteGetter(): CurrentSuiteGetter {
   if (!loadedSuite) {
-    const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuite();
+    const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     if (!loaded) {
       throw new Error("Failed to load Vitest suite methods");
     }
@@ -135,7 +135,7 @@ function getSuiteGetter(): CurrentSuiteGetter {
 
 function getTestGetter(): CurrentTestGetter {
   if (!loadedTest) {
-    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuite();
+    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
     if (!loaded) {
       throw new Error("Failed to load Vitest test methods");
     }
