@@ -130,11 +130,7 @@ export function getCurrentSuite(): SuiteCollector {
       throw new Error("Failed to load Vitest suite methods");
     }
   }
-  if (!currentSuiteGetter) {
-    throw new Error("Vitest suite getter was not initialized");
-  }
-
-  const suite = currentSuiteGetter();
+  const suite = currentSuiteGetter!();
   if (!suite) {
     throw new Error("getCurrentSuite called outside an active suite context");
   }
@@ -149,11 +145,7 @@ export function getCurrentTest(): RunnerTask {
       throw new Error("Failed to load Vitest test methods");
     }
   }
-  if (!currentTestGetter) {
-    throw new Error("Vitest test getter was not initialized");
-  }
-
-  const test = currentTestGetter();
+  const test = currentTestGetter!();
   if (!test) {
     throw new Error("getCurrentTest called outside an active test context");
   }
