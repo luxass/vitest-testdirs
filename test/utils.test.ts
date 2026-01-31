@@ -1,7 +1,7 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { describe, expect, it } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
 import { createDirnameFromTask } from "../src/utils";
+import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
 
 function createSuiteCollectorMock(name?: string) {
   return {

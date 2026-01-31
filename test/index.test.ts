@@ -3,7 +3,6 @@ import fsAsync from "node:fs/promises";
 import { platform } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it, onTestFinished } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
 import {
   createFileTree,
   fromFileSystem,
@@ -13,6 +12,7 @@ import {
   testdir,
 } from "../src";
 import { createDirnameFromTask } from "../src/utils";
+import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
 
 function cleanup(path: string) {
   onTestFinished(async () => {

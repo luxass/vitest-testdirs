@@ -24,10 +24,10 @@ import {
   afterAll,
   onTestFinished,
 } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "./vitest-runner";
 import { z } from "zod";
 import { BASE_DIR } from "./constants";
 import { internalGenerateDirname, isInVitest } from "./utils";
+import { getCurrentSuite, getCurrentTest } from "./vitest-runner";
 
 export {
   BASE_DIR,

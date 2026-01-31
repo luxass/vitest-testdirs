@@ -2,10 +2,10 @@ import type { RunnerTask, SuiteCollector } from "vitest";
 import { join, normalize } from "node:path";
 import process from "node:process";
 import { expect } from "vitest";
-import { getCurrentSuite, getCurrentTest } from "./vitest-runner";
 import {
   BASE_DIR,
 } from "./constants";
+import { getCurrentSuite, getCurrentTest } from "./vitest-runner";
 
 /**
  * Regular expression that matches any character that is not a word character or hyphen.
