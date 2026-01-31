@@ -35,8 +35,7 @@ function loadFromVitest(): boolean {
 
 function loadFromRunners(): boolean {
   try {
-    const runners = require("vitest/runners") as Record<string, unknown>;
-    const runnerModule = runners as {
+    const runnerModule = require("vitest/runners") as {
       TestRunner?: {
         getCurrentSuite?: CurrentSuiteGetter;
         getCurrentTest?: CurrentTestGetter;
