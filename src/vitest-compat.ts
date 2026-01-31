@@ -133,11 +133,11 @@ function getSuiteGetter(): CurrentSuiteGetter {
   if (!loadedSuite) {
     const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuite();
     if (!loaded) {
-      throw new Error("getCurrentSuite must be called inside Vitest context");
+      throw new Error("Failed to load Vitest suite methods");
     }
   }
   if (!currentSuiteGetter) {
-    throw new Error("getCurrentSuite must be called inside Vitest context");
+    throw new Error("Vitest suite getter was not initialized");
   }
 
   return currentSuiteGetter;
@@ -147,11 +147,11 @@ function getTestGetter(): CurrentTestGetter {
   if (!loadedTest) {
     const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuite();
     if (!loaded) {
-      throw new Error("getCurrentTest must be called inside Vitest context");
+      throw new Error("Failed to load Vitest test methods");
     }
   }
   if (!currentTestGetter) {
-    throw new Error("getCurrentTest must be called inside Vitest context");
+    throw new Error("Vitest test getter was not initialized");
   }
 
   return currentTestGetter;
@@ -160,7 +160,7 @@ function getTestGetter(): CurrentTestGetter {
 export function getCurrentSuite(): SuiteCollector {
   const suite = getSuiteGetter()();
   if (!suite) {
-    throw new Error("getCurrentSuite must be called inside Vitest context");
+    throw new Error("getCurrentSuite called outside an active suite context");
   }
 
   return suite;
@@ -169,7 +169,7 @@ export function getCurrentSuite(): SuiteCollector {
 export function getCurrentTest(): RunnerTask {
   const test = getTestGetter()();
   if (!test) {
-    throw new Error("getCurrentTest must be called inside Vitest context");
+    throw new Error("getCurrentTest called outside an active test context");
   }
 
   return test;
