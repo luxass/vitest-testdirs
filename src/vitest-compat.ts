@@ -129,30 +129,13 @@ function loadSuiteFromSuite(): boolean {
   return false;
 }
 
-function ensureLoadedSuite(): void {
-  if (loadedSuite) {
-    return;
-  }
-
-  const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuite();
-  if (!loaded) {
-    throw new Error("getCurrentSuite must be called inside Vitest context");
-  }
-}
-
-function ensureLoadedTest(): void {
-  if (loadedTest) {
-    return;
-  }
-
-  const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuite();
-  if (!loaded) {
-    throw new Error("getCurrentTest must be called inside Vitest context");
-  }
-}
-
 function getSuiteGetter(): CurrentSuiteGetter {
-  ensureLoadedSuite();
+  if (!loadedSuite) {
+    const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuite();
+    if (!loaded) {
+      throw new Error("getCurrentSuite must be called inside Vitest context");
+    }
+  }
   if (!currentSuiteGetter) {
     throw new Error("getCurrentSuite must be called inside Vitest context");
   }
@@ -161,7 +144,12 @@ function getSuiteGetter(): CurrentSuiteGetter {
 }
 
 function getTestGetter(): CurrentTestGetter {
-  ensureLoadedTest();
+  if (!loadedTest) {
+    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuite();
+    if (!loaded) {
+      throw new Error("getCurrentTest must be called inside Vitest context");
+    }
+  }
   if (!currentTestGetter) {
     throw new Error("getCurrentTest must be called inside Vitest context");
   }
