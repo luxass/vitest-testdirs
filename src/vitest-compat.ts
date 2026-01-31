@@ -136,7 +136,7 @@ function ensureLoadedSuite(): void {
 
   const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuite();
   if (!loaded) {
-    throw new Error("getCurrentSuite must be called inside vitest context");
+    throw new Error("getCurrentSuite must be called inside Vitest context");
   }
 }
 
@@ -147,14 +147,14 @@ function ensureLoadedTest(): void {
 
   const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuite();
   if (!loaded) {
-    throw new Error("getCurrentTest must be called inside vitest context");
+    throw new Error("getCurrentTest must be called inside Vitest context");
   }
 }
 
 function getSuiteGetter(): CurrentSuiteGetter {
   ensureLoadedSuite();
   if (!currentSuiteGetter) {
-    throw new Error("getCurrentSuite must be called inside vitest context");
+    throw new Error("getCurrentSuite must be called inside Vitest context");
   }
 
   return currentSuiteGetter;
@@ -163,7 +163,7 @@ function getSuiteGetter(): CurrentSuiteGetter {
 function getTestGetter(): CurrentTestGetter {
   ensureLoadedTest();
   if (!currentTestGetter) {
-    throw new Error("getCurrentTest must be called inside vitest context");
+    throw new Error("getCurrentTest must be called inside Vitest context");
   }
 
   return currentTestGetter;
@@ -172,7 +172,7 @@ function getTestGetter(): CurrentTestGetter {
 export function getCurrentSuite(): SuiteCollector {
   const suite = getSuiteGetter()();
   if (!suite) {
-    throw new Error("getCurrentSuite must be called inside vitest context");
+    throw new Error("getCurrentSuite must be called inside Vitest context");
   }
 
   return suite;
@@ -181,7 +181,7 @@ export function getCurrentSuite(): SuiteCollector {
 export function getCurrentTest(): RunnerTask {
   const test = getTestGetter()();
   if (!test) {
-    throw new Error("getCurrentTest must be called inside vitest context");
+    throw new Error("getCurrentTest must be called inside Vitest context");
   }
 
   return test;
