@@ -1,8 +1,8 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { createRequire } from "node:module";
 
-type CurrentSuiteGetter = () => SuiteCollector;
-type CurrentTestGetter = () => RunnerTask;
+type CurrentSuiteGetter = () => SuiteCollector | undefined;
+type CurrentTestGetter = () => RunnerTask | undefined;
 
 let currentSuiteGetter: CurrentSuiteGetter | null = null;
 let currentTestGetter: CurrentTestGetter | null = null;
@@ -123,28 +123,18 @@ function loadSuiteFromSuiteModule(): boolean {
   }
 }
 
-function getSuiteGetter(): CurrentSuiteGetter {
+export function getCurrentSuite(): SuiteCollector {
   if (!loadedSuite) {
     const loaded = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     if (!loaded) {
       throw new Error("Failed to load Vitest suite methods");
     }
   }
-  return currentSuiteGetter!;
-}
-
-function getTestGetter(): CurrentTestGetter {
-  if (!loadedTest) {
-    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
-    if (!loaded) {
-      throw new Error("Failed to load Vitest test methods");
-    }
+  if (!currentSuiteGetter) {
+    throw new Error("Vitest suite getter was not initialized");
   }
-  return currentTestGetter!;
-}
 
-export function getCurrentSuite(): SuiteCollector {
-  const suite = getSuiteGetter()();
+  const suite = currentSuiteGetter();
   if (!suite) {
     throw new Error("getCurrentSuite called outside an active suite context");
   }
@@ -153,7 +143,17 @@ export function getCurrentSuite(): SuiteCollector {
 }
 
 export function getCurrentTest(): RunnerTask {
-  const test = getTestGetter()();
+  if (!loadedTest) {
+    const loaded = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
+    if (!loaded) {
+      throw new Error("Failed to load Vitest test methods");
+    }
+  }
+  if (!currentTestGetter) {
+    throw new Error("Vitest test getter was not initialized");
+  }
+
+  const test = currentTestGetter();
   if (!test) {
     throw new Error("getCurrentTest called outside an active test context");
   }
