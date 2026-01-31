@@ -5,7 +5,7 @@ import { expect } from "vitest";
 import {
   BASE_DIR,
 } from "./constants";
-import { getCurrentSuite, getCurrentTest } from "./vitest-runner";
+import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
 
 /**
  * Regular expression that matches any character that is not a word character or hyphen.

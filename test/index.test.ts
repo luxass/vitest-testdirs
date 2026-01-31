@@ -12,7 +12,7 @@ import {
   testdir,
 } from "../src";
 import { createDirnameFromTask } from "../src/utils";
-import { getCurrentSuite, getCurrentTest } from "../src/vitest-runner";
+import { getCurrentSuite, getCurrentTest } from "../src/vitest-compat";
 
 function cleanup(path: string) {
   onTestFinished(async () => {

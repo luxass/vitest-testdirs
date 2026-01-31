@@ -6,22 +6,51 @@ type CurrentTestGetter = () => RunnerTask | undefined;
 
 let currentSuiteGetter: CurrentSuiteGetter | null = null;
 let currentTestGetter: CurrentTestGetter | null = null;
+
 const require = createRequire(import.meta.url);
 
-function loadFromRunner(): boolean {
+function loadFromVitest(): boolean {
   try {
-    const runners = require("vitest/runners") as Record<string, unknown>;
-    const Runner = runners.TestRunner || runners.VitestTestRunner;
-    if (Runner && (typeof Runner === "function" || typeof Runner === "object")) {
-      const runner = Runner as {
+    const vitest = require("vitest") as {
+      TestRunner?: {
         getCurrentSuite?: CurrentSuiteGetter;
         getCurrentTest?: CurrentTestGetter;
       };
-      if (typeof runner.getCurrentSuite === "function" && typeof runner.getCurrentTest === "function") {
-        currentSuiteGetter = runner.getCurrentSuite.bind(runner);
-        currentTestGetter = runner.getCurrentTest.bind(runner);
-        return true;
-      }
+    };
+    if (
+      vitest.TestRunner
+      && typeof vitest.TestRunner.getCurrentSuite === "function"
+      && typeof vitest.TestRunner.getCurrentTest === "function"
+    ) {
+      currentSuiteGetter = vitest.TestRunner.getCurrentSuite;
+      currentTestGetter = vitest.TestRunner.getCurrentTest;
+      return true;
+    }
+  } catch {
+    return false;
+  }
+
+  return false;
+}
+
+function loadFromRunners(): boolean {
+  try {
+    const runners = require("vitest/runners") as Record<string, unknown>;
+    const runnerModule = runners as {
+      TestRunner?: {
+        getCurrentSuite?: CurrentSuiteGetter;
+        getCurrentTest?: CurrentTestGetter;
+      };
+      VitestTestRunner?: {
+        getCurrentSuite?: CurrentSuiteGetter;
+        getCurrentTest?: CurrentTestGetter;
+      };
+    };
+    const runner = runnerModule.TestRunner || runnerModule.VitestTestRunner;
+    if (runner && typeof runner.getCurrentSuite === "function" && typeof runner.getCurrentTest === "function") {
+      currentSuiteGetter = runner.getCurrentSuite;
+      currentTestGetter = runner.getCurrentTest;
+      return true;
     }
   } catch {
     return false;
@@ -53,7 +82,7 @@ function ensureLoaded(): void {
     return;
   }
 
-  if (!loadFromRunner()) {
+  if (!loadFromVitest() && !loadFromRunners()) {
     loadFromSuite();
   }
 }
