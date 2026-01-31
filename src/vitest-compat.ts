@@ -6,10 +6,8 @@ type CurrentTestGetter = () => RunnerTask | undefined;
 
 let currentSuiteGetter: CurrentSuiteGetter | null = null;
 let currentTestGetter: CurrentTestGetter | null = null;
-let loadedSuite = false;
-let loadedTest = false;
-let suiteLoadAttempted = false;
-let testLoadAttempted = false;
+let loadedSuite: boolean | null = null;
+let loadedTest: boolean | null = null;
 
 const require = createRequire(import.meta.url);
 
@@ -126,9 +124,8 @@ function loadSuiteFromSuiteModule(): boolean {
 }
 
 export function getCurrentSuite(): SuiteCollector {
-  if (!loadedSuite) {
-    if (!suiteLoadAttempted) {
-      suiteLoadAttempted = true;
+  if (loadedSuite !== true) {
+    if (loadedSuite === null) {
       loadedSuite = loadSuiteFromVitest() || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
     }
     if (!loadedSuite) {
@@ -144,9 +141,8 @@ export function getCurrentSuite(): SuiteCollector {
 }
 
 export function getCurrentTest(): RunnerTask {
-  if (!loadedTest) {
-    if (!testLoadAttempted) {
-      testLoadAttempted = true;
+  if (loadedTest !== true) {
+    if (loadedTest === null) {
       loadedTest = loadTestFromVitest() || loadTestFromRunners() || loadTestFromSuiteModule();
     }
     if (!loadedTest) {
