@@ -20,13 +20,14 @@ function loadFromVitest(): boolean {
       };
     };
     let loaded = false;
-    if (vitest.TestRunner && typeof vitest.TestRunner.getCurrentSuite === "function") {
-      currentSuiteGetter = vitest.TestRunner.getCurrentSuite;
+    const testRunner = vitest.TestRunner;
+    if (testRunner && typeof testRunner.getCurrentSuite === "function") {
+      currentSuiteGetter = testRunner.getCurrentSuite;
       loadedSuite = true;
       loaded = true;
     }
-    if (vitest.TestRunner && typeof vitest.TestRunner.getCurrentTest === "function") {
-      currentTestGetter = vitest.TestRunner.getCurrentTest;
+    if (testRunner && typeof testRunner.getCurrentTest === "function") {
+      currentTestGetter = testRunner.getCurrentTest;
       loadedTest = true;
       loaded = true;
     }
