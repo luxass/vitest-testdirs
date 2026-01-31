@@ -11,7 +11,7 @@ let loadedTest: boolean | null = null;
 
 const require = createRequire(import.meta.url);
 
-function loadFromVitest(loader: "suite" | "test" | "both"): boolean {
+function loadFromVitest(loader: "suite" | "test"): boolean {
   try {
     const vitest = require("vitest") as {
       TestRunner?: {
@@ -20,45 +20,21 @@ function loadFromVitest(loader: "suite" | "test" | "both"): boolean {
       };
     };
     const testRunner = vitest.TestRunner;
-    let suiteLoaded = false;
-    let testLoaded = false;
-    if (testRunner) {
-      if (loader !== "test" && typeof testRunner.getCurrentSuite === "function") {
-        currentSuiteGetter = testRunner.getCurrentSuite;
-        loadedSuite = true;
-        suiteLoaded = true;
-      }
-      if (loader !== "suite" && typeof testRunner.getCurrentTest === "function") {
-        currentTestGetter = testRunner.getCurrentTest;
-        loadedTest = true;
-        testLoaded = true;
-      }
+    if (!testRunner) {
+      return false;
     }
+
     if (loader === "suite") {
-      return suiteLoaded;
+      if (typeof testRunner.getCurrentSuite === "function") {
+        currentSuiteGetter = testRunner.getCurrentSuite!;
+        loadedSuite = true;
+        return true;
+      }
+      return false;
     }
-    if (loader === "test") {
-      return testLoaded;
-    }
-    return suiteLoaded && testLoaded;
-  } catch {
-    return false;
-  }
-}
 
-function loadTestFromRunners(): boolean {
-  try {
-    const runnerModule = require("vitest/runners") as {
-      TestRunner?: {
-        getCurrentTest?: CurrentTestGetter;
-      };
-      VitestTestRunner?: {
-        getCurrentTest?: CurrentTestGetter;
-      };
-    };
-    const runner = runnerModule.TestRunner || runnerModule.VitestTestRunner;
-    if (runner && typeof runner.getCurrentTest === "function") {
-      currentTestGetter = runner.getCurrentTest;
+    if (typeof testRunner.getCurrentTest === "function") {
+      currentTestGetter = testRunner.getCurrentTest!;
       loadedTest = true;
       return true;
     }
@@ -68,54 +44,29 @@ function loadTestFromRunners(): boolean {
   }
 }
 
-function loadSuiteFromRunners(): boolean {
-  try {
-    const runnerModule = require("vitest/runners") as {
-      TestRunner?: {
-        getCurrentSuite?: CurrentSuiteGetter;
-      };
-      VitestTestRunner?: {
-        getCurrentSuite?: CurrentSuiteGetter;
-      };
-    };
-    const runner = runnerModule.TestRunner || runnerModule.VitestTestRunner;
-    if (runner && typeof runner.getCurrentSuite === "function") {
-      currentSuiteGetter = runner.getCurrentSuite;
-      loadedSuite = true;
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-function loadTestFromSuiteModule(): boolean {
-  try {
-    const suite = require("vitest/suite") as {
-      getCurrentTest?: CurrentTestGetter;
-    };
-    if (typeof suite.getCurrentTest === "function") {
-      currentTestGetter = suite.getCurrentTest;
-      loadedTest = true;
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-function loadSuiteFromSuiteModule(): boolean {
+function loadFromSuiteModule(loader: "suite" | "test"): boolean {
   try {
     const suite = require("vitest/suite") as {
       getCurrentSuite?: CurrentSuiteGetter;
+      getCurrentTest?: CurrentTestGetter;
     };
-    if (typeof suite.getCurrentSuite === "function") {
-      currentSuiteGetter = suite.getCurrentSuite;
-      loadedSuite = true;
+
+    if (loader === "suite") {
+      if (typeof suite.getCurrentSuite === "function") {
+        currentSuiteGetter = suite.getCurrentSuite!;
+        loadedSuite = true;
+        return true;
+      }
+
+      return false;
+    }
+
+    if (typeof suite.getCurrentTest === "function") {
+      currentTestGetter = suite.getCurrentTest!;
+      loadedTest = true;
       return true;
     }
+
     return false;
   } catch {
     return false;
@@ -123,14 +74,13 @@ function loadSuiteFromSuiteModule(): boolean {
 }
 
 export function getCurrentSuite(): SuiteCollector {
-  if (loadedSuite !== true) {
-    if (loadedSuite === null) {
-      loadedSuite = loadFromVitest("suite") || loadSuiteFromRunners() || loadSuiteFromSuiteModule();
-    }
-    if (!loadedSuite) {
-      throw new Error("Failed to load Vitest suite methods");
-    }
+  if (loadedSuite === null) {
+    loadedSuite = loadFromVitest("suite") || loadFromSuiteModule("suite");
   }
+  if (loadedSuite !== true) {
+    throw new Error("Failed to load Vitest suite methods");
+  }
+
   const suite = currentSuiteGetter!();
   if (!suite) {
     throw new Error("getCurrentSuite called outside an active suite context");
@@ -140,14 +90,13 @@ export function getCurrentSuite(): SuiteCollector {
 }
 
 export function getCurrentTest(): RunnerTask {
-  if (loadedTest !== true) {
-    if (loadedTest === null) {
-      loadedTest = loadFromVitest("test") || loadTestFromRunners() || loadTestFromSuiteModule();
-    }
-    if (!loadedTest) {
-      throw new Error("Failed to load Vitest test methods");
-    }
+  if (loadedTest === null) {
+    loadedTest = loadFromVitest("test") || loadFromSuiteModule("test");
   }
+  if (loadedTest !== true) {
+    throw new Error("Failed to load Vitest test methods");
+  }
+
   const test = currentTestGetter!();
   if (!test) {
     throw new Error("getCurrentTest called outside an active test context");
