@@ -136,11 +136,7 @@ function getSuiteGetter(): CurrentSuiteGetter {
       throw new Error("Failed to load Vitest suite methods");
     }
   }
-  if (!currentSuiteGetter) {
-    throw new Error("Vitest suite getter was not initialized");
-  }
-
-  return currentSuiteGetter;
+  return currentSuiteGetter!;
 }
 
 function getTestGetter(): CurrentTestGetter {
@@ -150,11 +146,7 @@ function getTestGetter(): CurrentTestGetter {
       throw new Error("Failed to load Vitest test methods");
     }
   }
-  if (!currentTestGetter) {
-    throw new Error("Vitest test getter was not initialized");
-  }
-
-  return currentTestGetter;
+  return currentTestGetter!;
 }
 
 export function getCurrentSuite(): SuiteCollector {
