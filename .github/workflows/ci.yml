@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         node: [22, 24]
-        vitest: [3.0.0, 3.2.4, 4.1.0-beta.2, latest]
+        vitest: [3.0.0, 3.2.4, 4.0.18, latest]
         os:
           - ubuntu-latest
           - macos-latest
@@ -77,15 +77,4 @@ jobs:
         run: pnpm add -D vitest@${{ matrix.vitest }} @vitest/coverage-v8@${{ matrix.vitest }}
 
       - name: test
-        if: matrix.os != 'ubuntu-latest' && matrix.node != 22 && matrix.vitest != 'latest'
         run: pnpm test
-
-      - name: test with coverage
-        if: matrix.os == 'ubuntu-latest' || matrix.node == 22 || matrix.vitest == 'latest'
-        run: pnpm test --coverage
-
-      - name: upload coverage reports to codecov
-        if: matrix.os == 'ubuntu-latest' || matrix.node == 22 || matrix.vitest == 'latest'
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
