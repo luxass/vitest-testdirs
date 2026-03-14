@@ -14,6 +14,9 @@ import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
  * - Global flag (g) enables matching all occurrences
  */
 const DIR_REGEX = /[^\w\-]+/g;
+const TEST_FILE_REGEX = /\.test\.ts$/;
+const MULTI_HYPHEN_REGEX = /-{2,}/g;
+const TRAILING_HYPHEN_REGEX = /-+$/;
 
 /**
  * Checks if the code is currently running within a Vitest test environment.
@@ -53,19 +56,19 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
       .replace(`${process.cwd()}/`, "")
       .split("/")
       .pop()!
-      .replace(/\.test\.ts$/, "")
+      .replace(TEST_FILE_REGEX, "")
       .replace(DIR_REGEX, "-");
 
     const dirName = `vitest-${fileName}-${suiteName.replace(DIR_REGEX, "-")}`;
 
     // trim trailing hyphen and multiple hyphens
-    return dirName.replace(/-{2,}/g, "-").replace(/-+$/, "");
+    return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
   }
 
   const fileName = (suiteOrTest.file?.name || "unnamed")
     .split("/")
     .pop()!
-    .replace(/\.test\.ts$/, "")
+    .replace(TEST_FILE_REGEX, "")
     .replace(DIR_REGEX, "-");
   const name = suiteOrTest.name || "unnamed test";
 
@@ -79,7 +82,7 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
   }
 
   // trim trailing hyphen and multiple hyphens
-  return dirName.replace(/-{2,}/g, "-").replace(/-+$/, "");
+  return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
 }
 
 /**
