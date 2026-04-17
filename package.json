@@ -54,7 +54,7 @@
     "eslint-plugin-format": "^2.0.1",
     "publint": "^0.3.18",
     "tsdown": "^0.21.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.0",
     "vitest": "^4.1.0"
   }
 }
