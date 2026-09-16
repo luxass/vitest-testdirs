@@ -8,6 +8,8 @@ let currentTestGetter: CurrentTestGetter | null = null;
 let loadedSuite: boolean | null = null;
 let loadedTest: boolean | null = null;
 
+const VITEST_SUITE_SPECIFIER = "vitest/suite";
+
 async function tryLoad() {
   try {
     const vitest = (await import("vitest")) as typeof import("vitest") & {
@@ -38,8 +40,21 @@ async function tryLoad() {
     return;
   }
 
+  await tryLoadSuiteFallback();
+
+  loadedSuite ??= false;
+  loadedTest ??= false;
+}
+
+async function tryLoadSuiteFallback() {
   try {
-    const suite = await import("vitest/suite");
+    // `vitest/suite` only exists in Vitest 3 and 4. The specifier lives in a
+    // variable so neither bundlers nor TypeScript resolve it statically,
+    // which would fail under Vitest 5 where the subpath is gone.
+    const suite = (await import(VITEST_SUITE_SPECIFIER)) as unknown as {
+      getCurrentSuite?: CurrentSuiteGetter;
+      getCurrentTest?: CurrentTestGetter;
+    };
     if (loadedSuite !== true && typeof suite.getCurrentSuite === "function") {
       currentSuiteGetter = suite.getCurrentSuite;
       loadedSuite = true;
@@ -49,9 +64,6 @@ async function tryLoad() {
       loadedTest = true;
     }
   } catch {}
-
-  loadedSuite ??= false;
-  loadedTest ??= false;
 }
 
 // eslint-disable-next-line antfu/no-top-level-await
