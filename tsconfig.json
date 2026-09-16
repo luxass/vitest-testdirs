@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "ESNext.Disposable"],
+    "types": ["node"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
@@ -11,11 +12,6 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist"]
 }
