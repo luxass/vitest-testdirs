@@ -18,14 +18,24 @@ permissions: {}
 
 jobs:
   test:
-    name: "test (vitest: ${{ matrix.vitest }})"
+    name: "test (vitest: ${{ matrix.vitest }}, vite: ${{ matrix.vite }})"
     strategy:
       matrix:
-        vitest: ["3.0.0", "3.2.7", "4.0.0", "4.1.11", "5.0.0"]
+        include:
+          - vitest: "3.0.0"
+            vite: "6"
+          - vitest: "3.2.7"
+            vite: "6"
+          - vitest: "4.0.0"
+            vite: "7"
+          - vitest: "4.1.11"
+            vite: "8"
+          - vitest: "5.0.0"
+            vite: "8"
       fail-fast: false
     uses: luxass/shared-workflows/.github/workflows/reusable-test.yaml@a80d13d310b91d509547203435ad21b68ae47ba1 # v0.12.0
     permissions:
       contents: read
     with:
       node-version: 24
-      pre-test-script: "add --save-dev vitest@${{ matrix.vitest }} @vitest/coverage-v8@${{ matrix.vitest }}"
+      pre-test-script: "add --save-dev vitest@${{ matrix.vitest }} @vitest/coverage-v8@${{ matrix.vitest }} vite@${{ matrix.vite }}"
