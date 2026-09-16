@@ -2,34 +2,30 @@
   "name": "vitest-testdirs",
   "version": "4.4.3",
   "description": "A utility for Vitest to create isolated test directories",
-  "type": "module",
+  "keywords": [
+    "testdirs",
+    "vitest"
+  ],
+  "license": "MIT",
   "author": {
     "name": "Lucas Nørgård",
     "email": "lucasnrgaard@gmail.com",
     "url": "https://luxass.dev"
   },
-  "packageManager": "pnpm@12.4.1",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luxass/vitest-testdirs.git"
   },
-  "keywords": [
-    "vitest",
-    "testdirs"
+  "files": [
+    "dist"
   ],
+  "type": "module",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
     "./helpers": "./dist/helpers.mjs",
     "./vitest": "./dist/vitest.mjs",
     "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.mts",
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=24"
   },
   "scripts": {
     "build": "tsdown",
@@ -41,9 +37,6 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "vitest": ">=3.0.0 <4.0.0 || >=4.0.0 <5.0.0"
   },
   "dependencies": {
     "testdirs": "catalog:",
@@ -59,5 +52,12 @@
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
-  }
+  },
+  "peerDependencies": {
+    "vitest": ">=3.0.0 <4.0.0 || >=4.0.0 <5.0.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.4.1"
 }

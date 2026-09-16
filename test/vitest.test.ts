@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
 import { describe, expect } from "vitest";
+
 import { it } from "../src/vitest";
 
 describe("vitest integration", () => {
@@ -14,15 +16,20 @@ describe("vitest integration", () => {
     expect(existsSync(join(dir, "file.txt"))).toBe(true);
     expect(existsSync(join(dir, "nested/file.json"))).toBe(true);
     expect(readFileSync(join(dir, "file.txt"), "utf-8")).toBe("Hello World");
-    expect(JSON.parse(readFileSync(join(dir, "nested/file.json"), "utf-8"))).toEqual({ key: "value" });
+    expect(JSON.parse(readFileSync(join(dir, "nested/file.json"), "utf-8"))).toEqual({
+      key: "value",
+    });
   });
 
   it("should allow overriding options per testdir call", async ({ testdir }) => {
-    const dir = await testdir({
-      "file.txt": "Hello World",
-    }, {
-      dirname: "override-dir",
-    });
+    const dir = await testdir(
+      {
+        "file.txt": "Hello World",
+      },
+      {
+        dirname: "override-dir",
+      },
+    );
 
     expect(dir).toContain("override-dir");
   });

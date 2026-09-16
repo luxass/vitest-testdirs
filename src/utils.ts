@@ -1,10 +1,10 @@
-import type { RunnerTask, SuiteCollector } from "vitest";
 import { join, normalize } from "node:path";
 import process from "node:process";
+
+import type { RunnerTask, SuiteCollector } from "vitest";
 import { expect } from "vitest";
-import {
-  BASE_DIR,
-} from "./constants";
+
+import { BASE_DIR } from "./constants";
 import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
 
 /**

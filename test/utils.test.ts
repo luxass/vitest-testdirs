@@ -1,5 +1,6 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { describe, expect, it } from "vitest";
+
 import { createDirnameFromTask } from "../src/utils";
 import { getCurrentSuite, getCurrentTest } from "../src/vitest-compat";
 
@@ -10,9 +11,11 @@ function createSuiteCollectorMock(name?: string) {
   } as SuiteCollector;
 }
 
-type DeepPartial<T> = T extends object ? {
-  [P in keyof T]?: DeepPartial<T[P]>;
-} : T;
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
 
 function createTestMock(name: string, extra: DeepPartial<RunnerTask> = {}) {
   return {
@@ -28,7 +31,7 @@ describe("createDirnameFromTask", () => {
     expect(createDirnameFromTask(collector)).toBe("vitest-utils-test-suite");
   });
 
-  it("should use \"unnamed suite\" for collector without name", () => {
+  it('should use "unnamed suite" for collector without name', () => {
     const collector = createSuiteCollectorMock();
     expect(createDirnameFromTask(collector)).toBe("vitest-utils-unnamed-suite");
   });
@@ -69,34 +72,47 @@ describe("createDirnameFromTask", () => {
   });
 
   it("should work with vitest current suite helpers", () => {
-    expect(createDirnameFromTask(getCurrentTest() || getCurrentSuite())).toBe("vitest-utils-createDirnameFromTask-should-work-with-vitest-current-suite-helpers");
+    expect(createDirnameFromTask(getCurrentTest() || getCurrentSuite())).toBe(
+      "vitest-utils-createDirnameFromTask-should-work-with-vitest-current-suite-helpers",
+    );
   });
 
   it("should remove '.test.ts' from the file name", () => {
     const task = createTestMock("should remove '.test.ts' from the file name", {
       file: { name: "utils.test.ts" },
     });
-    expect(createDirnameFromTask(task)).toBe("vitest-utils-should-remove-test-ts-from-the-file-name");
+    expect(createDirnameFromTask(task)).toBe(
+      "vitest-utils-should-remove-test-ts-from-the-file-name",
+    );
   });
 
   it("should replace non-alphanumeric characters with '-'", () => {
-    const task = createTestMock("should replace ........ æøå non-alphanumeric characters with '-'", {
-      file: { name: "utils.test.ts" },
-    });
-    expect(createDirnameFromTask(task)).toBe("vitest-utils-should-replace-non-alphanumeric-characters-with");
+    const task = createTestMock(
+      "should replace ........ æøå non-alphanumeric characters with '-'",
+      {
+        file: { name: "utils.test.ts" },
+      },
+    );
+    expect(createDirnameFromTask(task)).toBe(
+      "vitest-utils-should-replace-non-alphanumeric-characters-with",
+    );
   });
 
   it("should replace trailing hyphens with nothing", () => {
     const task = createTestMock("should replace trailing hyphens with nothing-", {
       file: { name: "utils.test.ts" },
     });
-    expect(createDirnameFromTask(task)).toBe("vitest-utils-should-replace-trailing-hyphens-with-nothing");
+    expect(createDirnameFromTask(task)).toBe(
+      "vitest-utils-should-replace-trailing-hyphens-with-nothing",
+    );
   });
 
   it("should replace multiple hyphens with a single hyphen", () => {
     const task = createTestMock("should replace multiple---hyphens with a single hyphen---", {
       file: { name: "utils.test.ts" },
     });
-    expect(createDirnameFromTask(task)).toBe("vitest-utils-should-replace-multiple-hyphens-with-a-single-hyphen");
+    expect(createDirnameFromTask(task)).toBe(
+      "vitest-utils-should-replace-multiple-hyphens-with-a-single-hyphen",
+    );
   });
 });

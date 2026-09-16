@@ -19,8 +19,9 @@
  */
 
 import type { TestAPI, TestContext } from "vitest";
-import type { DirectoryJSON, TestdirOptions } from "./index";
 import { test as baseTest } from "vitest";
+
+import type { DirectoryJSON, TestdirOptions } from "./index";
 import { testdir } from "./index";
 
 interface TestWithOptionsContext extends TestContext {

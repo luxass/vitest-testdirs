@@ -36,7 +36,7 @@ async function tryLoad() {
   }
 
   try {
-    const suite = (await import("vitest/suite"));
+    const suite = await import("vitest/suite");
     if (loadedSuite !== true && typeof suite.getCurrentSuite === "function") {
       currentSuiteGetter = suite.getCurrentSuite;
       loadedSuite = true;

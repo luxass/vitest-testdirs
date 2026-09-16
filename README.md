@@ -51,9 +51,12 @@ import { testdir, withMetadata } from "../src";
 it("windows", async () => {
   const path = await testdir({
     "file.txt": withMetadata("Hello, World!", { mode: 0o444 }), // This works
-    "nested": withMetadata({
-      "file.txt": "Hello, World!",
-    }, { mode: 0o555 }), // This doesn't work.
+    nested: withMetadata(
+      {
+        "file.txt": "Hello, World!",
+      },
+      { mode: 0o555 },
+    ), // This doesn't work.
   });
 
   try {
