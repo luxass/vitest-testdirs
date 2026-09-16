@@ -125,16 +125,17 @@ export const testdir = createCustomTestdir(
     });
 
     if (options?.cleanup ?? true) {
-      if (test != null) {
-        onTestFinished(async () => {
-          await remove();
-        });
-      } else if (suite != null) {
+      if (test == null) {
+        if (suite == null) {
+          throw new Error("testdir must be called inside vitest context");
+        }
         afterAll(async () => {
           await remove();
         });
       } else {
-        throw new Error("testdir must be called inside vitest context");
+        onTestFinished(async () => {
+          await remove();
+        });
       }
     }
 

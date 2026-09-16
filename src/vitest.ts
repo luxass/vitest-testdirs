@@ -32,12 +32,13 @@ interface VitestTestExtended {
   testdir: (files?: DirectoryJSON, options?: TestdirOptions) => Promise<string>;
 }
 
+const testdirFn = (files?: DirectoryJSON, options?: TestdirOptions) => {
+  return testdir(files, options);
+};
+
 export const test: TestAPI<VitestTestExtended> = baseTest.extend<VitestTestExtended>({
   // eslint-disable-next-line no-empty-pattern
   testdir: async ({}, use) => {
-    const testdirFn = async (files?: DirectoryJSON, options?: TestdirOptions) => {
-      return testdir(files, options);
-    };
     await use(testdirFn);
   },
 });

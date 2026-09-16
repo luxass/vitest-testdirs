@@ -60,6 +60,7 @@ describe("symlinks", () => {
     it("should not detect other objects", () => {
       expect(isSymlink({})).toBe(false);
       expect(isSymlink(null)).toBe(false);
+      // oxlint-disable-next-line unicorn/no-useless-undefined
       expect(isSymlink(undefined)).toBe(false);
       expect(isSymlink("")).toBe(false);
       expect(isSymlink(123)).toBe(false);
@@ -111,6 +112,7 @@ describe("links", () => {
     it("should not detect other objects", () => {
       expect(isLink({})).toBe(false);
       expect(isLink(null)).toBe(false);
+      // eslint-disable-next-line unicorn/no-useless-undefined -- intentionally passing undefined at runtime
       expect(isLink(undefined)).toBe(false);
       expect(isLink("")).toBe(false);
       expect(isLink(123)).toBe(false);
@@ -182,6 +184,7 @@ describe("metadata", () => {
     it("should not detect other objects", () => {
       expect(hasMetadata({})).toBe(false);
       expect(hasMetadata(null)).toBe(false);
+      // eslint-disable-next-line unicorn/no-useless-undefined -- intentionally passing undefined at runtime
       expect(hasMetadata(undefined)).toBe(false);
       expect(hasMetadata("")).toBe(false);
       expect(hasMetadata(123)).toBe(false);
@@ -209,6 +212,7 @@ describe("isPrimitive", () => {
 
   it("should detect null and undefined", () => {
     expect(isPrimitive(null)).toBe(true);
+    // eslint-disable-next-line unicorn/no-useless-undefined -- intentionally passing undefined at runtime
     expect(isPrimitive(undefined)).toBe(true);
   });
 

@@ -66,9 +66,9 @@ describe("testdir", () => {
     // we need to have the onTestFinished callback before calling testdir
     // otherwise the order that they are called is testdir first, and then ours.
     // which means that our onTestFinished callback will be called before the one from testdir
-    onTestFinished(() => {
-      const dirname = createDirnameFromTask(getCurrentTest() || getCurrentSuite());
-      expect(fsAsync.readdir(dirname)).rejects.toThrow();
+    onTestFinished(async () => {
+      const dirname = createDirnameFromTask(getCurrentTest() ?? getCurrentSuite());
+      await expect(fsAsync.readdir(dirname)).rejects.toThrow();
     });
 
     const dirname = await testdir(files, {
@@ -95,7 +95,7 @@ describe("testdir", () => {
       testdir(files, {
         dirname: "../testdir",
       }),
-    ).rejects.toThrowError("The directory name must start with '.vitest-testdirs'");
+    ).rejects.toThrow("The directory name must start with '.vitest-testdirs'");
   });
 
   it("should create a test directory with with symlinks", async () => {
@@ -253,7 +253,7 @@ describe("createFileTree", () => {
         },
       };
 
-      await expect(createFileTree(path, files)).rejects.toThrowError("EACCES: permission denied");
+      await expect(createFileTree(path, files)).rejects.toThrow("EACCES: permission denied");
 
       const file1Content = await fsAsync.readFile(resolve(path, "file1.txt"), "utf-8");
       expect(file1Content).toBe("Hello, world!");
@@ -272,13 +272,13 @@ describe("createFileTree", () => {
 
       // because the dir has a non writable permission, it should throw an error
       // because we can't create the file inside the dir
-      await expect(
-        fsAsync.readFile(resolve(path, "dir1/dir2/file3.txt"), "utf-8"),
-      ).rejects.toThrowError("ENOENT: no such file or directory");
+      await expect(fsAsync.readFile(resolve(path, "dir1/dir2/file3.txt"), "utf-8")).rejects.toThrow(
+        "ENOENT: no such file or directory",
+      );
 
       await expect(
         fsAsync.writeFile(resolve(path, "dir1/dir2/file3.txt"), "Hello, world!"),
-      ).rejects.toThrowError("EACCES: permission denied");
+      ).rejects.toThrow("EACCES: permission denied");
     },
   );
 });
@@ -360,7 +360,7 @@ describe("create mapping of fs contents", () => {
         "README.md": "# vitest-testdirs\n",
         nested: {
           "README.md": "# Nested Fixture Folder\n",
-          // TODO: use buffer after https://github.com/luxass/vitest-testdirs/issues/66 is fixed
+          // NOTE: use buffer after https://github.com/luxass/vitest-testdirs/issues/66 is fixed
           // "image.txt": Buffer.from([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33, 10]),
           "image.txt": "Hello, World!\n",
         },
@@ -432,7 +432,8 @@ describe("withMetadata encoding tests", () => {
   });
 
   it("should create files with base64 encoding using withMetadata", async () => {
-    const base64Content = "SGVsbG8sIEJhc2U2NCE="; // "Hello, Base64!" in base64
+    // "Hello, Base64!" in base64
+    const base64Content = "SGVsbG8sIEJhc2U2NCE=";
     const files = {
       "base64-file.txt": metadata(base64Content, { encoding: "base64" }),
     };
@@ -470,7 +471,8 @@ describe("withMetadata encoding tests", () => {
   it("should create files with null encoding (binary) using withMetadata", async () => {
     const binaryBuffer = new Uint8Array([
       72, 101, 108, 108, 111, 44, 32, 66, 105, 110, 97, 114, 121, 33,
-    ]); // "Hello, Binary!"
+    ]);
+    // "Hello, Binary!"
     const files = {
       "null-encoding-file.bin": metadata(binaryBuffer, { encoding: null }),
     };

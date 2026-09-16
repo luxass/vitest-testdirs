@@ -11,7 +11,10 @@ let loadedTest: boolean | null = null;
 async function tryLoad() {
   try {
     const vitest = (await import("vitest")) as typeof import("vitest") & {
-      TestRunner?: any;
+      TestRunner?: {
+        getCurrentSuite?: CurrentSuiteGetter;
+        getCurrentTest?: CurrentTestGetter;
+      };
     };
     const testRunner = vitest?.TestRunner;
 
@@ -47,8 +50,8 @@ async function tryLoad() {
     }
   } catch {}
 
-  if (loadedSuite === null) loadedSuite = false;
-  if (loadedTest === null) loadedTest = false;
+  loadedSuite ??= false;
+  loadedTest ??= false;
 }
 
 // eslint-disable-next-line antfu/no-top-level-await

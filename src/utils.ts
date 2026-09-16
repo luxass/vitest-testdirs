@@ -13,10 +13,10 @@ import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
  * - Matches any character that is not [A-Za-z0-9_-]
  * - Global flag (g) enables matching all occurrences
  */
-const DIR_REGEX = /[^\w\-]+/g;
-const TEST_FILE_REGEX = /\.test\.ts$/;
-const MULTI_HYPHEN_REGEX = /-{2,}/g;
-const TRAILING_HYPHEN_REGEX = /-+$/;
+const DIR_REGEX = /[^\w-]+/gu;
+const TEST_FILE_REGEX = /\.test\.ts$/u;
+const MULTI_HYPHEN_REGEX = /-{2,}/gu;
+const TRAILING_HYPHEN_REGEX = /-+$/u;
 
 /**
  * Checks if the code is currently running within a Vitest test environment.
@@ -52,7 +52,7 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
   if (suiteOrTest.type === "collector") {
     const suiteName = suiteOrTest.name || "unnamed suite";
 
-    const fileName = (expect.getState().testPath || "unnamed")
+    const fileName = (expect.getState().testPath ?? "unnamed")
       .replace(`${process.cwd()}/`, "")
       .split("/")
       .pop()!
@@ -74,10 +74,10 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
 
   let dirName: string;
 
-  if (!suiteOrTest.suite) {
+  if (suiteOrTest.suite == null) {
     dirName = `vitest-${fileName}-${name.replace(DIR_REGEX, "-")}`;
   } else {
-    const suiteName = suiteOrTest.suite?.name;
+    const suiteName = suiteOrTest.suite.name;
     dirName = `vitest-${fileName}${suiteName ? `-${suiteName.replace(DIR_REGEX, "-")}-` : "-"}${name.replace(DIR_REGEX, "-")}`;
   }
 
@@ -101,9 +101,9 @@ export function internalGenerateDirname(dirname?: string): string {
     return normalize(join(BASE_DIR, dirname));
   }
 
-  const task = (test?.type === "test" ? test : suite) || suite;
+  const task = (test?.type === "test" ? test : suite) ?? suite;
 
-  if (!task) {
+  if (task == null) {
     throw new Error("testdir must be called inside vitest context");
   }
 

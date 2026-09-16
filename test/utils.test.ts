@@ -72,7 +72,7 @@ describe("createDirnameFromTask", () => {
   });
 
   it("should work with vitest current suite helpers", () => {
-    expect(createDirnameFromTask(getCurrentTest() || getCurrentSuite())).toBe(
+    expect(createDirnameFromTask(getCurrentTest() ?? getCurrentSuite())).toBe(
       "vitest-utils-createDirnameFromTask-should-work-with-vitest-current-suite-helpers",
     );
   });
