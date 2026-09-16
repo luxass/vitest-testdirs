@@ -163,13 +163,6 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
-  default:
-    testdirs:
-      specifier: 4.0.2
-      version: 4.0.2
-    zod:
-      specifier: 4.6.2
-      version: 4.6.2
   dev:
     oxfmt:
       specifier: 0.67.0
@@ -189,6 +182,13 @@ catalogs:
     typescript:
       specifier: 7.0.2
       version: 7.0.2
+  runtime:
+    testdirs:
+      specifier: 4.1.0
+      version: 4.1.0
+    zod:
+      specifier: 4.6.2
+      version: 4.6.2
   testing:
     '@vitest/coverage-v8':
       specifier: 4.1.0
@@ -206,10 +206,10 @@ importers:
   .:
     dependencies:
       testdirs:
-        specifier: 'catalog:'
-        version: 4.0.2
+        specifier: catalog:runtime
+        version: 4.1.0
       zod:
-        specifier: 'catalog:'
+        specifier: catalog:runtime
         version: 4.6.2
     devDependencies:
       '@types/node':
@@ -1264,9 +1264,9 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  testdirs@4.0.2:
-    resolution: {integrity: sha512-MzZDgbUt4yPmi/rwEZXUZZ912y/pmVqtE+G9YAOy6bfZ/7QdL0AjumpdsLUf3HH33I2jIINk5caxWSueRHok2Q==}
-    engines: {node: '>=22'}
+  testdirs@4.1.0:
+    resolution: {integrity: sha512-btPisnMUPpIvxCSd/tE33mO/chnSyJ82QqtftNmXrK+kRzl1cE2XC4mkB9o1xR4qrEwXfkfwL+YzdyAPrW8DqQ==}
+    engines: {node: '>=24'}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -2121,7 +2121,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  testdirs@4.0.2:
+  testdirs@4.1.0:
     dependencies:
       zod: 4.6.2
 

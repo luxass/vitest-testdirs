@@ -5,11 +5,14 @@ catalogMode: prefer
 strictDepBuilds: true
 blockExoticSubdeps: true
 
-catalog:
-  testdirs: 4.0.2
-  zod: 4.6.2
+minimumReleaseAgeExclude:
+  - testdirs
 
 catalogs:
+  runtime:
+    testdirs: 4.1.0
+    zod: 4.6.2
+
   dev:
     oxfmt: 0.67.0
     oxlint: 1.82.0
