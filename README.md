@@ -16,6 +16,7 @@ npm install vitest-testdirs --save-dev
 // index.test.ts
 import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+
 import { describe, expect, it } from "vitest";
 import { testdir } from "vitest-testdirs";
 
@@ -43,7 +44,9 @@ It mostly happens on Directories. You can try out the following example to see t
 
 ```ts
 import { readFile, writeFile } from "node:fs/promises";
+
 import { expect, it } from "vitest";
+
 import { testdir, withMetadata } from "../src";
 
 it("windows", async () => {
