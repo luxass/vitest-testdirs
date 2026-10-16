@@ -28,7 +28,7 @@ jobs:
     name: "test (os: ${{ matrix.os }}, node: ${{ matrix.node }})"
     strategy:
       matrix:
-        node: [ 24, 26 ]
+        node: [24, 26]
         os:
           - ubuntu-latest
           - macos-latest
