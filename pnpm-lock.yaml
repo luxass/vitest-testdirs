@@ -184,8 +184,8 @@ catalogs:
       version: 7.0.2
   runtime:
     testdirs:
-      specifier: 4.1.1
-      version: 4.1.1
+      specifier: 4.1.2
+      version: 4.1.2
     zod:
       specifier: 4.6.5
       version: 4.6.5
@@ -207,7 +207,7 @@ importers:
     dependencies:
       testdirs:
         specifier: catalog:runtime
-        version: 4.1.1
+        version: 4.1.2
       zod:
         specifier: catalog:runtime
         version: 4.6.5
@@ -1255,8 +1255,8 @@ packages:
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
 
-  testdirs@4.1.1:
-    resolution: {integrity: sha512-siGvYLSPcSqn2BkfoeSd8+idr7osE8qAc27QA22V9CBXbgWo5BktZBdbRwJGdNc3vTTMCeeVnK9L7ex0LSM8AA==}
+  testdirs@4.1.2:
+    resolution: {integrity: sha512-HoSZaDSoWhFip04JlTlUhghgD4r2pnfyDLky0xn9gXM/mj8g1Uf8rmbchIlTfh15zp93FAZLkcs2usjvRR/m9Q==}
     engines: {node: '>=24'}
 
   tinybench@6.1.4:
@@ -1436,9 +1436,6 @@ packages:
   yuku-parser@0.18.1:
     resolution: {integrity: sha512-t5pANCF6k9rgJre7jk8DMAU4lEoI1oWWZgXk0fcvmCYQquFVWv0rf6Awwt56nnPiHb0E24dhtrpfgf9ChTCbrQ==}
     engines: {node: '>=14.18.0'}
-
-  zod@4.6.2:
-    resolution: {integrity: sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ==}
 
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
@@ -2100,9 +2097,9 @@ snapshots:
 
   std-env@4.2.0: {}
 
-  testdirs@4.1.1:
+  testdirs@4.1.2:
     dependencies:
-      zod: 4.6.2
+      zod: 4.6.5
 
   tinybench@6.1.4: {}
 
@@ -2241,7 +2238,5 @@ snapshots:
     dependencies:
       '@yuku-toolchain/types': 0.18.1
       yuku-core: 0.18.1
-
-  zod@4.6.2: {}
 
   zod@4.6.5: {}

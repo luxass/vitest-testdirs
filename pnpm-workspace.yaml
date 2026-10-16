@@ -10,7 +10,7 @@ minimumReleaseAgeExclude:
 
 catalogs:
   runtime:
-    testdirs: 4.1.1
+    testdirs: 4.1.2
     zod: 4.6.5
 
   dev:
