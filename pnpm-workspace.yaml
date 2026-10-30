@@ -14,11 +14,11 @@ catalogs:
     zod: 4.6.5
 
   dev:
-    oxfmt: 0.72.0
+    oxfmt: 0.74.0
     oxlint: 1.87.0
-    oxlint-tsgolint: 7.0.2004
+    oxlint-tsgolint: 7.0.2005
     publint: 0.3.25
-    tsdown: 0.23.1
+    tsdown: 0.23.2
     typescript: 7.0.2
 
   testing:
