@@ -187,8 +187,8 @@ catalogs:
       specifier: 4.1.2
       version: 4.1.2
     zod:
-      specifier: 4.6.5
-      version: 4.6.5
+      specifier: 4.6.7
+      version: 4.6.7
   testing:
     '@vitest/coverage-v8':
       specifier: 5.0.3
@@ -210,7 +210,7 @@ importers:
         version: 4.1.2
       zod:
         specifier: catalog:runtime
-        version: 4.6.5
+        version: 4.6.7
     devDependencies:
       '@types/node':
         specifier: catalog:types
@@ -1336,6 +1336,9 @@ packages:
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
+
 snapshots:
 
   '@babel/helper-string-parser@7.29.7': {}
@@ -2068,3 +2071,5 @@ snapshots:
       yuku-core: 0.18.1
 
   zod@4.6.5: {}
+
+  zod@4.6.7: {}
