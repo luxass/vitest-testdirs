@@ -89,14 +89,6 @@ const optionsSchema = z.object({
 
 export type TestdirOptions = z.input<typeof optionsSchema>;
 
-// testdirs pins its own zod version, so its `z.ZodType` can differ from ours.
-// Cast the schema to testdirs' zod type and keep our input/output types, so
-// createCustomTestdir still infers the option types. Remove this cast when
-// testdirs and this package use the same zod version again.
-type TestdirsOptionsSchema = Parameters<typeof createCustomTestdir>[1]["optionsSchema"] & {
-  _zod: { input: TestdirOptions; output: z.output<typeof optionsSchema> };
-};
-
 /**
  * Creates a test directory with the specified files and options.
  *
@@ -153,7 +145,7 @@ export const testdir = createCustomTestdir(
     dirname(options) {
       return internalGenerateDirname(options?.dirname);
     },
-    optionsSchema: optionsSchema as unknown as TestdirsOptionsSchema,
+    optionsSchema,
     extensions: {
       /**
        * Creates a test directory from an existing filesystem path
