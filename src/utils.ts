@@ -18,25 +18,19 @@ const TEST_FILE_REGEX = /\.test\.ts$/u;
 const MULTI_HYPHEN_REGEX = /-{2,}/gu;
 const TRAILING_HYPHEN_REGEX = /-+$/u;
 
-/**
- * Checks if the code is currently running within a Vitest test environment.
- * This function uses Vitest's internal getCurrentTest and getCurrentSuite functions
- * to determine if execution is happening during a test run.
- *
- * @returns {boolean} True if code is running within a Vitest test, false otherwise
- */
-export function isInVitest(): boolean {
-  try {
-    getCurrentTest();
-    return true;
-  } catch {
-    try {
-      getCurrentSuite();
-      return true;
-    } catch {
-      return false;
-    }
+/** Returns the test or suite that owns the fixture directory. */
+export function getTestdirTask(): RunnerTask | SuiteCollector {
+  const test = getCurrentTest();
+  if (test?.type === "test") {
+    return test;
   }
+
+  const suite = getCurrentSuite();
+  if (suite == null) {
+    throw new Error("testdir must be called inside vitest context");
+  }
+
+  return suite;
 }
 
 /**
@@ -57,32 +51,32 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
       .split("/")
       .pop()!
       .replace(TEST_FILE_REGEX, "")
-      .replace(DIR_REGEX, "-");
+      .replaceAll(DIR_REGEX, "-");
 
-    const dirName = `vitest-${fileName}-${suiteName.replace(DIR_REGEX, "-")}`;
+    const dirName = `vitest-${fileName}-${suiteName.replaceAll(DIR_REGEX, "-")}`;
 
     // trim trailing hyphen and multiple hyphens
-    return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
+    return dirName.replaceAll(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
   }
 
   const fileName = (suiteOrTest.file?.name || "unnamed")
     .split("/")
     .pop()!
     .replace(TEST_FILE_REGEX, "")
-    .replace(DIR_REGEX, "-");
+    .replaceAll(DIR_REGEX, "-");
   const name = suiteOrTest.name || "unnamed test";
 
   let dirName: string;
 
   if (suiteOrTest.suite == null) {
-    dirName = `vitest-${fileName}-${name.replace(DIR_REGEX, "-")}`;
+    dirName = `vitest-${fileName}-${name.replaceAll(DIR_REGEX, "-")}`;
   } else {
     const suiteName = suiteOrTest.suite.name;
-    dirName = `vitest-${fileName}${suiteName ? `-${suiteName.replace(DIR_REGEX, "-")}-` : "-"}${name.replace(DIR_REGEX, "-")}`;
+    dirName = `vitest-${fileName}${suiteName ? `-${suiteName.replaceAll(DIR_REGEX, "-")}-` : "-"}${name.replaceAll(DIR_REGEX, "-")}`;
   }
 
   // trim trailing hyphen and multiple hyphens
-  return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
+  return dirName.replaceAll(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
 }
 
 /**
@@ -94,18 +88,6 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
  * @internal
  */
 export function internalGenerateDirname(dirname?: string): string {
-  const test = getCurrentTest();
-  const suite = getCurrentSuite();
-
-  if (dirname != null) {
-    return normalize(join(BASE_DIR, dirname));
-  }
-
-  const task = (test?.type === "test" ? test : suite) ?? suite;
-
-  if (task == null) {
-    throw new Error("testdir must be called inside vitest context");
-  }
-
-  return normalize(join(BASE_DIR, createDirnameFromTask(task)));
+  const task = getTestdirTask();
+  return normalize(join(BASE_DIR, dirname ?? createDirnameFromTask(task)));
 }

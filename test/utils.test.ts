@@ -1,8 +1,7 @@
 import type { RunnerTask, SuiteCollector } from "vitest";
 import { describe, expect, it } from "vitest";
 
-import { createDirnameFromTask } from "../src/utils";
-import { getCurrentSuite, getCurrentTest } from "../src/vitest-compat";
+import { createDirnameFromTask, getTestdirTask } from "../src/utils";
 
 function createSuiteCollectorMock(name?: string) {
   return {
@@ -72,7 +71,7 @@ describe("createDirnameFromTask", () => {
   });
 
   it("should work with vitest current suite helpers", () => {
-    expect(createDirnameFromTask(getCurrentTest() ?? getCurrentSuite())).toBe(
+    expect(createDirnameFromTask(getTestdirTask())).toBe(
       "vitest-utils-createDirnameFromTask-should-work-with-vitest-current-suite-helpers",
     );
   });

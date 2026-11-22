@@ -6,8 +6,6 @@ import { join, resolve } from "node:path";
 import { describe, expect, it, onTestFinished } from "vitest";
 
 import { createFileTree, fromFileSystem, link, metadata, symlink, testdir } from "../src";
-import { createDirnameFromTask } from "../src/utils";
-import { getCurrentSuite, getCurrentTest } from "../src/vitest-compat";
 
 function cleanup(path: string) {
   onTestFinished(async () => {
@@ -63,12 +61,9 @@ describe("testdir", () => {
       "file.txt": "content",
     };
 
-    // we need to have the onTestFinished callback before calling testdir
-    // otherwise the order that they are called is testdir first, and then ours.
-    // which means that our onTestFinished callback will be called before the one from testdir
+    // Register first so the fixture's cleanup hook runs before this assertion.
     onTestFinished(async () => {
-      const dirname = createDirnameFromTask(getCurrentTest() ?? getCurrentSuite());
-      await expect(fsAsync.readdir(dirname)).rejects.toThrow();
+      await expect(fsAsync.readdir(dirname)).rejects.toMatchObject({ code: "ENOENT" });
     });
 
     const dirname = await testdir(files, {
