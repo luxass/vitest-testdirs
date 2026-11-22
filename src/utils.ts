@@ -51,32 +51,32 @@ export function createDirnameFromTask(suiteOrTest: RunnerTask | SuiteCollector):
       .split("/")
       .pop()!
       .replace(TEST_FILE_REGEX, "")
-      .replace(DIR_REGEX, "-");
+      .replaceAll(DIR_REGEX, "-");
 
-    const dirName = `vitest-${fileName}-${suiteName.replace(DIR_REGEX, "-")}`;
+    const dirName = `vitest-${fileName}-${suiteName.replaceAll(DIR_REGEX, "-")}`;
 
     // trim trailing hyphen and multiple hyphens
-    return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
+    return dirName.replaceAll(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
   }
 
   const fileName = (suiteOrTest.file?.name || "unnamed")
     .split("/")
     .pop()!
     .replace(TEST_FILE_REGEX, "")
-    .replace(DIR_REGEX, "-");
+    .replaceAll(DIR_REGEX, "-");
   const name = suiteOrTest.name || "unnamed test";
 
   let dirName: string;
 
   if (suiteOrTest.suite == null) {
-    dirName = `vitest-${fileName}-${name.replace(DIR_REGEX, "-")}`;
+    dirName = `vitest-${fileName}-${name.replaceAll(DIR_REGEX, "-")}`;
   } else {
     const suiteName = suiteOrTest.suite.name;
-    dirName = `vitest-${fileName}${suiteName ? `-${suiteName.replace(DIR_REGEX, "-")}-` : "-"}${name.replace(DIR_REGEX, "-")}`;
+    dirName = `vitest-${fileName}${suiteName ? `-${suiteName.replaceAll(DIR_REGEX, "-")}-` : "-"}${name.replaceAll(DIR_REGEX, "-")}`;
   }
 
   // trim trailing hyphen and multiple hyphens
-  return dirName.replace(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
+  return dirName.replaceAll(MULTI_HYPHEN_REGEX, "-").replace(TRAILING_HYPHEN_REGEX, "");
 }
 
 /**
