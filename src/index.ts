@@ -25,8 +25,7 @@ import { afterAll, onTestFinished } from "vitest";
 import { z } from "zod";
 
 import { BASE_DIR } from "./constants";
-import { internalGenerateDirname, isInVitest } from "./utils";
-import { getCurrentSuite, getCurrentTest } from "./vitest-compat";
+import { getTestdirTask, internalGenerateDirname } from "./utils";
 
 export {
   BASE_DIR,
@@ -95,16 +94,11 @@ export type TestdirOptions = z.input<typeof optionsSchema>;
  * @param {DirectoryJSON} files - The directory structure to create.
  * @param {TestdirOptions?} options - The options for creating the test directory.
  * @returns {Promise<string>} The path of the created test directory.
- * @throws An error if `testdir` is called outside of a test.
+ * @throws An error if `testdir` is called outside a Vitest test or suite.
  */
 export const testdir = createCustomTestdir(
   async ({ files, fixturePath, options }) => {
-    if (!isInVitest()) {
-      throw new Error("testdir must be called inside vitest context");
-    }
-
-    const test = getCurrentTest();
-    const suite = getCurrentSuite();
+    const task = getTestdirTask();
 
     const allowOutside = options?.allowOutside ?? false;
 
@@ -125,15 +119,12 @@ export const testdir = createCustomTestdir(
     });
 
     if (options?.cleanup ?? true) {
-      if (test == null) {
-        if (suite == null) {
-          throw new Error("testdir must be called inside vitest context");
-        }
-        afterAll(async () => {
+      if (task.type === "test") {
+        onTestFinished(async () => {
           await remove();
         });
       } else {
-        onTestFinished(async () => {
+        afterAll(async () => {
           await remove();
         });
       }
@@ -177,15 +168,9 @@ export const testdir = createCustomTestdir(
        * If not provided, a directory name will be generated based on the test name.
        *
        * @returns {string} The path of the current test directory.
-       * @throws An error if `testdir` is called outside of a test.
+       * @throws An error if called outside a Vitest test or suite.
        */
-      dirname: (dirname?: string): string => {
-        if (!isInVitest()) {
-          throw new Error("testdir must be called inside vitest context");
-        }
-
-        return internalGenerateDirname(dirname);
-      },
+      dirname: (dirname?: string): string => internalGenerateDirname(dirname),
     },
   },
 );

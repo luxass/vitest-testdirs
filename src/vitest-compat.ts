@@ -69,7 +69,8 @@ async function tryLoadSuiteFallback() {
 // eslint-disable-next-line antfu/no-top-level-await
 await tryLoad();
 
-export function getCurrentSuite(): SuiteCollector {
+/** Returns the active suite, if one exists. */
+export function getCurrentSuite(): SuiteCollector | undefined {
   if (loadedSuite !== true) {
     // Module should have blocked on import; if it didn't (e.g. top-level await was disabled),
     // make sure Vitest is available at module evaluation time so the internal getters can be loaded.
@@ -78,15 +79,11 @@ export function getCurrentSuite(): SuiteCollector {
     );
   }
 
-  const suite = currentSuiteGetter!();
-  if (!suite) {
-    throw new Error("getCurrentSuite called outside an active suite context");
-  }
-
-  return suite;
+  return currentSuiteGetter!();
 }
 
-export function getCurrentTest(): RunnerTask {
+/** Returns the active test, if one exists. */
+export function getCurrentTest(): RunnerTask | undefined {
   if (loadedTest !== true) {
     // Module should have blocked on import; if it didn't (e.g. top-level await was disabled),
     // make sure Vitest is available at module evaluation time so the internal getters can be loaded.
@@ -95,10 +92,5 @@ export function getCurrentTest(): RunnerTask {
     );
   }
 
-  const test = currentTestGetter!();
-  if (!test) {
-    throw new Error("getCurrentTest called outside an active test context");
-  }
-
-  return test;
+  return currentTestGetter!();
 }
